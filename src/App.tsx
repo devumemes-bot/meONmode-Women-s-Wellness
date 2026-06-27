@@ -365,7 +365,7 @@ Please confirm my order. Thank you!`;
                     {/* The image requested */}
                     <img 
                       src="https://i.postimg.cc/vcnzsNV5/Chat-GPT-Image-Jun-20-2026-10-27-35-PM.png" 
-                      alt="meONmode Women's Wellness Combo Kit" 
+                      alt="meONmode Combo Kit" 
                       className="w-full h-full object-cover rounded-xl"
                       onError={(e) => {
                         // Safe elegant fallback styling if local file doesn't exist
@@ -382,7 +382,7 @@ Please confirm my order. Thank you!`;
                             </div>
                             <div class="text-center my-auto space-y-1">
                               <h3 class="font-serif text-2xl font-bold text-white tracking-wide">meONmode®</h3>
-                              <p class="text-amber-200 text-[10px] tracking-widest uppercase">Women's Wellness Combo</p>
+                              <p class="text-amber-200 text-[10px] tracking-widest uppercase">Combo Kit</p>
                               <div class="inline-block bg-[#5C1D13]/60 px-3 py-1 rounded-xl border border-white/10 mt-1">
                                 <span class="text-[9px] text-white font-bold line-through drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹3,798</span>
                                 <span class="text-white text-sm font-bold ml-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹1,999</span>
@@ -1344,7 +1344,7 @@ Please confirm my order. Thank you!`;
                 <div className="space-y-2">
                   <h3 className="font-serif text-xl font-bold text-white">Your Cart is Empty</h3>
                   <p className="text-xs text-[#F7E7D9]/80 max-w-sm mx-auto leading-relaxed">
-                    Choose from our high-converting clinically balanced women's wellness formulas to reset your monthly cycle health.
+                    Choose from our high-converting clinically balanced meONmode formulas to reset your monthly cycle health.
                   </p>
                 </div>
                 <button 

@@ -3,7 +3,7 @@ import { Product } from './types';
 export const PRODUCTS: Product[] = [
   {
     id: 'combo-kit',
-    name: "meONmode® Women's Wellness Combo Kit",
+    name: "meONmode® Combo Kit",
     subtitle: "OVAIRA Capsules + FLOWELLE Syrup",
     price: 1999,
     mrp: 3798,
@@ -59,8 +59,8 @@ export const PRODUCTS: Product[] = [
   },
   {
     id: 'flowelle',
-    name: "meONmode® FLOWELLE Feminine Wellness Drink",
-    subtitle: "Natural Support for Women's Wellness (100% Ayurvedic, Safe & Effective)",
+    name: "meONmode® FLOWELLE Drink",
+    subtitle: "Natural Support (100% Ayurvedic, Safe & Effective)",
     price: 999,
     mrp: 1799,
     image: 'https://i.postimg.cc/hf0kMP18/Chat-GPT-Image-Jun-20-2026-10-28-00-PM.png',
