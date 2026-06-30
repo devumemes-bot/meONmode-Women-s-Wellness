@@ -187,7 +187,7 @@ Please process and confirm this parcel for dispatch.`;
 
     // Encode payload
     const encodedPayload = encodeURIComponent(textPayload);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=919350302092&text=${encodedPayload}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodedPayload}`;
 
     // Open WhatsApp in a new tab
     window.open(whatsappUrl, '_blank');
@@ -1190,7 +1190,7 @@ Please process and confirm this parcel for dispatch.`;
                   </p>
                   <div className="pt-2">
                     <a 
-                      href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20want%20to%20join%20the%20Wellness%20Club%20Group."
+                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20want%20to%20join%20the%20Wellness%20Club%20Group."
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-5 rounded-xl transition-all shadow-md hover:scale-[1.02]"
@@ -2299,7 +2299,7 @@ Please process and confirm this parcel for dispatch.`;
               </button>
               
               <a 
-                href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20wanted%20to%20follow%20up%20on%20my%20order.%20Please%20guide%20me."
+                href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20wanted%20to%20follow%20up%20on%20my%20order.%20Please%20guide%20me."
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex-grow bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm py-4 rounded-xl flex items-center justify-center gap-2"
@@ -2380,13 +2380,13 @@ Please process and confirm this parcel for dispatch.`;
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     <a 
-                      href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20would%20like%20to%20file%20a%20refund%2Freplacement%20claim." 
+                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20would%20like%20to%20file%20a%20refund%2Freplacement%20claim." 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/30 p-3 rounded-xl flex items-center gap-2 text-white font-semibold text-xs transition-colors"
                     >
                       <span className="text-base">💬</span>
-                      WhatsApp Support: +91 93503 02092
+                      WhatsApp Support: +91 72908 10336
                     </a>
                     <a 
                       href="mailto:meonmodewellness@gmail.com" 
