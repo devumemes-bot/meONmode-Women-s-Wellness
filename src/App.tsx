@@ -36,7 +36,12 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showToast, setShowToast] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<'women' | 'men'>('women');
+  const [activeCategory, setActiveCategory] = useState<'women' | 'men' | 'all'>('women');
+
+  const isMenProduct = (prod: Product | null) => {
+    if (!prod) return false;
+    return MENS_PRODUCTS.some(m => m.id === prod.id);
+  };
 
   // Form Details
   const [checkout, setCheckout] = useState<CheckoutDetails>({
@@ -49,6 +54,7 @@ export default function App() {
   const [checkoutStep, setCheckoutStep] = useState<1 | 2>(1);
   const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi'>('cod');
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [dismissedBanner, setDismissedBanner] = useState<boolean>(false);
 
   // Auto scroll to top on view changes
   useEffect(() => {
@@ -147,36 +153,41 @@ export default function App() {
       return;
     }
 
-    // Check if Flowelle is purchased
-    const hasFlowelle = cart.some(item => item.product.id === 'flowelle');
-    let flowelleProductLine = '';
-    if (hasFlowelle) {
-      flowelleProductLine = `Product: FLOWELLE Syrup (500ml)\n`;
-    }
-
     // Generate cart text details
-    const cartDetailsText = cart.map(item => 
-      `• ${item.product.name} (${item.product.volumeOrQty}) x ${item.quantity} - ₹${(item.product.price * item.quantity).toLocaleString('en-IN')}`
+    const cartSummary = cart.map(item => 
+      `${item.product.name} x ${item.quantity} - Rs. ${(item.product.price * item.quantity).toLocaleString('en-IN')}`
     ).join('\n');
 
-    const totalToPay = getCartTotal();
-    const paymentModeLabel = paymentMethod === 'upi' ? 'Pay via UPI (Scan & Pay)' : 'Cash on Delivery (COD)';
+    const subtotal = Math.round(getCartTotal() / 1.18);
+    const gst = getCartTotal() - subtotal;
+    const deliveryCharge = paymentMethod === 'cod' ? 150 : 0;
+    const finalTotal = getCartTotal() + deliveryCharge;
+
+    const codChargeLine = paymentMethod === 'cod' ? `\nCOD Charge: Rs. 150` : ``;
 
     // Create the specified WhatsApp payload
-    const textPayload = `Hello meONmode Team, I want to place an order:
-${flowelleProductLine}- Items: 
-${cartDetailsText}
-- Total Price: ₹${totalToPay.toLocaleString('en-IN')}
-- Name: ${checkout.fullName.trim()}
-- Mobile: ${checkout.phone.trim()}
-- Address: ${checkout.address.trim()}, Pincode: ${checkout.pincode.trim()}
-- Payment Method: ${paymentModeLabel}
+    const textPayload = `*NEW ORDER - meONmode*
+───────────────────────
+*Customer Delivery Details:*
+• Name: ${checkout.fullName.trim()}
+• Phone Number: ${checkout.phone.trim()}
+• Full Address: ${checkout.address.trim()}
+• Pincode: ${checkout.pincode.trim()}
 
-Please confirm my order. Thank you!`;
+*Order Summary:*
+${cartSummary}
+
+Subtotal: Rs. ${subtotal.toLocaleString('en-IN')}
+GST (18%): Rs. ${gst.toLocaleString('en-IN')}${codChargeLine}
+*Total Amount: Rs. ${finalTotal.toLocaleString('en-IN')}*
+
+*Payment Method:* ${paymentMethod === 'cod' ? 'Cash on Delivery' : 'UPI Paid'}
+───────────────────────
+Please process and confirm this parcel for dispatch.`;
 
     // Encode payload
     const encodedPayload = encodeURIComponent(textPayload);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodedPayload}`;
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=919350302092&text=${encodedPayload}`;
 
     // Open WhatsApp in a new tab
     window.open(whatsappUrl, '_blank');
@@ -192,14 +203,20 @@ Please confirm my order. Thank you!`;
 
   return (
     <div className={`min-h-screen text-[#FDFEFE] font-sans antialiased selection:bg-[#E5A93C] selection:text-[#4A1D05] transition-all duration-700 ${
-      activeCategory === 'men' 
-        ? 'bg-gradient-to-b from-[#121212] via-[#0D0D0D] to-[#181818]' 
-        : 'bg-gradient-to-b from-[#C86428] via-[#8B3B15] to-[#4A1D05]'
+      activeCategory === 'all'
+        ? 'bg-gradient-to-b from-[#2B1B15] via-[#1C110D] to-[#120B09]'
+        : activeCategory === 'men' 
+          ? 'bg-gradient-to-b from-[#121212] via-[#0D0D0D] to-[#181818]' 
+          : 'bg-gradient-to-b from-[#C86428] via-[#8B3B15] to-[#4A1D05]'
     }`}>
       
       {/* 100% Privacy Sticky Alert Bar */}
       <div className={`transition-all duration-500 text-center py-2 px-4 text-xs font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10 ${
-        activeCategory === 'men' ? 'bg-[#1C1C1C] text-[#E5A93C]' : 'bg-[#5C1D13] text-[#FDFEFE]'
+        activeCategory === 'all'
+          ? 'bg-[#1F130E] text-[#E5A93C]'
+          : activeCategory === 'men' 
+            ? 'bg-[#1C1C1C] text-[#E5A93C]' 
+            : 'bg-[#5C1D13] text-[#FDFEFE]'
       }`}>
         <Lock className="w-3.5 h-3.5 text-[#E5A93C]" />
         <span>100% Discreet Packaging. Free Shipping across India. Cash on Delivery Available.</span>
@@ -207,7 +224,11 @@ Please confirm my order. Thank you!`;
 
       {/* Global Navigation Header */}
       <header className={`sticky top-0 z-40 backdrop-blur-md border-b border-white/10 px-4 py-3 shadow-lg transition-colors duration-500 ${
-        activeCategory === 'men' ? 'bg-[#0A0A0A]/95 border-amber-500/20 shadow-amber-950/5' : 'bg-[#4A1D05]/90'
+        activeCategory === 'all'
+          ? 'bg-[#1C110D]/95 border-amber-500/15 shadow-amber-950/10'
+          : activeCategory === 'men' 
+            ? 'bg-[#0A0A0A]/95 border-amber-500/20 shadow-amber-950/5' 
+            : 'bg-[#4A1D05]/90'
       }`}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -226,6 +247,8 @@ Please confirm my order. Thank you!`;
                     } else {
                       setCurrentView('home');
                     }
+                  } else if (currentView === 'refund-policy') {
+                    setCurrentView('home');
                   }
                 }}
                 className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors flex items-center justify-center"
@@ -262,7 +285,28 @@ Please confirm my order. Thank you!`;
               >
                 Home
               </button>
-              {activeCategory === 'men' ? (
+              <button 
+                onClick={() => currentView !== 'success' && setCurrentView('refund-policy')} 
+                className={`transition-colors hover:text-[#E5A93C] ${currentView === 'refund-policy' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+              >
+                Return Policy
+              </button>
+              {activeCategory === 'all' ? (
+                <>
+                  <button 
+                    onClick={() => handleProductClick(PRODUCTS[0])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'combo-kit' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    Women's Combo
+                  </button>
+                  <button 
+                    onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'mens-combo' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    Men's Combo
+                  </button>
+                </>
+              ) : activeCategory === 'men' ? (
                 <>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
@@ -364,28 +408,39 @@ Please confirm my order. Thank you!`;
               <span className="text-xs uppercase tracking-widest font-bold font-sans text-[#E5A93C]">
                 Select Your Wellness Collection
               </span>
-              <div className="inline-flex p-1 rounded-full bg-black/45 backdrop-blur-md border border-white/10 shadow-inner shadow-black/60 relative">
+              <div className="inline-flex flex-wrap md:flex-nowrap justify-center p-1 rounded-3xl md:rounded-full bg-black/45 backdrop-blur-md border border-white/10 shadow-inner shadow-black/60 relative gap-1 md:gap-0">
                 <button
                   onClick={() => setActiveCategory('women')}
-                  className={`relative z-10 px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'women'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#C86428] to-[#8B3B15]'
                       : 'text-white/60 hover:text-white'
                   }`}
                 >
                   <span>👩</span>
-                  <span>Women's Collection</span>
+                  <span>Women's</span>
                 </button>
                 <button
                   onClick={() => setActiveCategory('men')}
-                  className={`relative z-10 px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'men'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] border border-[#D4AF37]/25'
                       : 'text-white/60 hover:text-white'
                   }`}
                 >
                   <span>🧔</span>
-                  <span>Men's Collection</span>
+                  <span>Men's</span>
+                </button>
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                    activeCategory === 'all'
+                      ? 'text-white shadow-lg bg-gradient-to-r from-[#8C5D3A] to-[#3B2314] border border-[#E5A93C]/25'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <span>✨</span>
+                  <span>All Products</span>
                 </button>
               </div>
             </div>
@@ -394,9 +449,11 @@ Please confirm my order. Thank you!`;
             
             {/* Bento Block 1: Hero Banner Section (Col Span 8) */}
             <section className={`lg:col-span-8 relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl flex flex-col justify-between transition-all duration-700 ${
-              activeCategory === 'men'
-                ? 'bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A]'
-                : 'bg-gradient-to-br from-[#8B3B15] to-[#4A1D05]'
+              activeCategory === 'all'
+                ? 'bg-gradient-to-br from-[#2B1B15] to-[#120B09]'
+                : activeCategory === 'men'
+                  ? 'bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A]'
+                  : 'bg-gradient-to-br from-[#8B3B15] to-[#4A1D05]'
             }`}>
               {/* Fallback pattern background */}
               <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#C86428_1px,transparent_1px)] [background-size:16px_16px]"></div>
@@ -405,16 +462,23 @@ Please confirm my order. Thank you!`;
                 {/* Text Sales Copy */}
                 <div className="md:col-span-7 space-y-5">
                   <div className={`inline-flex items-center gap-2 border text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full transition-colors duration-500 ${
-                    activeCategory === 'men'
-                      ? 'bg-[#E5A93C]/10 border-amber-500/30 text-[#E5A93C]'
-                      : 'bg-[#5C1D13] border-[#E5A93C]/30 text-[#E5A93C]'
+                    activeCategory === 'all'
+                      ? 'bg-[#3B2314] border-[#E5A93C]/30 text-[#E5A93C]'
+                      : activeCategory === 'men'
+                        ? 'bg-[#E5A93C]/10 border-amber-500/30 text-[#E5A93C]'
+                        : 'bg-[#5C1D13] border-[#E5A93C]/30 text-[#E5A93C]'
                   }`}>
                     <Sparkles className="w-3 h-3" />
-                    {activeCategory === 'men' ? "Premium Men's Vitality" : "Premium Ayurvedic Restoration"}
+                    {activeCategory === 'all' ? "Premium Complete Rejuvenation" : activeCategory === 'men' ? "Premium Men's Vitality" : "Premium Ayurvedic Restoration"}
                   </div>
                   
                   <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
-                    {activeCategory === 'men' ? (
+                    {activeCategory === 'all' ? (
+                      <>
+                        Peak Wellness. <br />
+                        <span className="text-[#E5A93C]">All ON Mode.</span>
+                      </>
+                    ) : activeCategory === 'men' ? (
                       <>
                         Unleash Your <br />
                         <span className="text-[#E5A93C]">MAX Mode.</span>
@@ -428,9 +492,11 @@ Please confirm my order. Thank you!`;
                   </h1>
 
                   <p className="text-white/90 text-xs sm:text-sm md:text-base leading-relaxed">
-                    {activeCategory === 'men'
-                      ? "Elevate your strength, physical stamina, and performance with clinically tested Ayurvedic herbs that support cellular energy and vital restoration."
-                      : "Say goodbye to irregular periods, painful cramps, and PCOS/PCOD issues. Nourish your system with clinically balanced herbs that target root issues for lifelong uterine wellness."}
+                    {activeCategory === 'all'
+                      ? "Nourish your entire system with our complete medical-grade Ayurvedic formulations. Experience hormone synergy, period regularity, robust stamina, and complete vigor."
+                      : activeCategory === 'men'
+                        ? "Elevate your strength, physical stamina, and performance with clinically tested Ayurvedic herbs that support cellular energy and vital restoration."
+                        : "Say goodbye to irregular periods, painful cramps, and PCOS/PCOD issues. Nourish your system with clinically balanced herbs that target root issues for lifelong uterine wellness."}
                   </p>
 
                   {/* Highlight Specs */}
@@ -475,7 +541,11 @@ Please confirm my order. Thank you!`;
                 {/* Right Hero Image Column representing 1000166066_2.jpg / Product Hero */}
                 <div className="md:col-span-5 relative flex justify-center">
                   <div className={`relative w-full max-w-[240px] md:max-w-xs rounded-2xl overflow-hidden p-1 shadow-2xl border border-white/20 transition-all duration-500 bg-gradient-to-br ${
-                    activeCategory === 'men' ? 'from-[#333333] to-[#121212]' : 'from-[#C86428] to-[#5C1D13]'
+                    activeCategory === 'all'
+                      ? 'from-[#3B2314] to-[#1F120B]'
+                      : activeCategory === 'men'
+                        ? 'from-[#333333] to-[#121212]'
+                        : 'from-[#C86428] to-[#5C1D13]'
                   }`}>
                     {/* The image requested */}
                     <img 
@@ -541,7 +611,7 @@ Please confirm my order. Thank you!`;
                     />
                     {/* Glassmorphic price tag pill */}
                     <div className="absolute top-3 right-3 bg-[#5C1D13]/90 backdrop-blur-md border-2 border-amber-400 text-white font-extrabold px-3 py-1 rounded-full text-[10px] shadow-[0_0_10px_rgba(251,191,36,0.5)] drop-shadow-md">
-                      {activeCategory === 'men' ? 'Save 51%' : 'Save 47%'}
+                      {activeCategory === 'all' ? 'Save Up to 51%' : activeCategory === 'men' ? 'Save 51%' : 'Save 47%'}
                     </div>
                   </div>
                 </div>
@@ -558,7 +628,7 @@ Please confirm my order. Thank you!`;
                 </div>
                 
                 <h2 className="font-serif text-xl sm:text-2xl font-extrabold text-white leading-tight">
-                  {activeCategory === 'men' ? "1 Lakh+ Indian Men Trust meONmode®" : "5 Lakh+ Indian Women Trust meONmode®"}
+                  {activeCategory === 'all' ? "6 Lakh+ Indians Trust meONmode®" : activeCategory === 'men' ? "1 Lakh+ Indian Men Trust meONmode®" : "5 Lakh+ Indian Women Trust meONmode®"}
                 </h2>
 
                 <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
@@ -591,7 +661,9 @@ Please confirm my order. Thank you!`;
                 </div>
 
                 <p className="text-[#F7E7D9] text-xs sm:text-sm leading-relaxed">
-                  {activeCategory === 'men' ? (
+                  {activeCategory === 'all' ? (
+                    "Ayurveda treats physical energy and hormones at the deep cellular level, balancing the entire system, optimizing cycle rhythm and daily vigor in just 30 seconds a day."
+                  ) : activeCategory === 'men' ? (
                     "Ayurveda treats physical energy at the cellular level, optimizing stamina, strengthening vascular health, and restoring baseline vigor in just 30 seconds a day."
                   ) : (
                     "Ayurveda treats the deep tissue level, regularizing cycles, stopping excruciating muscle spasms, and cleansing follicular blockages in just 30 seconds a day."
@@ -602,7 +674,7 @@ Please confirm my order. Thank you!`;
               <div className="pt-4 border-t border-white/10 flex items-center gap-2 mt-4">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                  {activeCategory === 'men' ? "90-Day Vitality Restoration Reset" : "90-Day Cycle Restoration Reset"}
+                  {activeCategory === 'all' ? "90-Day Full System Restoration Reset" : activeCategory === 'men' ? "90-Day Vitality Restoration Reset" : "90-Day Cycle Restoration Reset"}
                 </span>
               </div>
             </section>
@@ -616,43 +688,47 @@ Please confirm my order. Thank you!`;
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
-                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                  activeCategory === 'all' ? 'bg-[#2B1B15]/40' : activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
                 }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
                       1
                     </div>
                     <h4 className="font-serif font-bold text-white text-base">
-                      {activeCategory === 'men' ? "SHAKTIMAX Capsule" : "OVAIRA Capsule"}
+                      {activeCategory === 'all' ? "OVAIRA / SHAKTIMAX" : activeCategory === 'men' ? "SHAKTIMAX Capsule" : "OVAIRA Capsule"}
                     </h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    {activeCategory === 'men'
-                      ? "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals) with water."
-                      : "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals)."}
+                    {activeCategory === 'all'
+                      ? "Take Capsules in the Morning and Evening (After Meals). Highly recommended for balanced recovery."
+                      : activeCategory === 'men'
+                        ? "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals) with water."
+                        : "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals)."}
                   </p>
                 </div>
 
                 <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
-                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                  activeCategory === 'all' ? 'bg-[#2B1B15]/40' : activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
                 }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
                       2
                     </div>
                     <h4 className="font-serif font-bold text-white text-base">
-                      {activeCategory === 'men' ? "WANTMORE Powder" : "FLOWELLE Syrup"}
+                      {activeCategory === 'all' ? "FLOWELLE / WANTMORE" : activeCategory === 'men' ? "WANTMORE Powder" : "FLOWELLE Syrup"}
                     </h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    {activeCategory === 'men'
-                      ? "Take 1 scoop (approx. 5g) mixed in warm milk or lukewarm water daily after dinner."
-                      : "Take 5ml in the Morning and 5ml in the Evening (After Meals)."}
+                    {activeCategory === 'all'
+                      ? "Take liquids/powders in the Evening (After Dinner). Supports deep muscle and blood cleansing."
+                      : activeCategory === 'men'
+                        ? "Take 1 scoop (approx. 5g) mixed in warm milk or lukewarm water daily after dinner."
+                        : "Take 5ml in the Morning and 5ml in the Evening (After Meals)."}
                   </p>
                 </div>
 
                 <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
-                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                  activeCategory === 'all' ? 'bg-[#2B1B15]/40' : activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
                 }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
@@ -661,9 +737,11 @@ Please confirm my order. Thank you!`;
                     <h4 className="font-serif font-bold text-white text-base">The 90-Day Reset</h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    {activeCategory === 'men'
-                      ? "Enjoy restored baseline energy levels, optimized vascular physical power, and maximum strength."
-                      : "Enjoy flawless ovulation schedules, clear cystic-free facial skin, and standard painless flows."}
+                    {activeCategory === 'all'
+                      ? "Optimized cycle rhythm, standard ovulation, clear skin, and high muscle vitality."
+                      : activeCategory === 'men'
+                        ? "Enjoy restored baseline energy levels, optimized vascular physical power, and maximum strength."
+                        : "Enjoy flawless ovulation schedules, clear cystic-free facial skin, and standard painless flows."}
                   </p>
                 </div>
               </div>
@@ -673,32 +751,40 @@ Please confirm my order. Thank you!`;
             <section className="lg:col-span-12 space-y-6 pt-4">
               <div className="text-center space-y-2 animate-fade-in">
                 <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">
-                  {activeCategory === 'men' ? "Men's Wellness Catalogue" : "Our Treatment Catalogue"}
+                  {activeCategory === 'all' ? "Unified Wellness Catalogue" : activeCategory === 'men' ? "Men's Wellness Catalogue" : "Our Treatment Catalogue"}
                 </span>
                 <h2 className="font-serif text-3xl md:text-4xl font-extrabold text-white">
-                  {activeCategory === 'men' ? "Choose Your Vitality Protocol" : "Choose Your Wellness Protocol"}
+                  {activeCategory === 'all' ? "Choose Your Healing Journey" : activeCategory === 'men' ? "Choose Your Vitality Protocol" : "Choose Your Wellness Protocol"}
                 </h2>
                 <p className="text-[#F7E7D9]/90 max-w-lg mx-auto text-sm">
-                  {activeCategory === 'men'
-                    ? "Restore physical vigor, elevate stamina, and optimize cellular energy with clinical-grade Ayurvedic formulations."
-                    : "Whether you need comprehensive restoration or targeted balance, choose our clinically verified herbal regimens."}
+                  {activeCategory === 'all'
+                    ? "Restore physical vigor, elevate stamina, balance hormones, and regularize your natural system with clinical-grade Ayurvedic formulations."
+                    : activeCategory === 'men'
+                      ? "Restore physical vigor, elevate stamina, and optimize cellular energy with clinical-grade Ayurvedic formulations."
+                      : "Whether you need comprehensive restoration or targeted balance, choose our clinically verified herbal regimens."}
                 </p>
               </div>
 
               {/* Dynamic Catalog Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                  <span className="text-xl">{activeCategory === 'men' ? "🧔" : "👩"}</span>
+                  <span className="text-xl">{activeCategory === 'all' ? "✨" : activeCategory === 'men' ? "🧔" : "👩"}</span>
                   <h3 className="font-serif text-lg font-bold text-white tracking-wide">
-                    {activeCategory === 'men' ? "Men's Premium Vitality Protocol" : "Women's Hormonal Reset Protocol"}
+                    {activeCategory === 'all' ? "Complete Ayurvedic Reset Protocol" : activeCategory === 'men' ? "Men's Premium Vitality Protocol" : "Women's Hormonal Reset Protocol"}
                   </h3>
                 </div>
                   
                 {/* Grid of Product Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {(activeCategory === 'men' ? MENS_PRODUCTS : PRODUCTS).map((prod) => {
+                  {(activeCategory === 'all' 
+                    ? [PRODUCTS[1], PRODUCTS[2], MENS_PRODUCTS[0], MENS_PRODUCTS[1], PRODUCTS[0], MENS_PRODUCTS[2]] 
+                    : activeCategory === 'men' 
+                      ? MENS_PRODUCTS 
+                      : PRODUCTS
+                  ).map((prod) => {
                     const isCombo = prod.id === 'combo-kit' || prod.id === 'mens-combo';
                     const textThemeDark = prod.id === 'combo-kit';
+                    const isMen = isMenProduct(prod);
                     
                     return (
                       <div 
@@ -713,11 +799,11 @@ Please confirm my order. Thank you!`;
                       >
                         {/* Top banner image fallback or real image */}
                         <div className={`relative w-full h-auto overflow-hidden flex items-center justify-center bg-gradient-to-br ${
-                          activeCategory === 'men' ? 'from-[#222222] to-[#0D0D0D]' : 'from-[#8B3B15] to-[#4A1D05]'
+                          isMen ? 'from-[#222222] to-[#0D0D0D]' : 'from-[#8B3B15] to-[#4A1D05]'
                         }`}>
                           {prod.tag && (
                             <span className={`absolute top-4 left-4 z-10 text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-md tracking-wider border ${
-                              activeCategory === 'men'
+                              isMen
                                 ? 'bg-black text-[#E5A93C] border-amber-500/30'
                                 : 'bg-[#5C1D13] text-[#E5A93C] border-[#E5A93C]/30'
                             }`}>
@@ -809,7 +895,7 @@ Please confirm my order. Thank you!`;
                               <div className="grid grid-cols-2 gap-2">
                                 <button 
                                   onClick={() => handleProductClick(prod)}
-                                  className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all hover:shadow-[0_0_10px_rgba(255,255,255,0.1)] text-center cursor-pointer ${
+                                  className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all hover:shadow-[0_0_10px_rgba(255,255,255,0.15)] text-center cursor-pointer ${
                                     textThemeDark 
                                       ? 'border-neutral-200 text-neutral-700 bg-neutral-50 hover:bg-neutral-100' 
                                       : 'border-white/10 text-white bg-white/5 hover:bg-white/10'
@@ -820,7 +906,7 @@ Please confirm my order. Thank you!`;
                                 <button 
                                   onClick={() => addToCart(prod, 1)}
                                   className={`text-xs font-bold py-2.5 px-3 rounded-xl transition-all text-center cursor-pointer ${
-                                    activeCategory === 'men'
+                                    isMen
                                       ? 'bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] text-black font-extrabold hover:shadow-[0_0_15px_rgba(212,175,55,0.4)]'
                                       : 'bg-[#C86428] text-white hover:bg-[#8B3B15] hover:shadow-[0_0_15px_rgba(200,100,40,0.5)]'
                                   }`}
@@ -834,7 +920,7 @@ Please confirm my order. Thank you!`;
                                 className={`w-full text-xs font-extrabold py-3 px-4 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                                   textThemeDark 
                                     ? 'bg-[#5C1D13] text-white hover:bg-[#4A1D05]' 
-                                    : activeCategory === 'men'
+                                    : isMen
                                       ? 'bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] text-black hover:brightness-110 shadow-lg shadow-black/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)]'
                                       : 'bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white hover:brightness-110 shadow-lg shadow-[#4A1D05]/30 hover:shadow-[0_0_15px_rgba(200,100,40,0.5)]'
                                 }`}
@@ -854,7 +940,11 @@ Please confirm my order. Thank you!`;
 
             {/* Bento Block 5: Reassuring Medical Statement (Col Span 7) */}
             <section className={`lg:col-span-7 backdrop-blur-md border p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6 transition-colors duration-700 ${
-              activeCategory === 'men' ? 'bg-[#181818]/90 border-amber-500/20' : 'bg-[#5C1D13]/70 border-white/10'
+              activeCategory === 'all'
+                ? 'bg-[#1C110D]/90 border-amber-500/15'
+                : activeCategory === 'men' 
+                  ? 'bg-[#181818]/90 border-amber-500/20' 
+                  : 'bg-[#5C1D13]/70 border-white/10'
             }`}>
               <div className="space-y-4">
                 <span className="text-[#E5A93C] text-xs font-bold tracking-widest uppercase block">Clinically Certified Wellness</span>
@@ -884,7 +974,9 @@ Please confirm my order. Thank you!`;
                 </div>
 
                 <p className="text-[#F7E7D9] text-xs sm:text-sm leading-relaxed">
-                  {activeCategory === 'men' ? (
+                  {activeCategory === 'all' ? (
+                    "Modern synthetic treatments are packed with temporary chemicals or high-dose artificial hormones which trigger severe weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on organic, bio-active botanical compounds and uterine toners processed inside GMP certified facilities."
+                  ) : activeCategory === 'men' ? (
                     "Most performance pills are packed with dangerous synthetic stimulants or low-grade chemicals which trigger critical blood pressure spikes, cardiac stress, and anxiety. meONmode® relies purely on organic, bio-active botanical compounds processed inside GMP certified facilities."
                   ) : (
                     "Most hormonal pills are packed with heavy doses of synthetic estrogen which trigger high weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on bio-active phytoestrogens and uterine toners processed inside GMP certified facilities."
@@ -918,7 +1010,7 @@ Please confirm my order. Thank you!`;
             <section className="lg:col-span-5 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6">
               <div className="space-y-1">
                 <h4 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">
-                  {activeCategory === 'men' ? "Clinical Men's Performance Score" : "Clinical Period Support Score"}
+                  {activeCategory === 'all' ? "Clinical Restorative Success Score" : activeCategory === 'men' ? "Clinical Men's Performance Score" : "Clinical Period Support Score"}
                 </h4>
                 <p className="text-[11px] text-[#F7E7D9]/80 text-center">Observed improvements over 90 days</p>
               </div>
@@ -956,7 +1048,7 @@ Please confirm my order. Thank you!`;
                 <div>
                   <div className="flex justify-between mb-1">
                     <span>
-                      {activeCategory === 'men' ? "Physical Stamina & Power Boosted" : "Irregular Flow Regularized (Within 45 Days)"}
+                      {activeCategory === 'all' ? "Stamina & Physical Endurance Boosted" : activeCategory === 'men' ? "Physical Stamina & Power Boosted" : "Irregular Flow Regularized (Within 45 Days)"}
                     </span>
                     <span className="text-[#E5A93C]">94%</span>
                   </div>
@@ -968,7 +1060,7 @@ Please confirm my order. Thank you!`;
                 <div>
                   <div className="flex justify-between mb-1">
                     <span>
-                      {activeCategory === 'men' ? "Vigor Restoration & Endurance Increased" : "Agonizing Pelvic Cramps Reduced"}
+                      {activeCategory === 'all' ? "Hormonal Balance & Stress Reduced" : activeCategory === 'men' ? "Vigor Restoration & Endurance Increased" : "Agonizing Pelvic Cramps Reduced"}
                     </span>
                     <span className="text-[#E5A93C]">97%</span>
                   </div>
@@ -980,7 +1072,7 @@ Please confirm my order. Thank you!`;
                 <div>
                   <div className="flex justify-between mb-1">
                     <span>
-                      {activeCategory === 'men' ? "Baseline Cellular Energy Stabilized" : "Cyst Clearance & LH/FSH Balanced"}
+                      {activeCategory === 'all' ? "Overall Energy & Vitality Restored" : activeCategory === 'men' ? "Baseline Cellular Energy Stabilized" : "Cyst Clearance & LH/FSH Balanced"}
                     </span>
                     <span className="text-[#E5A93C]">88%</span>
                   </div>
@@ -1002,19 +1094,21 @@ Please confirm my order. Thank you!`;
               <div className="text-center space-y-1">
                 <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Real Stories, Real Relief</span>
                 <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-white">
-                  {activeCategory === 'men' ? "Hear from our meONmode® Brothers" : "Hear from our meONmode® Sisters"}
+                  {activeCategory === 'all' ? "Hear from our meONmode® Community" : activeCategory === 'men' ? "Hear from our meONmode® Brothers" : "Hear from our meONmode® Sisters"}
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
                 {/* Featured Video / Visual Testimonial */}
                 <div className={`md:col-span-5 backdrop-blur-md rounded-3xl p-6 flex flex-col justify-center space-y-4 shadow-lg transition-colors border ${
-                  activeCategory === 'men'
-                    ? 'bg-[#181818]/60 border-amber-500/20 hover:bg-[#181818]/80'
-                    : 'bg-[#5C1D13]/40 border-[#E5A93C]/20 hover:bg-[#5C1D13]/55'
+                  activeCategory === 'all'
+                    ? 'bg-[#1C110D]/60 border-amber-500/15 hover:bg-[#1C110D]/80'
+                    : activeCategory === 'men'
+                      ? 'bg-[#181818]/60 border-amber-500/20 hover:bg-[#181818]/80'
+                      : 'bg-[#5C1D13]/40 border-[#E5A93C]/20 hover:bg-[#5C1D13]/55'
                 }`}>
                   <h4 className="font-serif font-bold text-[#E5A93C] text-xs uppercase tracking-widest text-center">
-                    {activeCategory === 'men' ? "Featured Brother Story" : "Featured Sister Story"}
+                    {activeCategory === 'all' ? "Featured Community Story" : activeCategory === 'men' ? "Featured Brother Story" : "Featured Sister Story"}
                   </h4>
                   <div className="rounded-2xl overflow-hidden border border-white/10 shadow-md bg-black/40">
                     <img 
@@ -1045,15 +1139,22 @@ Please confirm my order. Thank you!`;
                     />
                   </div>
                   <p className="text-xs text-white/90 leading-relaxed text-center italic">
-                    {activeCategory === 'men' 
-                      ? "\"My fatigue reduced completely and daily recovery returned within 30 days!\""
-                      : "\"My ovarian cysts reduced completely and cycles returned within 90 days!\""}
+                    {activeCategory === 'all'
+                      ? "\"My entire physical vitality, cellular strength, and hormone cycles restored completely!\""
+                      : activeCategory === 'men' 
+                        ? "\"My fatigue reduced completely and daily recovery returned within 30 days!\""
+                        : "\"My ovarian cysts reduced completely and cycles returned within 90 days!\""}
                   </p>
                 </div>
 
                 {/* Grid of Text Testimonials */}
                 <div className="md:col-span-7 grid grid-cols-1 gap-4 flex flex-col justify-between">
-                  {(activeCategory === 'men' ? MENS_TESTIMONIALS : TESTIMONIALS).map((t, idx) => (
+                  {(activeCategory === 'all'
+                    ? [TESTIMONIALS[0], MENS_TESTIMONIALS[0], TESTIMONIALS[1]]
+                    : activeCategory === 'men' 
+                      ? MENS_TESTIMONIALS 
+                      : TESTIMONIALS
+                  ).map((t, idx) => (
                     <div key={idx} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-5 flex flex-col justify-between space-y-2 shadow-sm hover:bg-white/10 transition-colors">
                       <div className="space-y-1">
                         <div className="flex text-amber-500">
@@ -1081,13 +1182,15 @@ Please confirm my order. Thank you!`;
                   <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Community Support</span>
                   <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Join the meONmode® Wellness Club Group</h3>
                   <p className="text-[#F7E7D9]/80 text-xs sm:text-sm leading-relaxed">
-                    {activeCategory === 'men'
-                      ? "You are not alone in this journey. Connect with 10,000+ brothers, get daily Ayurvedic strength tips, clean diet plans, and direct expert consultations inside our exclusive Wellness Club."
-                      : "You are not alone in this journey. Connect with 10,000+ sisters, get daily Ayurvedic lifestyle tips, diet plans, and direct expert consultations inside our exclusive Wellness Club."}
+                    {activeCategory === 'all'
+                      ? "You are not alone in this journey. Connect with 15,000+ members, get daily Ayurvedic lifestyle tips, diet plans, strength guides, and direct expert consultations inside our exclusive Wellness Club."
+                      : activeCategory === 'men'
+                        ? "You are not alone in this journey. Connect with 10,000+ brothers, get daily Ayurvedic strength tips, clean diet plans, and direct expert consultations inside our exclusive Wellness Club."
+                        : "You are not alone in this journey. Connect with 10,000+ sisters, get daily Ayurvedic lifestyle tips, diet plans, and direct expert consultations inside our exclusive Wellness Club."}
                   </p>
                   <div className="pt-2">
                     <a 
-                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20want%20to%20join%20the%20Wellness%20Club%20Group."
+                      href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20want%20to%20join%20the%20Wellness%20Club%20Group."
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-5 rounded-xl transition-all shadow-md hover:scale-[1.02]"
@@ -1134,13 +1237,13 @@ Please confirm my order. Thank you!`;
             <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl">
               <div className="text-center space-y-1">
                 <h3 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
-                  {activeCategory === 'men' ? "Wellness & Performance Queries Answered" : "Period Health Queries Answered"}
+                  {activeCategory === 'all' ? "Unified Ayurvedic Queries Answered" : activeCategory === 'men' ? "Wellness & Performance Queries Answered" : "Period Health Queries Answered"}
                 </h3>
                 <p className="text-[#F7E7D9]/80 text-xs sm:text-sm">Empowering you with complete, transparent Ayurvedic clinical facts.</p>
               </div>
 
               <div className="space-y-3 max-w-3xl mx-auto pt-4 border-t border-white/5">
-                {(activeCategory === 'men' ? MENS_FAQS : FAQS).map((faq, idx) => (
+                {(activeCategory === 'all' ? [...FAQS, ...MENS_FAQS] : activeCategory === 'men' ? MENS_FAQS : FAQS).map((faq, idx) => (
                   <div 
                     key={idx}
                     className="border-b border-white/10 pb-3"
@@ -1184,7 +1287,7 @@ Please confirm my order. Thank you!`;
 
             {/* Main Product Spotlight Card */}
             {(() => {
-              const isMens = activeCategory === 'men';
+              const isMens = isMenProduct(selectedProduct);
               return (
                 <div className={`rounded-3xl overflow-hidden shadow-2xl border ${
                   isMens 
@@ -1780,22 +1883,35 @@ Please confirm my order. Thank you!`;
                       <span>Herbal Combo Discount Savings</span>
                       <span>-₹{(getCartMrpTotal() - getCartTotal()).toLocaleString('en-IN')}</span>
                     </div>
+
+                    <div className="border-t border-white/10 my-2"></div>
+
                     <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>Discreet Delivery Shipping</span>
-                      <span className="text-emerald-400 font-bold uppercase tracking-wider">FREE</span>
+                      <span>Subtotal</span>
+                      <span className="text-white font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹{Math.round(getCartTotal() / 1.18).toLocaleString('en-IN')}</span>
                     </div>
+
                     <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>Cash On Delivery (COD) charges</span>
-                      <span className="text-emerald-400 font-bold uppercase tracking-wider">FREE</span>
+                      <span>Delivery</span>
+                      {paymentMethod === 'cod' ? (
+                        <span className="text-amber-300 font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹150 (COD charge)</span>
+                      ) : (
+                        <span className="text-emerald-400 font-bold uppercase tracking-wider">FREE</span>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
+                      <span>GST (18%)</span>
+                      <span className="text-white font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹{(getCartTotal() - Math.round(getCartTotal() / 1.18)).toLocaleString('en-IN')}</span>
                     </div>
                     
                     <div className="border-t border-white/10 pt-3 flex justify-between items-baseline">
-                      <span className="font-serif text-sm font-bold text-white drop-shadow-md">Net Price to Pay (On COD)</span>
+                      <span className="font-serif text-sm font-bold text-white drop-shadow-md">Total</span>
                       <span 
-                        className="font-serif text-lg font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                        className="font-serif text-lg font-black text-white"
                         style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}
                       >
-                        ₹{getCartTotal().toLocaleString('en-IN')}
+                        ₹{(getCartTotal() + (paymentMethod === 'cod' ? 150 : 0)).toLocaleString('en-IN')}
                       </span>
                     </div>
                   </div>
@@ -1966,6 +2082,14 @@ Please confirm my order. Thank you!`;
                             <div className="text-xs text-neutral-500 leading-relaxed max-w-[85%]">{checkout.address}, {checkout.pincode}</div>
                           </div>
 
+                          {/* Incentive Text */}
+                          <div className="bg-amber-50 border border-amber-200/60 p-4 rounded-2xl flex items-start gap-2.5 text-xs text-neutral-800 shadow-sm mb-4">
+                            <span className="text-sm">💡</span>
+                            <p className="leading-relaxed font-medium">
+                              Choose UPI/Net Banking for <strong className="text-emerald-700 font-extrabold">FREE delivery</strong>. COD orders include ₹150 handling charge.
+                            </p>
+                          </div>
+
                           {/* Select Payment Method */}
                           <div className="space-y-3">
                             <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
@@ -2052,7 +2176,31 @@ Please confirm my order. Thank you!`;
                           )}
 
                           {/* Action trigger button */}
-                          <div className="pt-4 border-t border-neutral-100">
+                          <div className="pt-4 border-t border-neutral-100 space-y-4">
+                            {!dismissedBanner && (
+                              <div className="bg-amber-50 border-l-4 border-amber-500 p-3.5 rounded-r-xl flex items-start gap-2.5 text-xs text-neutral-700 animate-fade-in relative shadow-sm">
+                                <span className="shrink-0 text-base">📦</span>
+                                <div className="flex-grow pr-6 leading-relaxed font-medium">
+                                  Please record an unboxing video when your order arrives — required for any return/refund claims.{' '}
+                                  <button 
+                                    type="button" 
+                                    onClick={() => setCurrentView('refund-policy')} 
+                                    className="text-[#C86428] font-extrabold hover:underline"
+                                  >
+                                    [Read Return Policy]
+                                  </button>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setDismissedBanner(true)}
+                                  className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-600 font-extrabold text-xs"
+                                  aria-label="Dismiss banner"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            )}
+
                             <button 
                               id="whatsapp-confirm-btn"
                               type="submit"
@@ -2117,8 +2265,24 @@ Please confirm my order. Thank you!`;
                 </div>
                 <div className="flex justify-between">
                   <span>Payment Method:</span>
-                  <span className="font-bold text-emerald-400">Cash On Delivery (COD)</span>
+                  <span className="font-bold text-emerald-400">
+                    {paymentMethod === 'cod' ? "Cash On Delivery (COD)" : "Pay via UPI (Scan & Pay)"}
+                  </span>
                 </div>
+              </div>
+
+              {/* Unboxing Video Reminder Banner */}
+              <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex gap-3 items-start">
+                <span className="text-base shrink-0 mt-0.5">🎥</span>
+                <p className="text-[11px] md:text-xs text-[#F7E7D9] leading-relaxed">
+                  <strong>Reminder:</strong> Please record an unboxing video when your package arrives. This is required for any future return or refund requests.{' '}
+                  <button 
+                    onClick={() => setCurrentView('refund-policy')}
+                    className="text-[#E5A93C] font-extrabold hover:underline cursor-pointer"
+                  >
+                    [View Return Policy →]
+                  </button>
+                </p>
               </div>
             </div>
 
@@ -2135,7 +2299,7 @@ Please confirm my order. Thank you!`;
               </button>
               
               <a 
-                href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20wanted%20to%20follow%20up%20on%20my%20order.%20Please%20guide%20me."
+                href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20wanted%20to%20follow%20up%20on%20my%20order.%20Please%20guide%20me."
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex-grow bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm py-4 rounded-xl flex items-center justify-center gap-2"
@@ -2144,6 +2308,135 @@ Please confirm my order. Thank you!`;
               </a>
             </div>
 
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5: REFUND & RETURN POLICY VIEW ----------------- */}
+        {currentView === 'refund-policy' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => setCurrentView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">Refund & Return Policy</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Ayurvedic Wellness Standards</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              
+              {/* Section 1 */}
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
+                  Eligibility & Scope
+                </h3>
+                <p className="text-white/80 pl-10">
+                  At meONmode, we want you to be completely satisfied with your wellness purchase. We offer full refund or replacements only on damaged, incorrect, or defective products. Due to the high-purity, clinical nature of Ayurvedic medicine, personal preference or subjective changes in symptom relief timing do not qualify as defects.
+                </p>
+              </div>
+
+              {/* Section 2 - Highlighted Callout Box */}
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
+                  Mandatory Unboxing Video Requirement
+                </h3>
+                <div className="pl-10">
+                  <div className="bg-gradient-to-br from-[#5C1D13] to-[#4A1D05] border-2 border-[#E5A93C] rounded-2xl p-5 md:p-6 space-y-3.5 shadow-lg">
+                    <div className="flex items-center gap-2.5 text-[#E5A93C] font-serif font-black text-sm uppercase tracking-wide">
+                      <span className="text-xl">⚠️</span> IMPORTANT: Unboxing Video Required
+                    </div>
+                    <p className="text-xs text-[#F7E7D9] leading-relaxed">
+                      To qualify for a refund, return, or replacement, you MUST record a continuous unboxing video. No claims will be entertained without this proof under any circumstances.
+                    </p>
+                    <div className="space-y-2 border-t border-white/10 pt-3">
+                      <h4 className="text-xs font-extrabold text-[#E5A93C] uppercase tracking-wider">How to record a valid unboxing video:</h4>
+                      <ol className="list-decimal list-inside text-xs text-[#F7E7D9]/90 space-y-1.5 pl-1 leading-relaxed font-medium">
+                        <li>Start recording <strong className="text-white font-extrabold underline">BEFORE</strong> opening the outer corrugated box packaging.</li>
+                        <li>The shipping courier label showing your name, complete address, and barcode must be clearly visible and in focus.</li>
+                        <li>Keep the video completely continuous and unedited. Absolutely NO cuts, pans, or pauses are permitted.</li>
+                        <li>Physically show all items inside and inspect them in front of the camera, highlighting any leakage or breakages.</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 3 */}
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
+                  How to Submit a Claim
+                </h3>
+                <div className="text-white/80 pl-10 space-y-2">
+                  <p>
+                    Please submit your claim within <strong className="text-white">48 hours</strong> of package delivery. Send the raw, uncut unboxing video along with your Order ID through either of the channels below:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <a 
+                      href="https://api.whatsapp.com/send?phone=919350302092&text=Hello%20meONmode%20Team%2C%20I%20would%20like%20to%20file%20a%20refund%2Freplacement%20claim." 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/30 p-3 rounded-xl flex items-center gap-2 text-white font-semibold text-xs transition-colors"
+                    >
+                      <span className="text-base">💬</span>
+                      WhatsApp Support: +91 93503 02092
+                    </a>
+                    <a 
+                      href="mailto:meonmodewellness@gmail.com" 
+                      className="bg-blue-600/25 hover:bg-blue-600/35 border border-blue-500/30 p-3 rounded-xl flex items-center gap-2 text-white font-semibold text-xs transition-colors"
+                    >
+                      <span className="text-base">✉️</span>
+                      Email: meonmodewellness@gmail.com
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 4 */}
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
+                  Review & Processing Timeframe
+                </h3>
+                <p className="text-white/80 pl-10">
+                  Our quality assurance team will inspect your submitted video evidence within <strong className="text-white">2 to 3 business days</strong>. Once approved, a replacement package will be dispatched at zero additional cost, or a direct refund will be credited to your original payment method/bank account within <strong className="text-white">7 business days</strong>.
+                </p>
+              </div>
+
+              {/* Section 5 */}
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">05</span>
+                  Non-Returnable & Void Conditions
+                </h3>
+                <div className="text-white/80 pl-10">
+                  <p className="mb-2">A claim is strictly void and rejected if any of the following occur:</p>
+                  <ul className="list-disc list-inside space-y-1.5 pl-1 text-white/70">
+                    <li>Missing unboxing video, or video with cuts/edits.</li>
+                    <li>The unboxing video starts after the outer courier tape/packaging has already been sliced, opened, or tampered with.</li>
+                    <li>Claims submitted after the strict 48-hour delivery window.</li>
+                    <li>Submitting a cropped or low-resolution video where the package shipping label is illegible.</li>
+                  </ul>
+                </div>
+              </div>
+
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => setCurrentView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
           </div>
         )}
 
@@ -2170,7 +2463,15 @@ Please confirm my order. Thank you!`;
           </div>
         </div>
 
-        <div className="border-t border-white/5 pt-8 text-[11px] text-neutral-400 max-w-2xl mx-auto space-y-2">
+        <div className="border-t border-white/5 pt-8 text-[11px] text-neutral-400 max-w-2xl mx-auto space-y-3">
+          <div className="flex justify-center gap-6 text-xs text-[#E5A93C] font-semibold mb-2">
+            <button 
+              onClick={() => setCurrentView('refund-policy')} 
+              className="hover:underline cursor-pointer"
+            >
+              Refund & Return Policy
+            </button>
+          </div>
           <p>© 2026 meONmode® Ayurvedic Wellness. All rights reserved.</p>
           <p className="leading-relaxed">
             Disclaimer: Ayurveda is a holistic approach. While our therapeutic claims are supported by ancient texts and clinical audits of selected herbs, individual results can fluctuate depending on underlying health conditions (e.g. chronic metabolic blockages). Consult your Ayurvedic physician.
