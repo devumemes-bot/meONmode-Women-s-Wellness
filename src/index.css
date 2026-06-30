@@ -20,5 +20,18 @@
     color: #FDFEFE;
     -webkit-font-smoothing: antialiased;
   }
+  
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+  }
+}
+
+.crisp-img {
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  image-rendering: pixelated !important;
 }
 

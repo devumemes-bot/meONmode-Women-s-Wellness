@@ -4,7 +4,7 @@ export interface Product {
   subtitle: string;
   price: number;
   mrp: number;
-  image: string;
+  images: string[];
   tag?: string;
   shortDescription: string;
   longDescription: string;

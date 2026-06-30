@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   ShoppingBag, 
   ChevronRight, 
+  ChevronLeft,
   Star, 
   ArrowLeft, 
   Plus, 
@@ -25,7 +26,7 @@ import {
   Send,
   Leaf
 } from 'lucide-react';
-import { PRODUCTS, TESTIMONIALS, FAQS } from './data';
+import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS } from './data';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showToast, setShowToast] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<'women' | 'men'>('women');
 
   // Form Details
   const [checkout, setCheckout] = useState<CheckoutDetails>({
@@ -44,11 +46,19 @@ export default function App() {
     pincode: ''
   });
   const [formErrors, setFormErrors] = useState<Partial<CheckoutDetails>>({});
+  const [checkoutStep, setCheckoutStep] = useState<1 | 2>(1);
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'upi'>('cod');
+  const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
 
   // Auto scroll to top on view changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentView, selectedProduct]);
+
+  // Reset active image index when selected product changes
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [selectedProduct?.id]);
 
   // Cart Functions
   const addToCart = (product: Product, quantity: number = 1) => {
@@ -104,6 +114,8 @@ export default function App() {
     if (!exists) {
       addToCart(product, 1);
     }
+    setCheckoutStep(1);
+    setPaymentMethod('cod');
     setCurrentView('cart');
   };
 
@@ -130,6 +142,11 @@ export default function App() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    if (checkoutStep === 1) {
+      setCheckoutStep(2);
+      return;
+    }
+
     // Check if Flowelle is purchased
     const hasFlowelle = cart.some(item => item.product.id === 'flowelle');
     let flowelleProductLine = '';
@@ -143,6 +160,7 @@ export default function App() {
     ).join('\n');
 
     const totalToPay = getCartTotal();
+    const paymentModeLabel = paymentMethod === 'upi' ? 'Pay via UPI (Scan & Pay)' : 'Cash on Delivery (COD)';
 
     // Create the specified WhatsApp payload
     const textPayload = `Hello meONmode Team, I want to place an order:
@@ -152,6 +170,7 @@ ${cartDetailsText}
 - Name: ${checkout.fullName.trim()}
 - Mobile: ${checkout.phone.trim()}
 - Address: ${checkout.address.trim()}, Pincode: ${checkout.pincode.trim()}
+- Payment Method: ${paymentModeLabel}
 
 Please confirm my order. Thank you!`;
 
@@ -172,16 +191,24 @@ Please confirm my order. Thank you!`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#C86428] via-[#8B3B15] to-[#4A1D05] text-[#FDFEFE] font-sans antialiased selection:bg-[#E5A93C] selection:text-[#4A1D05]">
+    <div className={`min-h-screen text-[#FDFEFE] font-sans antialiased selection:bg-[#E5A93C] selection:text-[#4A1D05] transition-all duration-700 ${
+      activeCategory === 'men' 
+        ? 'bg-gradient-to-b from-[#121212] via-[#0D0D0D] to-[#181818]' 
+        : 'bg-gradient-to-b from-[#C86428] via-[#8B3B15] to-[#4A1D05]'
+    }`}>
       
       {/* 100% Privacy Sticky Alert Bar */}
-      <div className="bg-[#5C1D13] text-center py-2 px-4 text-xs font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10">
+      <div className={`transition-all duration-500 text-center py-2 px-4 text-xs font-medium tracking-wide flex items-center justify-center gap-2 border-b border-white/10 ${
+        activeCategory === 'men' ? 'bg-[#1C1C1C] text-[#E5A93C]' : 'bg-[#5C1D13] text-[#FDFEFE]'
+      }`}>
         <Lock className="w-3.5 h-3.5 text-[#E5A93C]" />
         <span>100% Discreet Packaging. Free Shipping across India. Cash on Delivery Available.</span>
       </div>
 
       {/* Global Navigation Header */}
-      <header className="sticky top-0 z-40 bg-[#4A1D05]/90 backdrop-blur-md border-b border-white/10 px-4 py-3 shadow-lg">
+      <header className={`sticky top-0 z-40 backdrop-blur-md border-b border-white/10 px-4 py-3 shadow-lg transition-colors duration-500 ${
+        activeCategory === 'men' ? 'bg-[#0A0A0A]/95 border-amber-500/20 shadow-amber-950/5' : 'bg-[#4A1D05]/90'
+      }`}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             {currentView !== 'home' && (
@@ -235,30 +262,61 @@ Please confirm my order. Thank you!`;
               >
                 Home
               </button>
-              <button 
-                onClick={() => handleProductClick(PRODUCTS[0])} 
-                className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'combo-kit' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
-              >
-                Combo Kit
-              </button>
-              <button 
-                onClick={() => handleProductClick(PRODUCTS[1])} 
-                className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'ovaira' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
-              >
-                OVAIRA Capsules
-              </button>
-              <button 
-                onClick={() => handleProductClick(PRODUCTS[2])} 
-                className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'flowelle' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
-              >
-                FLOWELLE Syrup
-              </button>
+              {activeCategory === 'men' ? (
+                <>
+                  <button 
+                    onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'mens-combo' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    Men's Combo
+                  </button>
+                  <button 
+                    onClick={() => handleProductClick(MENS_PRODUCTS[0])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'wantmore-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    WANTMORE Powder
+                  </button>
+                  <button 
+                    onClick={() => handleProductClick(MENS_PRODUCTS[1])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'shaktimax-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    SHAKTIMAX Capsules
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => handleProductClick(PRODUCTS[0])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'combo-kit' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    Combo Kit
+                  </button>
+                  <button 
+                    onClick={() => handleProductClick(PRODUCTS[1])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'ovaira' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    OVAIRA Capsules
+                  </button>
+                  <button 
+                    onClick={() => handleProductClick(PRODUCTS[2])} 
+                    className={`transition-colors hover:text-[#E5A93C] ${selectedProduct?.id === 'flowelle' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    FLOWELLE Syrup
+                  </button>
+                </>
+              )}
             </nav>
 
             {/* Cart Button */}
             <button 
               id="header-cart-btn"
-              onClick={() => currentView !== 'success' && setCurrentView('cart')}
+              onClick={() => {
+                if (currentView !== 'success') {
+                  setCheckoutStep(1);
+                  setPaymentMethod('cod');
+                  setCurrentView('cart');
+                }
+              }}
               className="relative p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-center group"
               aria-label="Shopping Cart"
             >
@@ -283,7 +341,11 @@ Please confirm my order. Thank you!`;
             <p className="text-sm font-semibold">{showToast}</p>
           </div>
           <button 
-            onClick={() => setCurrentView('cart')}
+            onClick={() => {
+              setCheckoutStep(1);
+              setPaymentMethod('cod');
+              setCurrentView('cart');
+            }}
             className="text-xs bg-[#C86428] text-white py-1.5 px-3 rounded-lg font-bold hover:bg-[#8B3B15] transition-colors"
           >
             Checkout Now
@@ -296,28 +358,79 @@ Please confirm my order. Thank you!`;
 
         {/* ----------------- VIEW 1: HOME VIEW ----------------- */}
         {currentView === 'home' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          <div className="space-y-8">
+            {/* Premium Category Toggle Switch */}
+            <div className="flex flex-col items-center justify-center space-y-2 mb-2">
+              <span className="text-xs uppercase tracking-widest font-bold font-sans text-[#E5A93C]">
+                Select Your Wellness Collection
+              </span>
+              <div className="inline-flex p-1 rounded-full bg-black/45 backdrop-blur-md border border-white/10 shadow-inner shadow-black/60 relative">
+                <button
+                  onClick={() => setActiveCategory('women')}
+                  className={`relative z-10 px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                    activeCategory === 'women'
+                      ? 'text-white shadow-lg bg-gradient-to-r from-[#C86428] to-[#8B3B15]'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <span>👩</span>
+                  <span>Women's Collection</span>
+                </button>
+                <button
+                  onClick={() => setActiveCategory('men')}
+                  className={`relative z-10 px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                    activeCategory === 'men'
+                      ? 'text-white shadow-lg bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] border border-[#D4AF37]/25'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  <span>🧔</span>
+                  <span>Men's Collection</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
             {/* Bento Block 1: Hero Banner Section (Col Span 8) */}
-            <section className="lg:col-span-8 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] border border-white/10 shadow-2xl flex flex-col justify-between">
+            <section className={`lg:col-span-8 relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl flex flex-col justify-between transition-all duration-700 ${
+              activeCategory === 'men'
+                ? 'bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A]'
+                : 'bg-gradient-to-br from-[#8B3B15] to-[#4A1D05]'
+            }`}>
               {/* Fallback pattern background */}
               <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#C86428_1px,transparent_1px)] [background-size:16px_16px]"></div>
               
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-center relative z-10 h-full">
                 {/* Text Sales Copy */}
                 <div className="md:col-span-7 space-y-5">
-                  <div className="inline-flex items-center gap-2 bg-[#5C1D13] border border-[#E5A93C]/30 text-[#E5A93C] py-1 px-3 rounded-full text-xs font-bold uppercase tracking-wider">
+                  <div className={`inline-flex items-center gap-2 border text-xs font-bold uppercase tracking-wider py-1 px-3 rounded-full transition-colors duration-500 ${
+                    activeCategory === 'men'
+                      ? 'bg-[#E5A93C]/10 border-amber-500/30 text-[#E5A93C]'
+                      : 'bg-[#5C1D13] border-[#E5A93C]/30 text-[#E5A93C]'
+                  }`}>
                     <Sparkles className="w-3 h-3" />
-                    Premium Ayurvedic Restoration
+                    {activeCategory === 'men' ? "Premium Men's Vitality" : "Premium Ayurvedic Restoration"}
                   </div>
                   
                   <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.1]">
-                    Your Body. <br />
-                    <span className="text-[#E5A93C]">ON Mode.</span>
+                    {activeCategory === 'men' ? (
+                      <>
+                        Unleash Your <br />
+                        <span className="text-[#E5A93C]">MAX Mode.</span>
+                      </>
+                    ) : (
+                      <>
+                        Your Body. <br />
+                        <span className="text-[#E5A93C]">ON Mode.</span>
+                      </>
+                    )}
                   </h1>
 
                   <p className="text-white/90 text-xs sm:text-sm md:text-base leading-relaxed">
-                    Say goodbye to irregular periods, painful cramps, and PCOS/PCOD issues. Nourish your system with clinically balanced herbs that target root issues for lifelong uterine wellness.
+                    {activeCategory === 'men'
+                      ? "Elevate your strength, physical stamina, and performance with clinically tested Ayurvedic herbs that support cellular energy and vital restoration."
+                      : "Say goodbye to irregular periods, painful cramps, and PCOS/PCOD issues. Nourish your system with clinically balanced herbs that target root issues for lifelong uterine wellness."}
                   </p>
 
                   {/* Highlight Specs */}
@@ -343,16 +456,16 @@ Please confirm my order. Thank you!`;
                   <div className="pt-2 flex flex-col sm:flex-row gap-3">
                     <button 
                       id="hero-buy-combo-btn"
-                      onClick={() => handleQuickBuy(PRODUCTS[0])}
-                      className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] active:scale-95 text-center flex items-center justify-center gap-2"
+                      onClick={() => handleQuickBuy(activeCategory === 'men' ? MENS_PRODUCTS[2] : PRODUCTS[0])}
+                      className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <ShoppingBag className="w-4.5 h-4.5" />
-                      <span>Shop Combo Kit - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>₹1,999</span></span>
+                      <span>Shop Combo Kit - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹2,199' : '₹1,999'}</span></span>
                     </button>
                     <button 
                       id="hero-view-details-btn"
-                      onClick={() => handleProductClick(PRODUCTS[0])}
-                      className="bg-white/10 hover:bg-white/25 border border-white/20 text-white font-bold text-xs sm:text-sm py-3.5 px-6 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] text-center"
+                      onClick={() => handleProductClick(activeCategory === 'men' ? MENS_PRODUCTS[2] : PRODUCTS[0])}
+                      className="bg-white/10 hover:bg-white/25 border border-white/20 text-white font-bold text-xs sm:text-sm py-3.5 px-6 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] text-center cursor-pointer"
                     >
                       Learn More
                     </button>
@@ -361,45 +474,74 @@ Please confirm my order. Thank you!`;
 
                 {/* Right Hero Image Column representing 1000166066_2.jpg / Product Hero */}
                 <div className="md:col-span-5 relative flex justify-center">
-                  <div className="relative w-full max-w-[240px] md:max-w-xs aspect-square bg-gradient-to-br from-[#C86428] to-[#5C1D13] rounded-2xl overflow-hidden p-1 shadow-2xl border border-white/20">
+                  <div className={`relative w-full max-w-[240px] md:max-w-xs rounded-2xl overflow-hidden p-1 shadow-2xl border border-white/20 transition-all duration-500 bg-gradient-to-br ${
+                    activeCategory === 'men' ? 'from-[#333333] to-[#121212]' : 'from-[#C86428] to-[#5C1D13]'
+                  }`}>
                     {/* The image requested */}
                     <img 
-                      src="https://i.postimg.cc/vcnzsNV5/Chat-GPT-Image-Jun-20-2026-10-27-35-PM.png" 
-                      alt="meONmode Combo Kit" 
-                      className="w-full h-full object-cover rounded-xl"
+                      src={activeCategory === 'men' ? 'mens-combo.jpg' : 'https://i.postimg.cc/vcnzsNV5/Chat-GPT-Image-Jun-20-2026-10-27-35-PM.png'} 
+                      alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
+                      className="w-full h-auto max-w-full object-contain block mx-auto rounded-xl crisp-img"
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                       onError={(e) => {
                         // Safe elegant fallback styling if local file doesn't exist
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
                         const parent = target.parentElement;
                         if (parent) {
+                          const existingFallback = parent.querySelector('.hero-fallback-overlay');
+                          if (existingFallback) {
+                            existingFallback.remove();
+                          }
                           const fallbackDiv = document.createElement('div');
-                          fallbackDiv.className = "absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-br from-[#4A1D05] to-[#C86428] text-white";
-                          fallbackDiv.innerHTML = `
-                            <div class="flex justify-between items-start">
-                              <span class="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold tracking-wider border border-amber-500/30 px-1.5 py-0.5 rounded">OVAIRA + FLOWELLE</span>
-                              <span class="text-[#E5A93C] text-[10px] font-semibold">Ayurvedic Treatment</span>
-                            </div>
-                            <div class="text-center my-auto space-y-1">
-                              <h3 class="font-serif text-2xl font-bold text-white tracking-wide">meONmode®</h3>
-                              <p class="text-amber-200 text-[10px] tracking-widest uppercase">Combo Kit</p>
-                              <div class="inline-block bg-[#5C1D13]/60 px-3 py-1 rounded-xl border border-white/10 mt-1">
-                                <span class="text-[9px] text-white font-bold line-through drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹3,798</span>
-                                <span class="text-white text-sm font-bold ml-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹1,999</span>
+                          fallbackDiv.className = "hero-fallback-overlay absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-br from-[#4A1D05] to-[#C86428] text-white";
+                          if (activeCategory === 'men') {
+                            fallbackDiv.className = "hero-fallback-overlay absolute inset-0 flex flex-col justify-between p-4 bg-gradient-to-br from-[#111111] to-[#333333] text-white";
+                            fallbackDiv.innerHTML = `
+                              <div class="flex justify-between items-start">
+                                <span class="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold tracking-wider border border-amber-500/30 px-1.5 py-0.5 rounded">WANTMORE + SHAKTIMAX</span>
+                                <span class="text-[#E5A93C] text-[10px] font-semibold">Ayurvedic Vitality</span>
                               </div>
-                            </div>
-                            <div class="flex items-center justify-center gap-1 text-[10px] text-amber-200">
-                              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                              <span>Special Promo Pack</span>
-                            </div>
-                          `;
+                              <div class="text-center my-auto space-y-1">
+                                <h3 class="font-serif text-2xl font-bold text-white tracking-wide">meONmode®</h3>
+                                <p class="text-amber-200 text-[10px] tracking-widest uppercase">Men's Combo</p>
+                                <div class="inline-block bg-black/60 px-3 py-1 rounded-xl border border-white/10 mt-1">
+                                  <span class="text-[9px] text-white font-bold line-through drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹4,498</span>
+                                  <span class="text-white text-sm font-bold ml-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹2,199</span>
+                                </div>
+                              </div>
+                              <div class="flex items-center justify-center gap-1 text-[10px] text-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                                <span>Premium Men's Pack</span>
+                              </div>
+                            `;
+                          } else {
+                            fallbackDiv.innerHTML = `
+                              <div class="flex justify-between items-start">
+                                <span class="text-[9px] bg-amber-500/20 text-amber-300 font-extrabold tracking-wider border border-amber-500/30 px-1.5 py-0.5 rounded">OVAIRA + FLOWELLE</span>
+                                <span class="text-[#E5A93C] text-[10px] font-semibold">Ayurvedic Treatment</span>
+                              </div>
+                              <div class="text-center my-auto space-y-1">
+                                <h3 class="font-serif text-2xl font-bold text-white tracking-wide">meONmode®</h3>
+                                <p class="text-amber-200 text-[10px] tracking-widest uppercase">Combo Kit</p>
+                                <div class="inline-block bg-[#5C1D13]/60 px-3 py-1 rounded-xl border border-white/10 mt-1">
+                                  <span class="text-[9px] text-white font-bold line-through drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹3,798</span>
+                                  <span class="text-white text-sm font-bold ml-1.5 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">₹1,999</span>
+                                </div>
+                              </div>
+                              <div class="flex items-center justify-center gap-1 text-[10px] text-amber-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span>Special Promo Pack</span>
+                              </div>
+                            `;
+                          }
                           parent.appendChild(fallbackDiv);
                         }
                       }}
                     />
                     {/* Glassmorphic price tag pill */}
                     <div className="absolute top-3 right-3 bg-[#5C1D13]/90 backdrop-blur-md border-2 border-amber-400 text-white font-extrabold px-3 py-1 rounded-full text-[10px] shadow-[0_0_10px_rgba(251,191,36,0.5)] drop-shadow-md">
-                      Save 47%
+                      {activeCategory === 'men' ? 'Save 51%' : 'Save 47%'}
                     </div>
                   </div>
                 </div>
@@ -416,25 +558,52 @@ Please confirm my order. Thank you!`;
                 </div>
                 
                 <h2 className="font-serif text-xl sm:text-2xl font-extrabold text-white leading-tight">
-                  5 Lakh+ Indian Women Trust meONmode®
+                  {activeCategory === 'men' ? "1 Lakh+ Indian Men Trust meONmode®" : "5 Lakh+ Indian Women Trust meONmode®"}
                 </h2>
 
                 <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                   <img 
-                    src="https://i.postimg.cc/sQTb4nr9/Chat-GPT-Image-Jun-20-2026-10-27-18-PM.png" 
-                    alt="5 Lakh+ Women Trust meONmode" 
-                    className="w-full h-auto object-cover"
+                    src={activeCategory === 'men' ? 'shaktimax-men.jpg' : 'https://i.postimg.cc/sQTb4nr9/Chat-GPT-Image-Jun-20-2026-10-27-18-PM.png'} 
+                    alt={activeCategory === 'men' ? "Men Trust meONmode" : "5 Lakh+ Women Trust meONmode"} 
+                    className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                    style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        const existingFallback = parent.querySelector('.trust-fallback-overlay');
+                        if (existingFallback) {
+                          existingFallback.remove();
+                        }
+                        const fallback = document.createElement('div');
+                        fallback.className = "trust-fallback-overlay p-4 text-center text-white/90 font-serif text-sm flex flex-col items-center justify-center min-h-[140px]";
+                        fallback.innerHTML = `
+                          <div class="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 mb-2">
+                            <svg class="w-6 h-6 text-[#E5A93C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                          </div>
+                          <span class="font-bold">meONmode® Quality Assured</span>
+                        `;
+                        parent.appendChild(fallback);
+                      }
+                    }}
                   />
                 </div>
 
                 <p className="text-[#F7E7D9] text-xs sm:text-sm leading-relaxed">
-                  Ayurveda treats the deep tissue level, regularizing cycles, stopping excruciating muscle spasms, and cleansing follicular blockages in just <span className="text-[#E5A93C] font-semibold">30 seconds a day</span>.
+                  {activeCategory === 'men' ? (
+                    "Ayurveda treats physical energy at the cellular level, optimizing stamina, strengthening vascular health, and restoring baseline vigor in just 30 seconds a day."
+                  ) : (
+                    "Ayurveda treats the deep tissue level, regularizing cycles, stopping excruciating muscle spasms, and cleansing follicular blockages in just 30 seconds a day."
+                  )}
                 </p>
               </div>
 
               <div className="pt-4 border-t border-white/10 flex items-center gap-2 mt-4">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">90-Day Cycle Restoration Reset</span>
+                <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
+                  {activeCategory === 'men' ? "90-Day Vitality Restoration Reset" : "90-Day Cycle Restoration Reset"}
+                </span>
               </div>
             </section>
 
@@ -446,31 +615,45 @@ Please confirm my order. Thank you!`;
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-3 p-5 bg-[#4A1D05]/50 rounded-2xl border border-white/5 flex flex-col justify-between">
+                <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
+                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
                       1
                     </div>
-                    <h4 className="font-serif font-bold text-white text-base">OVAIRA Capsule</h4>
+                    <h4 className="font-serif font-bold text-white text-base">
+                      {activeCategory === 'men' ? "SHAKTIMAX Capsule" : "OVAIRA Capsule"}
+                    </h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).
+                    {activeCategory === 'men'
+                      ? "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals) with water."
+                      : "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals)."}
                   </p>
                 </div>
 
-                <div className="space-y-3 p-5 bg-[#4A1D05]/50 rounded-2xl border border-white/5 flex flex-col justify-between">
+                <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
+                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
                       2
                     </div>
-                    <h4 className="font-serif font-bold text-white text-base">FLOWELLE Syrup</h4>
+                    <h4 className="font-serif font-bold text-white text-base">
+                      {activeCategory === 'men' ? "WANTMORE Powder" : "FLOWELLE Syrup"}
+                    </h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    Take 5ml in the Morning and 5ml in the Evening (After Meals).
+                    {activeCategory === 'men'
+                      ? "Take 1 scoop (approx. 5g) mixed in warm milk or lukewarm water daily after dinner."
+                      : "Take 5ml in the Morning and 5ml in the Evening (After Meals)."}
                   </p>
                 </div>
 
-                <div className="space-y-3 p-5 bg-[#4A1D05]/50 rounded-2xl border border-white/5 flex flex-col justify-between">
+                <div className={`space-y-3 p-5 rounded-2xl border border-white/5 flex flex-col justify-between transition-colors duration-500 ${
+                  activeCategory === 'men' ? 'bg-[#1C1C1C]' : 'bg-[#4A1D05]/50'
+                }`}>
                   <div>
                     <div className="w-9 h-9 bg-[#C86428]/25 text-[#E5A93C] rounded-full flex items-center justify-center font-bold text-sm border border-[#C86428]/30 mb-2">
                       3
@@ -478,7 +661,9 @@ Please confirm my order. Thank you!`;
                     <h4 className="font-serif font-bold text-white text-base">The 90-Day Reset</h4>
                   </div>
                   <p className="text-xs text-[#F7E7D9]/80 leading-relaxed">
-                    Enjoy flawless ovulation schedules, clear cystic-free facial skin, and standard painless flows.
+                    {activeCategory === 'men'
+                      ? "Enjoy restored baseline energy levels, optimized vascular physical power, and maximum strength."
+                      : "Enjoy flawless ovulation schedules, clear cystic-free facial skin, and standard painless flows."}
                   </p>
                 </div>
               </div>
@@ -486,63 +671,88 @@ Please confirm my order. Thank you!`;
 
             {/* Bento Block 4: Product Catalog Section (Col Span 12) */}
             <section className="lg:col-span-12 space-y-6 pt-4">
-              <div className="text-center space-y-2">
-                <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">Our Treatment Catalogue</span>
-                <h2 className="font-serif text-3xl md:text-4xl font-extrabold text-white">Choose Your Wellness Protocol</h2>
+              <div className="text-center space-y-2 animate-fade-in">
+                <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">
+                  {activeCategory === 'men' ? "Men's Wellness Catalogue" : "Our Treatment Catalogue"}
+                </span>
+                <h2 className="font-serif text-3xl md:text-4xl font-extrabold text-white">
+                  {activeCategory === 'men' ? "Choose Your Vitality Protocol" : "Choose Your Wellness Protocol"}
+                </h2>
                 <p className="text-[#F7E7D9]/90 max-w-lg mx-auto text-sm">
-                  Whether you need comprehensive restoration or targeted balance, choose our clinically verified herbal regimens.
+                  {activeCategory === 'men'
+                    ? "Restore physical vigor, elevate stamina, and optimize cellular energy with clinical-grade Ayurvedic formulations."
+                    : "Whether you need comprehensive restoration or targeted balance, choose our clinically verified herbal regimens."}
                 </p>
               </div>
 
-              {/* Women's Catalog Section */}
+              {/* Dynamic Catalog Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                  <span className="text-xl">👩</span>
-                  <h3 className="font-serif text-lg font-bold text-white tracking-wide">Women's Hormonal Reset Protocol</h3>
+                  <span className="text-xl">{activeCategory === 'men' ? "🧔" : "👩"}</span>
+                  <h3 className="font-serif text-lg font-bold text-white tracking-wide">
+                    {activeCategory === 'men' ? "Men's Premium Vitality Protocol" : "Women's Hormonal Reset Protocol"}
+                  </h3>
                 </div>
                   
-                  {/* Grid of Product Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {PRODUCTS.filter(p => ['combo-kit', 'ovaira', 'flowelle'].includes(p.id)).map((prod) => (
+                {/* Grid of Product Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {(activeCategory === 'men' ? MENS_PRODUCTS : PRODUCTS).map((prod) => {
+                    const isCombo = prod.id === 'combo-kit' || prod.id === 'mens-combo';
+                    const textThemeDark = prod.id === 'combo-kit';
+                    
+                    return (
                       <div 
                         key={prod.id}
                         className={`rounded-3xl overflow-hidden shadow-2xl flex flex-col justify-between transform transition-transform hover:-translate-y-1 duration-300 border ${
-                          prod.id === 'combo-kit' 
-                            ? 'bg-[#FDFEFE] text-neutral-900 border-b-8 border-[#C86428] border-neutral-200' 
+                          isCombo 
+                            ? textThemeDark 
+                              ? 'bg-[#FDFEFE] text-neutral-900 border-b-8 border-[#C86428] border-neutral-200' 
+                              : 'bg-[#181818] text-white border-b-8 border-amber-500 border-amber-500/30 shadow-amber-500/5'
                             : 'bg-white/5 backdrop-blur-md text-white border-white/10'
                         }`}
                       >
                         {/* Top banner image fallback or real image */}
-                        <div className="relative h-56 bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] overflow-hidden">
+                        <div className={`relative w-full h-auto overflow-hidden flex items-center justify-center bg-gradient-to-br ${
+                          activeCategory === 'men' ? 'from-[#222222] to-[#0D0D0D]' : 'from-[#8B3B15] to-[#4A1D05]'
+                        }`}>
                           {prod.tag && (
-                            <span className="absolute top-4 left-4 z-10 bg-[#5C1D13] text-[#E5A93C] text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-md tracking-wider border border-[#E5A93C]/30">
+                            <span className={`absolute top-4 left-4 z-10 text-[10px] font-extrabold px-3 py-1.5 rounded-full shadow-md tracking-wider border ${
+                              activeCategory === 'men'
+                                ? 'bg-black text-[#E5A93C] border-amber-500/30'
+                                : 'bg-[#5C1D13] text-[#E5A93C] border-[#E5A93C]/30'
+                            }`}>
                               {prod.tag}
                             </span>
                           )}
                           
                           <img 
-                            src={prod.image} 
+                            src={prod.images && prod.images[0]} 
                             alt={prod.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                            style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                               const parent = target.parentElement;
                               if (parent) {
+                                const existingFallback = parent.querySelector('.card-fallback-overlay');
+                                if (existingFallback) {
+                                  existingFallback.remove();
+                                }
                                 const overlay = document.createElement('div');
-                                overlay.className = "absolute inset-0 flex flex-col justify-center items-center p-6 text-center text-white";
+                                overlay.className = "card-fallback-overlay absolute inset-0 flex flex-col justify-center items-center p-6 text-center text-white";
                                 let iconSvg = '';
-                                if (prod.id === 'combo-kit') {
-                                  iconSvg = `<span class="p-3 bg-[#C86428]/20 rounded-full text-[#E5A93C] mb-2 border border-[#C86428]/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg></span>`;
-                                } else if (prod.id === 'ovaira') {
-                                  iconSvg = `<span class="p-3 bg-[#C86428]/20 rounded-full text-[#E5A93C] mb-2 border border-[#C86428]/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l.707-.707m2.828 9.9a5 5 0 113.536 0V21h-3.536v-5.1z"></path></svg></span>`;
+                                if (prod.id === 'combo-kit' || prod.id === 'mens-combo') {
+                                  iconSvg = `<span class="p-3 bg-amber-500/20 rounded-full text-[#E5A93C] mb-2 border border-amber-500/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path></svg></span>`;
+                                } else if (prod.id === 'ovaira' || prod.id === 'shaktimax-men') {
+                                  iconSvg = `<span class="p-3 bg-amber-500/20 rounded-full text-[#E5A93C] mb-2 border border-amber-500/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l.707-.707m2.828 9.9a5 5 0 113.536 0V21h-3.536v-5.1z"></path></svg></span>`;
                                 } else {
-                                  iconSvg = `<span class="p-3 bg-[#C86428]/20 rounded-full text-[#E5A93C] mb-2 border border-[#C86428]/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>`;
+                                  iconSvg = `<span class="p-3 bg-amber-500/20 rounded-full text-[#E5A93C] mb-2 border border-amber-500/40"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>`;
                                 }
                                 overlay.innerHTML = `
                                   ${iconSvg}
                                   <h4 class="font-serif font-bold text-lg text-[#E5A93C]">${prod.volumeOrQty}</h4>
-                                  <p class="text-[10px] uppercase tracking-widest text-[#F7E7D9] mt-1">meONmode Certified</p>
+                                  <p class="text-[10px] uppercase tracking-widest text-neutral-300 mt-1">meONmode Certified</p>
                                 `;
                                 parent.appendChild(overlay);
                               }
@@ -557,18 +767,18 @@ Please confirm my order. Thank you!`;
                             <div className="flex items-center gap-1 text-amber-500 text-xs font-semibold mb-1">
                               <Star className="w-3.5 h-3.5 fill-current" />
                               <span>{prod.rating}</span>
-                              <span className={prod.id === 'combo-kit' ? 'text-neutral-400' : 'text-neutral-300'}>
+                              <span className={textThemeDark ? 'text-neutral-400' : 'text-neutral-300'}>
                                 ({prod.reviewsCount.toLocaleString('en-IN')} reviews)
                               </span>
                             </div>
 
-                            <h3 className={`font-serif text-xl font-extrabold ${prod.id === 'combo-kit' ? 'text-[#4A1D05]' : 'text-white'}`}>
+                            <h3 className={`font-serif text-xl font-extrabold ${textThemeDark ? 'text-[#4A1D05]' : 'text-white'}`}>
                               {prod.name}
                             </h3>
-                            <p className={`text-xs tracking-wider uppercase font-medium mt-0.5 ${prod.id === 'combo-kit' ? 'text-neutral-500' : 'text-neutral-300'}`}>
+                            <p className={`text-xs tracking-wider uppercase font-medium mt-0.5 ${textThemeDark ? 'text-neutral-500' : 'text-neutral-300'}`}>
                               {prod.subtitle}
                             </p>
-                            <p className={`text-sm mt-2.5 line-clamp-3 leading-relaxed ${prod.id === 'combo-kit' ? 'text-neutral-600' : 'text-[#F7E7D9]'}`}>
+                            <p className={`text-sm mt-2.5 line-clamp-3 leading-relaxed ${textThemeDark ? 'text-neutral-600' : 'text-[#F7E7D9]'}`}>
                               {prod.shortDescription}
                             </p>
                           </div>
@@ -586,7 +796,7 @@ Please confirm my order. Thank you!`;
                                 ₹{prod.mrp.toLocaleString('en-IN')}
                               </span>
                               <span className={`text-xs font-extrabold px-2.5 py-1 rounded-full border-2 ${
-                                prod.id === 'combo-kit' 
+                                textThemeDark 
                                   ? 'text-red-700 bg-red-50 border-red-600/50 shadow-[0_0_8px_rgba(185,28,28,0.2)]' 
                                   : 'text-amber-400 bg-amber-950/50 border-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.3)]'
                               }`}>
@@ -595,12 +805,12 @@ Please confirm my order. Thank you!`;
                             </div>
 
                             {/* CTAs */}
-                            <div className={`flex flex-col gap-2 pt-2 border-t ${prod.id === 'combo-kit' ? 'border-neutral-100' : 'border-white/10'}`}>
+                            <div className={`flex flex-col gap-2 pt-2 border-t ${textThemeDark ? 'border-neutral-100' : 'border-white/10'}`}>
                               <div className="grid grid-cols-2 gap-2">
                                 <button 
                                   onClick={() => handleProductClick(prod)}
                                   className={`text-xs font-bold py-2.5 px-3 rounded-xl border transition-all hover:shadow-[0_0_10px_rgba(255,255,255,0.1)] text-center cursor-pointer ${
-                                    prod.id === 'combo-kit' 
+                                    textThemeDark 
                                       ? 'border-neutral-200 text-neutral-700 bg-neutral-50 hover:bg-neutral-100' 
                                       : 'border-white/10 text-white bg-white/5 hover:bg-white/10'
                                   }`}
@@ -609,10 +819,10 @@ Please confirm my order. Thank you!`;
                                 </button>
                                 <button 
                                   onClick={() => addToCart(prod, 1)}
-                                  className={`text-xs font-bold py-2.5 px-3 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] text-center cursor-pointer ${
-                                    prod.id === 'combo-kit' 
-                                      ? 'bg-[#C86428] text-white hover:bg-[#8B3B15]' 
-                                      : 'bg-[#C86428] text-white hover:bg-[#8B3B15]'
+                                  className={`text-xs font-bold py-2.5 px-3 rounded-xl transition-all text-center cursor-pointer ${
+                                    activeCategory === 'men'
+                                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] text-black font-extrabold hover:shadow-[0_0_15px_rgba(212,175,55,0.4)]'
+                                      : 'bg-[#C86428] text-white hover:bg-[#8B3B15] hover:shadow-[0_0_15px_rgba(200,100,40,0.5)]'
                                   }`}
                                 >
                                   Add to Cart
@@ -621,10 +831,12 @@ Please confirm my order. Thank you!`;
                               
                               <button 
                                 onClick={() => handleQuickBuy(prod)}
-                                className={`w-full text-xs font-extrabold py-3 px-4 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] text-center flex items-center justify-center gap-1.5 cursor-pointer ${
-                                  prod.id === 'combo-kit' 
+                                className={`w-full text-xs font-extrabold py-3 px-4 rounded-xl transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+                                  textThemeDark 
                                     ? 'bg-[#5C1D13] text-white hover:bg-[#4A1D05]' 
-                                    : 'bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white hover:brightness-110 shadow-lg shadow-[#4A1D05]/30'
+                                    : activeCategory === 'men'
+                                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] text-black hover:brightness-110 shadow-lg shadow-black/50 hover:shadow-[0_0_15px_rgba(212,175,55,0.4)]'
+                                      : 'bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white hover:brightness-110 shadow-lg shadow-[#4A1D05]/30 hover:shadow-[0_0_15px_rgba(200,100,40,0.5)]'
                                 }`}
                               >
                                 <ShoppingBag className="w-3.5 h-3.5" />
@@ -634,13 +846,16 @@ Please confirm my order. Thank you!`;
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
+              </div>
             </section>
 
             {/* Bento Block 5: Reassuring Medical Statement (Col Span 7) */}
-            <section className="lg:col-span-7 bg-[#5C1D13]/70 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6">
+            <section className={`lg:col-span-7 backdrop-blur-md border p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6 transition-colors duration-700 ${
+              activeCategory === 'men' ? 'bg-[#181818]/90 border-amber-500/20' : 'bg-[#5C1D13]/70 border-white/10'
+            }`}>
               <div className="space-y-4">
                 <span className="text-[#E5A93C] text-xs font-bold tracking-widest uppercase block">Clinically Certified Wellness</span>
                 <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white leading-tight">
@@ -649,25 +864,31 @@ Please confirm my order. Thank you!`;
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-2">
                   <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                    <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-[#5C1D13]/60 text-center border-b border-white/5">100% Raw Roots & Bark</span>
+                    <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">100% Raw Roots & Bark</span>
                     <img 
                       src="https://i.postimg.cc/K34wqnG9/Chat-GPT-Image-Jun-20-2026-10-27-28-PM.png" 
                       alt="100% Ayurvedic Ingredients / Roots & Bark" 
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                     />
                   </div>
                   <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                    <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-[#5C1D13]/60 text-center border-b border-white/5">Ayurveda vs Synthetic Pills</span>
+                    <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">Ayurveda vs Synthetic Pills</span>
                     <img 
                       src="https://i.postimg.cc/zH36tnz2/Chat-GPT-Image-Jun-20-2026-10-27-39-PM.png" 
                       alt="Why Ayurvedic capsules are better Comparison" 
-                      className="w-full h-auto object-cover"
+                      className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                     />
                   </div>
                 </div>
 
                 <p className="text-[#F7E7D9] text-xs sm:text-sm leading-relaxed">
-                  Most hormonal pills are packed with heavy doses of synthetic estrogen which trigger high weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on bio-active phytoestrogens and uterine toners processed inside GMP certified facilities.
+                  {activeCategory === 'men' ? (
+                    "Most performance pills are packed with dangerous synthetic stimulants or low-grade chemicals which trigger critical blood pressure spikes, cardiac stress, and anxiety. meONmode® relies purely on organic, bio-active botanical compounds processed inside GMP certified facilities."
+                  ) : (
+                    "Most hormonal pills are packed with heavy doses of synthetic estrogen which trigger high weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on bio-active phytoestrogens and uterine toners processed inside GMP certified facilities."
+                  )}
                 </p>
               </div>
 
@@ -696,22 +917,47 @@ Please confirm my order. Thank you!`;
             {/* Bento Block 6: Support Score Graphic (Col Span 5) */}
             <section className="lg:col-span-5 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6">
               <div className="space-y-1">
-                <h4 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">Clinical Period Support Score</h4>
+                <h4 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">
+                  {activeCategory === 'men' ? "Clinical Men's Performance Score" : "Clinical Period Support Score"}
+                </h4>
                 <p className="text-[11px] text-[#F7E7D9]/80 text-center">Observed improvements over 90 days</p>
               </div>
 
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                 <img 
-                  src="https://i.postimg.cc/KRTN2HMB/Chat-GPT-Image-Jun-20-2026-10-27-45-PM.png" 
-                  alt="Bye Bye Period Problems / 87% & 95% Results" 
-                  className="w-full h-auto object-cover"
+                  src={activeCategory === 'men' ? 'wantmore-men.jpg' : 'https://i.postimg.cc/KRTN2HMB/Chat-GPT-Image-Jun-20-2026-10-27-45-PM.png'} 
+                  alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
+                  className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                  style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      const existingFallback = parent.querySelector('.score-fallback-overlay');
+                      if (existingFallback) {
+                        existingFallback.remove();
+                      }
+                      const fallback = document.createElement('div');
+                      fallback.className = "score-fallback-overlay p-4 text-center text-white/90 font-serif text-sm flex flex-col items-center justify-center min-h-[140px]";
+                      fallback.innerHTML = `
+                        <div class="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 mb-2">
+                          <svg class="w-6 h-6 text-[#E5A93C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <span class="font-bold">Over 90% Voted Recovery Success</span>
+                      `;
+                      parent.appendChild(fallback);
+                    }
+                  }}
                 />
               </div>
               
               <div className="space-y-4 text-xs font-semibold">
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span>Irregular Flow Regularized (Within 45 Days)</span>
+                    <span>
+                      {activeCategory === 'men' ? "Physical Stamina & Power Boosted" : "Irregular Flow Regularized (Within 45 Days)"}
+                    </span>
                     <span className="text-[#E5A93C]">94%</span>
                   </div>
                   <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
@@ -721,7 +967,9 @@ Please confirm my order. Thank you!`;
 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span>Agonizing Pelvic Cramps Reduced</span>
+                    <span>
+                      {activeCategory === 'men' ? "Vigor Restoration & Endurance Increased" : "Agonizing Pelvic Cramps Reduced"}
+                    </span>
                     <span className="text-[#E5A93C]">97%</span>
                   </div>
                   <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
@@ -731,7 +979,9 @@ Please confirm my order. Thank you!`;
 
                 <div>
                   <div className="flex justify-between mb-1">
-                    <span>Cyst Clearance & LH/FSH Balanced</span>
+                    <span>
+                      {activeCategory === 'men' ? "Baseline Cellular Energy Stabilized" : "Cyst Clearance & LH/FSH Balanced"}
+                    </span>
                     <span className="text-[#E5A93C]">88%</span>
                   </div>
                   <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
@@ -751,28 +1001,59 @@ Please confirm my order. Thank you!`;
             <section className="lg:col-span-12 space-y-6">
               <div className="text-center space-y-1">
                 <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Real Stories, Real Relief</span>
-                <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Hear from our meONmode® Sisters</h2>
+                <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-white">
+                  {activeCategory === 'men' ? "Hear from our meONmode® Brothers" : "Hear from our meONmode® Sisters"}
+                </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-                {/* Featured Video / Visual Testimonial from Sneha Patel */}
-                <div className="md:col-span-5 bg-[#5C1D13]/40 backdrop-blur-md border border-[#E5A93C]/20 rounded-3xl p-6 flex flex-col justify-center space-y-4 shadow-lg hover:bg-[#5C1D13]/55 transition-colors">
-                  <h4 className="font-serif font-bold text-[#E5A93C] text-xs uppercase tracking-widest text-center">Featured Sister Story</h4>
+                {/* Featured Video / Visual Testimonial */}
+                <div className={`md:col-span-5 backdrop-blur-md rounded-3xl p-6 flex flex-col justify-center space-y-4 shadow-lg transition-colors border ${
+                  activeCategory === 'men'
+                    ? 'bg-[#181818]/60 border-amber-500/20 hover:bg-[#181818]/80'
+                    : 'bg-[#5C1D13]/40 border-[#E5A93C]/20 hover:bg-[#5C1D13]/55'
+                }`}>
+                  <h4 className="font-serif font-bold text-[#E5A93C] text-xs uppercase tracking-widest text-center">
+                    {activeCategory === 'men' ? "Featured Brother Story" : "Featured Sister Story"}
+                  </h4>
                   <div className="rounded-2xl overflow-hidden border border-white/10 shadow-md bg-black/40">
                     <img 
-                      src="https://i.postimg.cc/JHtv6br6/Chat-GPT-Image-Jun-20-2026-10-27-30-PM.png" 
-                      alt="Sneha Patel Testimonial" 
-                      className="w-full h-auto object-cover"
+                      src={activeCategory === 'men' ? 'wantmore-men.jpg' : 'https://i.postimg.cc/JHtv6br6/Chat-GPT-Image-Jun-20-2026-10-27-30-PM.png'} 
+                      alt={activeCategory === 'men' ? "Rajesh Varma Testimonial" : "Sneha Patel Testimonial"} 
+                      className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          const existingFallback = parent.querySelector('.featured-fallback-overlay');
+                          if (existingFallback) {
+                            existingFallback.remove();
+                          }
+                          const fallback = document.createElement('div');
+                          fallback.className = "featured-fallback-overlay p-4 text-center text-white/90 font-serif text-xs flex flex-col items-center justify-center min-h-[140px]";
+                          fallback.innerHTML = `
+                            <div class="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 mb-2">
+                              <svg class="w-6 h-6 text-[#E5A93C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <span class="font-bold">Featured Video Testimonial</span>
+                          `;
+                          parent.appendChild(fallback);
+                        }
+                      }}
                     />
                   </div>
                   <p className="text-xs text-white/90 leading-relaxed text-center italic">
-                    "My ovarian cysts reduced completely and cycles returned within 90 days!"
+                    {activeCategory === 'men' 
+                      ? "\"My fatigue reduced completely and daily recovery returned within 30 days!\""
+                      : "\"My ovarian cysts reduced completely and cycles returned within 90 days!\""}
                   </p>
                 </div>
 
                 {/* Grid of Text Testimonials */}
                 <div className="md:col-span-7 grid grid-cols-1 gap-4 flex flex-col justify-between">
-                  {TESTIMONIALS.map((t, idx) => (
+                  {(activeCategory === 'men' ? MENS_TESTIMONIALS : TESTIMONIALS).map((t, idx) => (
                     <div key={idx} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-5 flex flex-col justify-between space-y-2 shadow-sm hover:bg-white/10 transition-colors">
                       <div className="space-y-1">
                         <div className="flex text-amber-500">
@@ -800,7 +1081,9 @@ Please confirm my order. Thank you!`;
                   <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Community Support</span>
                   <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Join the meONmode® Wellness Club Group</h3>
                   <p className="text-[#F7E7D9]/80 text-xs sm:text-sm leading-relaxed">
-                    You are not alone in this journey. Connect with 10,000+ sisters, get daily Ayurvedic lifestyle tips, diet plans, and direct expert consultations inside our exclusive Wellness Club.
+                    {activeCategory === 'men'
+                      ? "You are not alone in this journey. Connect with 10,000+ brothers, get daily Ayurvedic strength tips, clean diet plans, and direct expert consultations inside our exclusive Wellness Club."
+                      : "You are not alone in this journey. Connect with 10,000+ sisters, get daily Ayurvedic lifestyle tips, diet plans, and direct expert consultations inside our exclusive Wellness Club."}
                   </p>
                   <div className="pt-2">
                     <a 
@@ -818,14 +1101,19 @@ Please confirm my order. Thank you!`;
                     <img 
                       src="1000166074.jpg" 
                       alt="meONmode Wellness Club Group" 
-                      className="w-full h-auto object-cover max-h-64" 
+                      className="w-full h-auto max-w-full object-contain block mx-auto crisp-img" 
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }} 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
                         const parent = target.parentElement;
                         if (parent) {
+                          const existingFallback = parent.querySelector('.club-fallback-overlay');
+                          if (existingFallback) {
+                            existingFallback.remove();
+                          }
                           const fb = document.createElement('div');
-                          fb.className = "p-8 text-center text-white/80 font-medium text-xs flex flex-col items-center justify-center min-h-[180px]";
+                          fb.className = "club-fallback-overlay p-8 text-center text-white/80 font-medium text-xs flex flex-col items-center justify-center min-h-[180px]";
                           fb.innerHTML = `
                             <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-full mb-2">
                               <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
@@ -845,12 +1133,14 @@ Please confirm my order. Thank you!`;
             {/* Bento Block 8: FAQ Accordion (Col Span 12) */}
             <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl">
               <div className="text-center space-y-1">
-                <h3 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">Period Health Queries Answered</h3>
+                <h3 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
+                  {activeCategory === 'men' ? "Wellness & Performance Queries Answered" : "Period Health Queries Answered"}
+                </h3>
                 <p className="text-[#F7E7D9]/80 text-xs sm:text-sm">Empowering you with complete, transparent Ayurvedic clinical facts.</p>
               </div>
 
               <div className="space-y-3 max-w-3xl mx-auto pt-4 border-t border-white/5">
-                {FAQS.map((faq, idx) => (
+                {(activeCategory === 'men' ? MENS_FAQS : FAQS).map((faq, idx) => (
                   <div 
                     key={idx}
                     className="border-b border-white/10 pb-3"
@@ -874,7 +1164,8 @@ Please confirm my order. Thank you!`;
               </div>
             </section>
           </div>
-        )}
+        </div>
+      )}
 
         {/* ----------------- VIEW 2: PRODUCT DETAIL VIEW ----------------- */}
         {selectedProduct && currentView === 'detail' && (
@@ -893,7 +1184,7 @@ Please confirm my order. Thank you!`;
 
             {/* Main Product Spotlight Card */}
             {(() => {
-              const isMens = false;
+              const isMens = activeCategory === 'men';
               return (
                 <div className={`rounded-3xl overflow-hidden shadow-2xl border ${
                   isMens 
@@ -903,7 +1194,7 @@ Please confirm my order. Thank you!`;
                   <div className="grid grid-cols-1 md:grid-cols-12">
                     
                     {/* Image Column */}
-                    <div className="md:col-span-5 h-80 md:h-auto min-h-[350px] relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#8B3B15] to-[#4A1D05]">
+                    <div className="md:col-span-5 relative flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] p-6 min-h-[350px] md:min-h-[450px]">
                       {selectedProduct.tag && (
                         <span className={`absolute top-4 left-4 z-10 text-[10px] font-extrabold px-3 py-1.5 rounded-full tracking-wider shadow-md ${
                           isMens 
@@ -914,31 +1205,94 @@ Please confirm my order. Thank you!`;
                         </span>
                       )}
 
-                      <img 
-                        src={selectedProduct.image} 
-                        alt={selectedProduct.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.style.display = 'none';
-                          const parent = target.parentElement;
-                          if (parent) {
-                            const fallback = document.createElement('div');
-                            fallback.className = "absolute inset-0 flex flex-col justify-center items-center p-8 text-center text-white";
-                            fallback.innerHTML = `
-                              <span class="p-4 ${isMens ? 'bg-[#E5A93C]/10 border-[#E5A93C]/30 text-[#E5A93C]' : 'bg-[#C86428]/30 border-[#E5A93C]/30 text-[#E5A93C]'} rounded-full mb-3 border">
-                                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                              </span>
-                              <h4 class="font-serif font-extrabold text-2xl text-[#E5A93C]">${selectedProduct.name}</h4>
-                              <p class="text-xs text-neutral-300 mt-1 uppercase tracking-widest">${selectedProduct.volumeOrQty}</p>
-                              <div class="mt-4 ${isMens ? 'bg-[#E5A93C] text-neutral-950 font-black' : 'bg-[#5C1D13] text-white font-bold'} border border-white/10 px-4 py-2 rounded-xl text-xs">100% Doctor Approved Herbal Formula</div>
-                            `;
-                            parent.appendChild(fallback);
-                          }
-                        }}
-                      />
+                      {/* Image Slider Component */}
+                      <div className="w-full h-full relative flex flex-col justify-between items-center flex-1">
+                        {/* Main Image Carousel Wrapper */}
+                        <div className="relative w-full overflow-hidden flex items-center justify-center flex-1 min-h-[250px] md:min-h-[350px]">
+                          {(selectedProduct.images || []).map((imgSrc, idx) => (
+                            <div
+                              key={idx}
+                              className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out p-4 ${
+                                idx === activeImageIndex 
+                                  ? 'opacity-100 translate-x-0 scale-100 z-10' 
+                                  : 'opacity-0 pointer-events-none'
+                              } ${
+                                idx < activeImageIndex ? '-translate-x-10' : idx > activeImageIndex ? 'translate-x-10' : ''
+                              }`}
+                            >
+                              <img 
+                                src={imgSrc} 
+                                alt={`${selectedProduct.name} - View ${idx + 1}`}
+                                className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain block mx-auto crisp-img"
+                                style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const parent = target.parentElement;
+                                  if (parent) {
+                                    const existing = parent.querySelector('.slider-fallback');
+                                    if (!existing) {
+                                      const fallback = document.createElement('div');
+                                      fallback.className = "slider-fallback absolute inset-0 flex flex-col justify-center items-center p-6 text-center text-white";
+                                      fallback.innerHTML = `
+                                        <span class="p-3 ${isMens ? 'bg-[#E5A93C]/10 border-[#E5A93C]/30 text-[#E5A93C]' : 'bg-[#C86428]/30 border-[#E5A93C]/30 text-[#E5A93C]'} rounded-full mb-2 border">
+                                          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                          </svg>
+                                        </span>
+                                        <h4 class="font-serif font-extrabold text-lg text-[#E5A93C]">${selectedProduct.name}</h4>
+                                        <p class="text-[10px] text-neutral-300 mt-0.5 uppercase tracking-widest">${selectedProduct.volumeOrQty}</p>
+                                      `;
+                                      parent.appendChild(fallback);
+                                    }
+                                  }
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Left and Right Navigation Arrows (Visible only if more than 1 image) */}
+                        {(selectedProduct.images || []).length > 1 && (
+                          <>
+                            <button
+                              type="button"
+                              onClick={() => setActiveImageIndex((prev) => (prev === 0 ? (selectedProduct.images || []).length - 1 : prev - 1))}
+                              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-all border border-white/10 active:scale-95 flex items-center justify-center cursor-pointer"
+                              aria-label="Previous image"
+                            >
+                              <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setActiveImageIndex((prev) => (prev === (selectedProduct.images || []).length - 1 ? 0 : prev + 1))}
+                              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-black/40 hover:bg-black/60 text-white p-2 rounded-full transition-all border border-white/10 active:scale-95 flex items-center justify-center cursor-pointer"
+                              aria-label="Next image"
+                            >
+                              <ChevronRight className="w-5 h-5" />
+                            </button>
+                          </>
+                        )}
+
+                        {/* Pagination Dots (Visible only if more than 1 image) */}
+                        {(selectedProduct.images || []).length > 1 && (
+                          <div className="flex justify-center items-center gap-1.5 mt-2 z-20">
+                            {(selectedProduct.images || []).map((_, idx) => (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => setActiveImageIndex(idx)}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${
+                                  idx === activeImageIndex 
+                                    ? 'w-5 bg-[#E5A93C]' 
+                                    : 'w-1.5 bg-white/40 hover:bg-white/60'
+                                  }`}
+                                aria-label={`Go to slide ${idx + 1}`}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     {/* Info and Purchase Column */}
@@ -1110,7 +1464,8 @@ Please confirm my order. Thank you!`;
                         <img 
                           src="https://i.postimg.cc/crcpT4BF/Chat-GPT-Image-Jun-20-2026-10-28-01-PM.png" 
                           alt="8 Feminine Health Solutions" 
-                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
+                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://i.postimg.cc/dLCBYxyy/Chat-GPT-Image-Jun-20-2026-10-27-43-PM.png';
@@ -1135,7 +1490,8 @@ Please confirm my order. Thank you!`;
                         <img 
                           src="https://i.postimg.cc/zVkspXFd/Chat-GPT-Image-Jun-20-2026-10-28-03-PM.png" 
                           alt="33-Herb Pure Formulation" 
-                          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
+                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://i.postimg.cc/dLCBYxyy/Chat-GPT-Image-Jun-20-2026-10-27-43-PM.png';
@@ -1230,7 +1586,8 @@ Please confirm my order. Thank you!`;
                             <img 
                               src="https://i.postimg.cc/BXCrNQBw/Chat-GPT-Image-Jun-20-2026-10-28-08-PM.png" 
                               alt="Dosage Info" 
-                              className="w-full h-auto object-contain max-h-[220px] transition-transform duration-500 group-hover:scale-105"
+                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
+                              style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src = 'https://i.postimg.cc/dLCBYxyy/Chat-GPT-Image-Jun-20-2026-10-27-43-PM.png';
@@ -1247,7 +1604,8 @@ Please confirm my order. Thank you!`;
                             <img 
                               src="https://i.postimg.cc/tYzKDCNS/Chat-GPT-Image-Jun-20-2026-10-28-06-PM.png" 
                               alt="Certification badge" 
-                              className="w-full h-auto object-contain max-h-[220px] transition-transform duration-500 group-hover:scale-105"
+                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
+                              style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src = 'https://i.postimg.cc/dLCBYxyy/Chat-GPT-Image-Jun-20-2026-10-27-43-PM.png';
@@ -1291,13 +1649,14 @@ Please confirm my order. Thank you!`;
                     <img 
                       src="https://i.postimg.cc/dLCBYxyy/Chat-GPT-Image-Jun-20-2026-10-27-43-PM.png" 
                       alt="Powerful Ingredients" 
-                      className="w-full h-auto object-cover animate-pulse-slow"
+                      className="w-full h-auto max-w-full object-contain block mx-auto animate-pulse-slow crisp-img"
+                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
                     />
                   </div>
 
                   <div className="space-y-4">
                     {selectedProduct.keyIngredients.map((ing, iIdx) => {
-                      const isMens = false;
+                      const isMens = activeCategory === 'men';
                       return (
                         <div 
                           key={iIdx} 
@@ -1457,127 +1816,258 @@ Please confirm my order. Thank you!`;
                 <div className="lg:col-span-7">
                   <div className="bg-[#FDFEFE] text-neutral-900 rounded-3xl p-6 md:p-8 shadow-2xl border border-amber-light">
                     <div className="space-y-1.5 border-b border-neutral-100 pb-4 mb-6">
-                      <h3 className="font-serif text-xl font-bold text-[#4A1D05]">Fill Delivery Details</h3>
-                      <p className="text-xs text-neutral-500">Provide shipping details to book your parcel with Cash on Delivery (COD).</p>
+                      <h3 className="font-serif text-xl font-bold text-[#4A1D05]">
+                        {checkoutStep === 1 ? "Step 1: Fill Delivery Details" : "Step 2: Choose Payment Method"}
+                      </h3>
+                      <p className="text-xs text-neutral-500">
+                        {checkoutStep === 1 
+                          ? "Provide shipping details to book your parcel with 100% discreet packaging." 
+                          : "Select how you would like to complete your wellness order."}
+                      </p>
                     </div>
 
                     <form onSubmit={handleCheckoutSubmit} className="space-y-5">
-                      
-                      {/* Name input */}
-                      <div className="space-y-1.5">
-                        <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
-                          Full Name *
-                        </label>
-                        <input 
-                          type="text"
-                          placeholder="Your First & Last Name"
-                          value={checkout.fullName}
-                          onChange={(e) => {
-                            setCheckout({ ...checkout, fullName: e.target.value });
-                            if (formErrors.fullName) setFormErrors({ ...formErrors, fullName: '' });
-                          }}
-                          className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
-                            formErrors.fullName ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
-                          }`}
-                        />
-                        {formErrors.fullName && (
-                          <span className="text-[11px] text-red-500 font-semibold">{formErrors.fullName}</span>
-                        )}
-                      </div>
+                      {checkoutStep === 1 ? (
+                        <>
+                          {/* Name input */}
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
+                              Full Name *
+                            </label>
+                            <input 
+                              type="text"
+                              placeholder="Your First & Last Name"
+                              value={checkout.fullName}
+                              onChange={(e) => {
+                                setCheckout({ ...checkout, fullName: e.target.value });
+                                if (formErrors.fullName) setFormErrors({ ...formErrors, fullName: '' });
+                              }}
+                              className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
+                                formErrors.fullName ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
+                              }`}
+                            />
+                            {formErrors.fullName && (
+                              <span className="text-[11px] text-red-500 font-semibold">{formErrors.fullName}</span>
+                            )}
+                          </div>
 
-                      {/* Phone input */}
-                      <div className="space-y-1.5">
-                        <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
-                          Active Mobile Number (WhatsApp Compatible) *
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3.5 top-3 text-neutral-400 font-semibold text-sm">+91</span>
-                          <input 
-                            type="tel"
-                            maxLength={10}
-                            placeholder="10-digit mobile number"
-                            value={checkout.phone}
-                            onChange={(e) => {
-                              // Only allow numbers
-                              const cleaned = e.target.value.replace(/\D/g, '');
-                              setCheckout({ ...checkout, phone: cleaned });
-                              if (formErrors.phone) setFormErrors({ ...formErrors, phone: '' });
-                            }}
-                            className={`w-full text-sm bg-neutral-50 pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
-                              formErrors.phone ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
-                            }`}
-                          />
-                        </div>
-                        {formErrors.phone ? (
-                          <span className="text-[11px] text-red-500 font-semibold block">{formErrors.phone}</span>
-                        ) : (
-                          <span className="text-[10px] text-neutral-400 block pl-1">Important: Our courier team calls on this number to confirm dispatch before shipping.</span>
-                        )}
-                      </div>
+                          {/* Phone input */}
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
+                              Active Mobile Number (WhatsApp Compatible) *
+                            </label>
+                            <div className="relative">
+                              <span className="absolute left-3.5 top-3 text-neutral-400 font-semibold text-sm">+91</span>
+                              <input 
+                                type="tel"
+                                maxLength={10}
+                                placeholder="10-digit mobile number"
+                                value={checkout.phone}
+                                onChange={(e) => {
+                                  // Only allow numbers
+                                  const cleaned = e.target.value.replace(/\D/g, '');
+                                  setCheckout({ ...checkout, phone: cleaned });
+                                  if (formErrors.phone) setFormErrors({ ...formErrors, phone: '' });
+                                }}
+                                className={`w-full text-sm bg-neutral-50 pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
+                                  formErrors.phone ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
+                                }`}
+                              />
+                            </div>
+                            {formErrors.phone ? (
+                              <span className="text-[11px] text-red-500 font-semibold block">{formErrors.phone}</span>
+                            ) : (
+                              <span className="text-[10px] text-neutral-400 block pl-1">Important: Our courier team calls on this number to confirm dispatch before shipping.</span>
+                            )}
+                          </div>
 
-                      {/* Address Input */}
-                      <div className="space-y-1.5">
-                        <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
-                          Complete Shipping Address *
-                        </label>
-                        <textarea 
-                          rows={3}
-                          placeholder="House No, Building, Street, Landmark, Village, City, State"
-                          value={checkout.address}
-                          onChange={(e) => {
-                            setCheckout({ ...checkout, address: e.target.value });
-                            if (formErrors.address) setFormErrors({ ...formErrors, address: '' });
-                          }}
-                          className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
-                            formErrors.address ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
-                          }`}
-                        />
-                        {formErrors.address && (
-                          <span className="text-[11px] text-red-500 font-semibold">{formErrors.address}</span>
-                        )}
-                      </div>
+                          {/* Address Input */}
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
+                              Complete Shipping Address *
+                            </label>
+                            <textarea 
+                              rows={3}
+                              placeholder="House No, Building, Street, Landmark, Village, City, State"
+                              value={checkout.address}
+                              onChange={(e) => {
+                                setCheckout({ ...checkout, address: e.target.value });
+                                if (formErrors.address) setFormErrors({ ...formErrors, address: '' });
+                              }}
+                              className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
+                                formErrors.address ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
+                              }`}
+                            />
+                            {formErrors.address && (
+                              <span className="text-[11px] text-red-500 font-semibold">{formErrors.address}</span>
+                            )}
+                          </div>
 
-                      {/* Pincode Input */}
-                      <div className="space-y-1.5">
-                        <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
-                          Pincode *
-                        </label>
-                        <input 
-                          type="text"
-                          maxLength={6}
-                          placeholder="6-digit Indian Postal Pin"
-                          value={checkout.pincode}
-                          onChange={(e) => {
-                            // Only allow numbers
-                            const cleaned = e.target.value.replace(/\D/g, '');
-                            setCheckout({ ...checkout, pincode: cleaned });
-                            if (formErrors.pincode) setFormErrors({ ...formErrors, pincode: '' });
-                          }}
-                          className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
-                            formErrors.pincode ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
-                          }`}
-                        />
-                        {formErrors.pincode && (
-                          <span className="text-[11px] text-red-500 font-semibold">{formErrors.pincode}</span>
-                        )}
-                      </div>
+                          {/* Pincode Input */}
+                          <div className="space-y-1.5">
+                            <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
+                              Pincode *
+                            </label>
+                            <input 
+                              type="text"
+                              maxLength={6}
+                              placeholder="6-digit Indian Postal Pin"
+                              value={checkout.pincode}
+                              onChange={(e) => {
+                                // Only allow numbers
+                                const cleaned = e.target.value.replace(/\D/g, '');
+                                setCheckout({ ...checkout, pincode: cleaned });
+                                if (formErrors.pincode) setFormErrors({ ...formErrors, pincode: '' });
+                              }}
+                              className={`w-full text-sm bg-neutral-50 px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#C86428] ${
+                                formErrors.pincode ? 'border-red-500 bg-red-50/50' : 'border-neutral-200'
+                              }`}
+                            />
+                            {formErrors.pincode && (
+                              <span className="text-[11px] text-red-500 font-semibold">{formErrors.pincode}</span>
+                            )}
+                          </div>
 
-                      {/* Action trigger button */}
-                      <div className="pt-4 border-t border-neutral-100">
-                        <button 
-                          id="whatsapp-confirm-btn"
-                          type="submit"
-                          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2.5 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] shadow-lg active:scale-95 duration-200"
-                        >
-                          <Send className="w-5 h-5" />
-                          <span>Confirm Order via WhatsApp</span>
-                        </button>
-                        
-                        <span className="block text-center text-[10px] text-neutral-400 mt-2.5">
-                          *Upon clicking, your order details will compile instantly. Please hit "Send" in WhatsApp to register. Your screen here will update automatically.
-                        </span>
-                      </div>
+                          {/* Action trigger button */}
+                          <div className="pt-4 border-t border-neutral-100">
+                            <button 
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (validateForm()) {
+                                  setCheckoutStep(2);
+                                }
+                              }}
+                              className="w-full bg-[#C86428] hover:bg-[#8B3B15] text-white font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2.5 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] shadow-lg active:scale-95 duration-200"
+                            >
+                              <span>Proceed to Payment</span>
+                              <ChevronRight className="w-5 h-5" />
+                            </button>
+                            
+                            <span className="block text-center text-[10px] text-neutral-400 mt-2.5">
+                              *Provide details first. Absolutely NO upfront payment or QR code is required to proceed.
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Shipping Details Summary */}
+                          <div className="bg-neutral-50 border border-neutral-100 rounded-2xl p-4 space-y-2 relative">
+                            <button
+                              type="button"
+                              onClick={() => setCheckoutStep(1)}
+                              className="absolute top-4 right-4 text-xs font-bold text-[#C86428] hover:underline flex items-center gap-1"
+                            >
+                              <ArrowLeft className="w-3 h-3" /> Edit
+                            </button>
+                            <h4 className="text-[10px] font-bold uppercase text-neutral-400 tracking-wider">Shipping Destination</h4>
+                            <div className="text-sm font-semibold text-[#4A1D05]">{checkout.fullName}</div>
+                            <div className="text-xs text-neutral-600 font-medium">+91 {checkout.phone}</div>
+                            <div className="text-xs text-neutral-500 leading-relaxed max-w-[85%]">{checkout.address}, {checkout.pincode}</div>
+                          </div>
 
+                          {/* Select Payment Method */}
+                          <div className="space-y-3">
+                            <label className="block text-xs font-bold text-[#4A1D05] uppercase tracking-wider">
+                              Select Payment Method *
+                            </label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {/* COD Option */}
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod('cod')}
+                                className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                                  paymentMethod === 'cod'
+                                    ? 'border-[#C86428] bg-[#C86428]/5 ring-2 ring-[#C86428]'
+                                    : 'border-neutral-200 bg-white hover:bg-neutral-50'
+                                }`}
+                              >
+                                <div className={`p-2 rounded-xl mt-0.5 ${paymentMethod === 'cod' ? 'bg-[#C86428]/10 text-[#C86428]' : 'bg-neutral-100 text-neutral-500'}`}>
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <span className="block text-sm font-bold text-[#4A1D05]">Cash on Delivery</span>
+                                  <span className="block text-[10px] text-neutral-500 mt-0.5">Pay in cash upon delivery</span>
+                                </div>
+                              </button>
+
+                              {/* UPI Option */}
+                              <button
+                                type="button"
+                                onClick={() => setPaymentMethod('upi')}
+                                className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all ${
+                                  paymentMethod === 'upi'
+                                    ? 'border-[#C86428] bg-[#C86428]/5 ring-2 ring-[#C86428]'
+                                    : 'border-neutral-200 bg-white hover:bg-neutral-50'
+                                }`}
+                              >
+                                <div className={`p-2 rounded-xl mt-0.5 ${paymentMethod === 'upi' ? 'bg-[#C86428]/10 text-[#C86428]' : 'bg-neutral-100 text-neutral-500'}`}>
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 8h16M4 16h16" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <span className="block text-sm font-bold text-[#4A1D05]">Pay via UPI</span>
+                                  <span className="block text-[10px] text-neutral-500 mt-0.5">Scan QR & Pay instantly</span>
+                                </div>
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Dynamic UPI Details & QR Code display */}
+                          {paymentMethod === 'upi' && (
+                            <div className="bg-amber-50/50 border border-amber-200/60 rounded-2xl p-5 flex flex-col items-center text-center space-y-4 animate-fade-in">
+                              <div className="bg-white p-3 rounded-2xl shadow-md border border-neutral-100 relative">
+                                {/* Paste your own QR code link in the src below if you want to replace it */}
+                                <img 
+                                  src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D9350302092m%40pnb%26pn%3DMEONMODE%2520ENTERPRISES" 
+                                  alt="meONmode UPI QR Code" 
+                                  className="w-48 h-48 block object-contain"
+                                />
+                                <div className="absolute inset-0 border border-black/5 rounded-2xl pointer-events-none"></div>
+                              </div>
+                              <div className="space-y-1">
+                                <span className="text-[10px] uppercase font-bold text-neutral-400 tracking-wider">UPI Merchant</span>
+                                <div className="text-sm font-extrabold text-[#4A1D05]">MEONMODE ENTERPRISES</div>
+                                <div className="text-xs bg-white border border-neutral-200 px-3 py-1.5 rounded-full inline-flex items-center gap-1.5 font-mono text-neutral-700 font-semibold mt-1">
+                                  <span>9350302092m@pnb</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText('9350302092m@pnb');
+                                      alert('UPI ID copied to clipboard!');
+                                    }}
+                                    className="text-[#C86428] hover:text-[#8B3B15] font-sans text-[10px] font-bold uppercase ml-1 border-l pl-1.5 border-neutral-200"
+                                  >
+                                    Copy
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="text-[11px] text-neutral-500 leading-normal max-w-sm">
+                                Scan the QR code using GPay, PhonePe, Paytm, or BHIM to pay instantly. Once paid, click the button below to confirm.
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action trigger button */}
+                          <div className="pt-4 border-t border-neutral-100">
+                            <button 
+                              id="whatsapp-confirm-btn"
+                              type="submit"
+                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2.5 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] shadow-lg active:scale-95 duration-200"
+                            >
+                              <Send className="w-5 h-5" />
+                              <span>Confirm Order via WhatsApp</span>
+                            </button>
+                            
+                            <span className="block text-center text-[10px] text-neutral-400 mt-2.5">
+                              *Upon clicking, your order details will compile instantly. Please hit "Send" in WhatsApp to register. Your screen here will update automatically.
+                            </span>
+                          </div>
+                        </>
+                      )}
                     </form>
                   </div>
                 </div>
