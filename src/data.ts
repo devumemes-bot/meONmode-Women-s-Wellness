@@ -8,9 +8,17 @@ export const PRODUCTS: Product[] = [
     price: 1999,
     mrp: 3798,
     images: [
-      '1000166076.jpg',
-      'ovaira_capsules.jpg',
-      'https://i.postimg.cc/hf0kMP18/Chat-GPT-Image-Jun-20-2026-10-28-00-PM.png'
+      'https://i.postimg.cc/5jhzFdCC/IMG-2915.png',
+      'https://i.postimg.cc/rRKv6RJj/IMG-2925.png',
+      'https://i.postimg.cc/kDGrRLmD/IMG-2926.png',
+      'https://i.postimg.cc/G9t0T6CY/IMG-2927.png',
+      'https://i.postimg.cc/WtHBGSN1/IMG-2929.png',
+      'https://i.postimg.cc/CdQ3GJh8/IMG-2930.png',
+      'https://i.postimg.cc/NLz36bsd/IMG-2931.png',
+      'https://i.postimg.cc/qg5PsQJm/IMG-2932.png',
+      'https://i.postimg.cc/CdQ3GJh2/IMG-2933.png',
+      'https://i.postimg.cc/xcNWtH8y/IMG-2934.png',
+      'https://i.postimg.cc/WhqQXrz9/IMG-2935.png'
     ],
     tag: "BEST SELLER - SAVE 47%",
     shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
@@ -41,8 +49,18 @@ export const PRODUCTS: Product[] = [
     price: 1199,
     mrp: 1899,
     images: [
-      'ovaira_capsules.jpg',
-      '1000166076.jpg'
+      'https://i.postimg.cc/JtDJn4Gw/IMG-2904.png',
+      'https://i.postimg.cc/t7ZPTCYJ/IMG-2905.png',
+      'https://i.postimg.cc/MXMRTKvv/IMG-2906.png',
+      'https://i.postimg.cc/Rq6fFVNF/IMG-2907.png',
+      'https://i.postimg.cc/14n6t5f4/IMG-2908.png',
+      'https://i.postimg.cc/Z0GNytdv/IMG-2909.png',
+      'https://i.postimg.cc/grCh6FZR/IMG-2910.png',
+      'https://i.postimg.cc/pywjnbFC/IMG-2911.png',
+      'https://i.postimg.cc/NL3XrqHp/IMG-2912.png',
+      'https://i.postimg.cc/MXCBj2Q9/IMG-2913.png',
+      'https://i.postimg.cc/G9WDswy7/IMG-2914.png',
+      'https://i.postimg.cc/5jhzFdCC/IMG-2915.png'
     ],
     tag: "PCOS SPECIALLY FORMULATED",
     shortDescription: "60 Veg Capsules to manage insulin resistance, reduce ovarian cysts, and clear hormonal acne.",
@@ -71,8 +89,16 @@ export const PRODUCTS: Product[] = [
     price: 999,
     mrp: 1799,
     images: [
-      'https://i.postimg.cc/hf0kMP18/Chat-GPT-Image-Jun-20-2026-10-28-00-PM.png',
-      '1000166076.jpg'
+      'https://i.postimg.cc/5jhzFdCC/IMG-2915.png',
+      'https://i.postimg.cc/kVSGCDTy/IMG-2916.png',
+      'https://i.postimg.cc/phtTLx7M/IMG-2917.png',
+      'https://i.postimg.cc/62N3pwSt/IMG-2918.png',
+      'https://i.postimg.cc/2bf6SmJz/IMG-2919.png',
+      'https://i.postimg.cc/R6zFZ989/IMG-2920.png',
+      'https://i.postimg.cc/CBV1xYtf/IMG-2921.png',
+      'https://i.postimg.cc/gXq0wQFw/IMG-2922.png',
+      'https://i.postimg.cc/DJdzWHk4/IMG-2923.png',
+      'https://i.postimg.cc/TLqPyFMr/IMG-2924.png'
     ],
     tag: "100% PAIN-FREE PERIODS",
     shortDescription: "500ml Premium Syrup to relieve painful period cramps and restore perfect cycle volume.",
