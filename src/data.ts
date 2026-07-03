@@ -12,7 +12,7 @@ export const PRODUCTS: Product[] = [
       'https://i.postimg.cc/2ywmZ4Ls/IMG-2925.png',
       'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png',
       'https://i.postimg.cc/Pfzd9kV6/IMG-2927.png',
-      'https://i.postimg.cc/5N4fMkDL/IMG-2929.png',
+      'https://i.postimg.cc/ZRvwLMtd/IMG-2913.png',
       'https://i.postimg.cc/gkzGPB1g/IMG-2930.png',
       'https://i.postimg.cc/dtsJKSzc/IMG-2931.png',
       'https://i.postimg.cc/YqrtwyJw/IMG-2932.png',
@@ -23,7 +23,7 @@ export const PRODUCTS: Product[] = [
     tag: "BEST SELLER - SAVE 47%",
     shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
     longDescription: "The ultimate dual-action therapeutic kit designed by Ayurvedic gynecologists to target the root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort. While OVAIRA capsules regulate LH/FSH balance and resolve ovarian cysts, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a perfect, natural, 100% side-effect-free solution to help you regain control over your life.",
-    volumeOrQty: "60 Capsules + 200ml Syrup",
+    volumeOrQty: "60 Capsules + 500ml Syrup",
     dosage: "• OVAIRA Capsule: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).\n• FLOWELLE Syrup: Take 5ml in the Morning and 5ml in the Evening (After Meals).",
     benefits: [
       "Normalizes irregular cycles and balances LH/FSH levels naturally",
@@ -39,8 +39,8 @@ export const PRODUCTS: Product[] = [
       { name: "Kanchnar", benefit: "Cyst Reduction", description: "Renowned in Ayurveda for reducing lymphatic swellings and assisting in ovarian cyst management." },
       { name: "Lodhra", benefit: "Flow Regulation", description: "Maintains optimal progesterone levels to stop excess bleeding and normalizes flow volume." }
     ],
-    rating: 4.9,
-    reviewsCount: 14820
+    rating: 5.0,
+    reviewsCount: 942
   },
   {
     id: 'ovaira',
@@ -58,8 +58,8 @@ export const PRODUCTS: Product[] = [
       'https://i.postimg.cc/X7JkmnN2/IMG-2910.png',
       'https://i.postimg.cc/5N0STf9h/IMG-2911.png',
       'https://i.postimg.cc/qMRxSpMV/IMG-2912.png',
-      'https://i.postimg.cc/7Y6ndqYr/IMG-2913.png',
-      'https://i.postimg.cc/nczGgncJ/IMG-2914.png'
+      'https://i.postimg.cc/ZRvwLMtd/IMG-2913.png',
+      'https://i.postimg.cc/zvm02F8S/IMG-2914.png'
     ],
     tag: "PCOS SPECIALLY FORMULATED",
     shortDescription: "60 Veg Capsules to manage insulin resistance, reduce ovarian cysts, and clear hormonal acne.",
@@ -78,8 +78,8 @@ export const PRODUCTS: Product[] = [
       { name: "Kanchnar Guggulu", benefit: "Glandular Tonic", description: "A classic Ayurvedic formulation to break down growths, nodules, and fluid-filled cysts." },
       { name: "Lodhra", benefit: "LH/FSH Balance", description: "Assists the pituitary gland in maintaining a healthy ratio of ovulation hormones." }
     ],
-    rating: 4.8,
-    reviewsCount: 8940
+    rating: 4.9,
+    reviewsCount: 874
   },
   {
     id: 'flowelle',
@@ -120,7 +120,7 @@ export const PRODUCTS: Product[] = [
       { name: "Ashwagandha", benefit: "Stress & Fatigue", description: "Helps reduce cortisol (stress), anxiety, and menstrual low energy or fatigue." }
     ],
     rating: 4.8,
-    reviewsCount: 6540
+    reviewsCount: 781
   }
 ];
 
@@ -151,21 +151,21 @@ export const MENS_PRODUCTS: Product[] = [
       { name: "Ashwagandha", benefit: "Stamina Support", description: "Prominent adaptogen that lowers cortisol levels and builds stamina." }
     ],
     rating: 4.9,
-    reviewsCount: 7240
+    reviewsCount: 819
   },
   {
-    id: 'shaktimax-men',
-    name: "meONmode® SHAKTIMAX FOR MEN (Capsules)",
+    id: 'alphamax-men',
+    name: "meONmode® AlphaMax FOR MEN (Capsules)",
     subtitle: "Power & Energy Capsules",
     price: 1199,
     mrp: 1999,
     images: [
-      'shaktimax-men.jpg',
+      'alphamax-men.jpg',
       'mens-combo.jpg'
     ],
     tag: "ENERGY & VITALITY",
     shortDescription: "60 veg capsules packed with organic extracts to optimize cellular energy, vitality, and health.",
-    longDescription: "meONmode® SHAKTIMAX is an advanced vitality supplement combining the power of Shudh Shilajit, Safed Musli, and Gokshura. It is designed to maximize daily physical energy, boost circulation, and regulate vitality markers naturally without any synthetic additions or chemicals.",
+    longDescription: "meONmode® AlphaMax is an advanced vitality supplement combining the power of Shudh Shilajit, Safed Musli, and Gokshura. It is designed to maximize daily physical energy, boost circulation, and regulate vitality markers naturally without any synthetic additions or chemicals.",
     volumeOrQty: "60 Veg Capsules",
     dosage: "Take 1 capsule in the morning and 1 capsule in the evening (after meals).",
     benefits: [
@@ -179,24 +179,24 @@ export const MENS_PRODUCTS: Product[] = [
       { name: "Gokshura", benefit: "Vascular Health", description: "Improves nitric oxide levels to support vascular flow and stamina." }
     ],
     rating: 4.8,
-    reviewsCount: 5120
+    reviewsCount: 736
   },
   {
     id: 'mens-combo',
     name: "Men's Ultimate Performance Combo",
-    subtitle: "WANTMORE Powder + SHAKTIMAX Capsules",
+    subtitle: "WANTMORE Powder + AlphaMax Capsules",
     price: 2199,
     mrp: 4498,
     images: [
       'mens-combo.jpg',
       'wantmore-men.jpg',
-      'shaktimax-men.jpg'
+      'alphamax-men.jpg'
     ],
     tag: "BEST SELLER - SAVE 51%",
     shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health.",
-    longDescription: "The absolute premium duo stack containing WANTMORE Powder and SHAKTIMAX Capsules. This synergy offers a dual-action therapeutic approach: while SHAKTIMAX provides cell-level vitality and recovery throughout the day, WANTMORE Powder powers peak performance, vascular output, and stamina during high-exertion activities.",
+    longDescription: "The absolute premium duo stack containing WANTMORE Powder and AlphaMax Capsules. This synergy offers a dual-action therapeutic approach: while AlphaMax provides cell-level vitality and recovery throughout the day, WANTMORE Powder powers peak performance, vascular output, and stamina during high-exertion activities.",
     volumeOrQty: "250g Powder + 60 Capsules",
-    dosage: "• WANTMORE Powder: Take 1 scoop daily with milk after dinner.\n• SHAKTIMAX Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.",
+    dosage: "• WANTMORE Powder: Take 1 scoop daily with milk after dinner.\n• AlphaMax Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.",
     benefits: [
       "Dual-action formula targeting complete vitality and cellular stamina",
       "Synergistic recovery of muscles and daily energy stores",
@@ -207,8 +207,8 @@ export const MENS_PRODUCTS: Product[] = [
       { name: "Shudh Shilajit", benefit: "Cellular Energy", description: "Enriches cells with minerals and fulvic acid for rapid ATP production." },
       { name: "Safed Musli", benefit: "Physical Vigor", description: "Restores deep tissue strength and boosts physical performance." }
     ],
-    rating: 4.9,
-    reviewsCount: 11250
+    rating: 5.0,
+    reviewsCount: 915
   }
 ];
 
@@ -254,7 +254,7 @@ export const MENS_TESTIMONIALS = [
     location: "Pune",
     rating: 5,
     title: "No more fatigue or energy crashes",
-    comment: "Shaktimax Capsules are unbelievable. I take one capsule with breakfast and have high, sustained energy throughout the day. Best natural supplement I've found that actually works without side effects."
+    comment: "AlphaMax Capsules are unbelievable. I take one capsule with breakfast and have high, sustained energy throughout the day. Best natural supplement I've found that actually works without side effects."
   },
   {
     name: "Dr. Karan Mehta",
@@ -284,14 +284,314 @@ export const FAQS = [
 export const MENS_FAQS = [
   {
     question: "How long does it take to feel a difference?",
-    answer: "Most men notice an increase in energy levels and reduced fatigue within 7 to 10 days of starting WANTMORE and SHAKTIMAX. For sustainable stamina gains and muscle recovery, we recommend a 90-day continuous reset protocol."
+    answer: "Most men notice an increase in energy levels and reduced fatigue within 7 to 10 days of starting WANTMORE and AlphaMax. For sustainable stamina gains and muscle recovery, we recommend a 90-day continuous reset protocol."
   },
   {
     question: "Is meONmode Men's collection safe?",
     answer: "Absolutely. Our products are made of 100% pure Ayurvedic herbs, contain no steroids, heavy metals, or artificial compounds, and are formulated under Ayush ministry guidelines for safe, daily, long-term consumption."
   },
   {
-    question: "Can I use both WANTMORE and SHAKTIMAX together?",
-    answer: "Yes, they are designed to work synergistically. SHAKTIMAX Capsules support continuous cellular recovery and vascular health, while WANTMORE Powder provides high-impact energy and power for peak performance."
+    question: "Can I use both WANTMORE and AlphaMax together?",
+    answer: "Yes, they are designed to work synergistically. AlphaMax Capsules support continuous cellular recovery and vascular health, while WANTMORE Powder provides high-impact energy and power for peak performance."
   }
 ];
+
+export interface CustomerReview {
+  productId: string;
+  name: string;
+  rating: number;
+  review: string;
+  image?: string | string[];
+  verified: boolean;
+  date?: string;
+  title?: string;
+  approved: boolean;
+  featured?: boolean;
+  email?: string;
+  phone?: string;
+  location?: string;
+}
+
+export const reviews: CustomerReview[] = [
+  {
+    productId: "ovaira",
+    name: "Priya Sharma",
+    rating: 5,
+    review: "I've been using OVAIRA consistently and it has become an important part of my daily wellness routine.",
+    image: "https://i.postimg.cc/0y5tTYHw/IMG-3015.jpg",
+    verified: true,
+    date: "12 July 2026",
+    title: "Essential Daily Wellness",
+    approved: true
+  },
+  {
+    productId: "flowelle",
+    name: "Anjali Verma",
+    rating: 5,
+    review: "FLOWELLE is easy to take and fits perfectly into my daily wellness routine.",
+    image: "https://i.postimg.cc/P5f6gWFD/IMG-3016.jpg",
+    verified: true,
+    date: "15 July 2026",
+    title: "Very easy to take",
+    approved: true
+  },
+  {
+    productId: "combo-kit",
+    name: "Karuna",
+    rating: 5,
+    review: "After using OVAIRA and FLOWELLE consistently, I feel more energetic and my daily wellness routine has become much better.",
+    image: "https://i.postimg.cc/CL0J83kT/IMG-3021.jpg",
+    verified: true,
+    date: "16 June 2026",
+    title: "More energetic every day",
+    approved: true
+  },
+  {
+    productId: "combo-kit",
+    name: "Deepika Sangwan",
+    rating: 5,
+    review: "The products are easy to use, beautifully packed, and fit perfectly into my daily wellness routine.",
+    image: "https://i.postimg.cc/ZKx7s7jB/IMG-3013.jpg\nhttps://i.postimg.cc/Z5YfG8D9/IMG-3014.jpg",
+    verified: true,
+    date: "25 June 2026",
+    title: "Beautifully packed & effective",
+    approved: true
+  },
+  {
+    productId: "combo-kit",
+    name: "Priyanka Sharma",
+    rating: 5,
+    review: "I had severe PCOS since 2021. Periods would only come with synthetic pills. After using the meONmode Combo Kit (OVAIRA + FLOWELLE) for 3 months, my cycles are back to a regular 28 days naturally! Best part? My agonizing cramps are 90% gone. Unbelievable results!",
+    verified: true,
+    date: "May 12, 2026",
+    title: "Cured my 2-year irregular periods!",
+    approved: true,
+    location: "Mumbai"
+  },
+  {
+    productId: "combo-kit",
+    name: "Ananya Iyer",
+    rating: 5,
+    review: "This combo kit has been an absolute savior. I used to suffer from extreme heavy flow, vomiting, and unbearable pain during the first two days of my periods. Now, I feel so much more energetic and active. Strongly recommended to every woman!",
+    verified: true,
+    date: "June 2, 2026",
+    title: "Life-changing period support",
+    approved: true,
+    location: "Bangalore"
+  },
+  {
+    productId: "combo-kit",
+    name: "Sneha Patel",
+    rating: 5,
+    review: "My latest ultrasound shows a significant reduction in ovarian cysts! My doctor was genuinely surprised. The combination of capsules and syrup has balanced my hormones completely. I don't feel bloated or moody anymore.",
+    verified: true,
+    date: "April 28, 2026",
+    title: "Cysts reduced on ultrasound!",
+    approved: true,
+    location: "Ahmedabad"
+  },
+  {
+    productId: "combo-kit",
+    name: "Dr. Meenakshi Nair",
+    rating: 5,
+    review: "As an Ayurvedic physician, I recommend this precise OVAIRA and FLOWELLE combination to my patients experiencing PCOD and severe hormonal imbalances. The combination of Shatavari, Ashoka, and Kanchnar works synergistically.",
+    verified: true,
+    date: "June 18, 2026",
+    title: "Highly balanced Ayurvedic ratio",
+    approved: true,
+    location: "Kochi"
+  },
+  {
+    productId: "ovaira",
+    name: "Kavitha R.",
+    rating: 5,
+    review: "I have been taking OVAIRA capsules for my irregular menstrual cycle and hormonal acne. Within 6 weeks, my acne has cleared up completely and my period came exactly on time. It has no side effects and is completely natural.",
+    verified: true,
+    date: "May 20, 2026",
+    title: "Excellent hormone balancer",
+    approved: true,
+    location: "Chennai"
+  },
+  {
+    productId: "ovaira",
+    name: "Meera Sen",
+    rating: 4,
+    review: "Took about a month to show visible results, but it did wonders for my ovulation tracking. My cycles are finally regularizing and the constant pelvic pain has reduced. Highly pure formulation.",
+    verified: true,
+    date: "June 10, 2026",
+    title: "Very effective, but took some time",
+    approved: true,
+    location: "Kolkata"
+  },
+  {
+    productId: "ovaira",
+    name: "Divya Kapoor",
+    rating: 5,
+    review: "These capsules are amazing. The weight gain and facial hair issues I was facing due to PCOS have finally started stabilizing. Feel light and healthy again.",
+    verified: true,
+    date: "April 15, 2026",
+    title: "PCOS symptoms are under control",
+    approved: true,
+    location: "Delhi"
+  },
+  {
+    productId: "flowelle",
+    name: "Aditi Joshi",
+    rating: 5,
+    review: "I used to take painkiller injections every month during my periods. FLOWELLE syrup has regularized the blood flow and eliminated my period pain entirely. The taste is authentic and pleasant too.",
+    verified: true,
+    date: "June 15, 2026",
+    title: "Zero cramps on Day 1!",
+    approved: true,
+    location: "Pune"
+  },
+  {
+    productId: "flowelle",
+    name: "Ridhi Gupta",
+    rating: 5,
+    review: "I was facing very scanty and dark flow for the past year. After taking this syrup for two cycles, my flow is healthy, normal, and bright. Truly a blessing.",
+    verified: true,
+    date: "May 3, 2026",
+    title: "Regularized my scanty flow",
+    approved: true,
+    location: "Jaipur"
+  },
+  {
+    productId: "flowelle",
+    name: "Shalini M.",
+    rating: 4,
+    review: "Extremely helpful for PMS bloating. I used to get severe mood swings and bloating 5 days before my cycle. This syrup keeps me calm and helps digest food better during those difficult days.",
+    verified: true,
+    date: "April 29, 2026",
+    title: "Relief from bloating & mood swings",
+    approved: true,
+    location: "Hyderabad"
+  },
+  {
+    productId: "wantmore-men",
+    name: "Vikram Malhotra",
+    rating: 5,
+    review: "WANTMORE powder has completely upgraded my daily workouts and stamina levels. I mix it with water post-workout, and the recovery rate is phenomenally fast. No sugar crashes, just pure natural strength.",
+    verified: true,
+    date: "June 1, 2026",
+    title: "Incredible athletic stamina boost",
+    approved: true,
+    location: "Pune"
+  },
+  {
+    productId: "wantmore-men",
+    name: "Dr. Karan Mehta",
+    rating: 5,
+    review: "Clinically speaking, the concentration of active L-arginine and Safed Musli in meONmode is pristine. It supports natural vascular circulation, decreases cortisol buildup, and enhances daily physical vigor.",
+    verified: true,
+    date: "May 25, 2026",
+    title: "Exceptional pure adaptogens",
+    approved: true,
+    location: "Ahmedabad"
+  },
+  {
+    productId: "wantmore-men",
+    name: "Sandeep Yadav",
+    rating: 4,
+    review: "Great quality powder that mixes cleanly. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this premium formulation.",
+    verified: true,
+    date: "April 18, 2026",
+    title: "Tastes extremely natural & organic",
+    approved: true,
+    location: "Gurugram"
+  },
+  {
+    productId: "alphamax-men",
+    name: "Rajesh Varma",
+    rating: 5,
+    review: "I was experiencing continuous post-work fatigue. After taking AlphaMax capsules daily for 4 weeks, my endurance has risen dramatically. I wake up fresh every single morning without feeling sluggish.",
+    verified: true,
+    date: "June 12, 2026",
+    title: "Double the power and energy!",
+    approved: true,
+    location: "Delhi"
+  },
+  {
+    productId: "alphamax-men",
+    name: "Amit Deshmukh",
+    rating: 4,
+    review: "It contains Shudh Shilajit which gives an amazing, clean energy boost throughout the day. It doesn't cause any palpitations or digestive discomfort. Highly satisfied with my purchase.",
+    verified: true,
+    date: "May 19, 2026",
+    title: "Great everyday energy capsules",
+    approved: true,
+    location: "Nagpur"
+  },
+  {
+    productId: "alphamax-men",
+    name: "Nikhil Fernandes",
+    rating: 5,
+    review: "These capsules are stellar. My recovery after endurance cycling is incredibly fast, and I feel a distinct sharpness in my daily physical strength. Completely natural and non-habit forming.",
+    verified: true,
+    date: "April 25, 2026",
+    title: "Best natural vitality booster",
+    approved: true,
+    location: "Goa"
+  },
+  {
+    productId: "mens-combo",
+    name: "Arun Nair",
+    rating: 5,
+    review: "This dual synergy works flawlessly. The AlphaMax capsules provide consistent cellular energy throughout the day, while the WANTMORE powder fuels peak athletic vascular flow. My gym gains and stamina have doubled!",
+    verified: true,
+    date: "June 22, 2026",
+    title: "The Ultimate Male Vitality Stack",
+    approved: true,
+    location: "Bengaluru"
+  },
+  {
+    productId: "mens-combo",
+    name: "Jaspreet Singh",
+    rating: 5,
+    review: "I have tried multiple premium supplements, but meONmode's Men's Combo is on another level. My chronic physical fatigue and brain fog are gone. I feel like I'm in my early 20s again. Clean and high quality.",
+    verified: true,
+    date: "June 5, 2026",
+    title: "Worth every single rupee!",
+    approved: true,
+    location: "Chandigarh"
+  },
+  {
+    productId: "mens-combo",
+    name: "Rohit Saxena",
+    rating: 4,
+    review: "Excellent combination. I take the capsules with breakfast and the powder post-workout. I have seen clear improvements in muscle mass recovery and sustained energy during long business trips. Best stack out there.",
+    verified: true,
+    date: "May 14, 2026",
+    title: "Highly energetic and powerful",
+    approved: true,
+    location: "Noida"
+  },
+  {
+    productId: "mens-combo",
+    name: "Dr. Vivek Chawla",
+    rating: 5,
+    review: "I recommend this combo stack to working professionals suffering from executive stress and fatigue. The Gokshura and Shudh Shilajit dosage is perfectly calibrated for cardiovascular health and cell vitality.",
+    verified: true,
+    date: "April 30, 2026",
+    title: "Clinically superior strength formulation",
+    approved: true,
+    location: "Delhi"
+  }
+];
+
+// Helper to support legacy structures during transition
+export const PRODUCT_REVIEWS: Record<string, CustomerReview[]> = reviews.reduce((acc, rev) => {
+  if (!acc[rev.productId]) {
+    acc[rev.productId] = [];
+  }
+  acc[rev.productId].push(rev);
+  return acc;
+}, {} as Record<string, CustomerReview[]>);
+
+export const reviewImages = [
+  'https://i.postimg.cc/ZKx7s7jB/IMG-3013.jpg',
+  'https://i.postimg.cc/Z5YfG8D9/IMG-3014.jpg',
+  'https://i.postimg.cc/0y5tTYHw/IMG-3015.jpg',
+  'https://i.postimg.cc/P5f6gWFD/IMG-3016.jpg'
+];
+

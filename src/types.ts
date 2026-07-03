@@ -21,7 +21,7 @@ export interface CartItem {
   quantity: number;
 }
 
-export type ViewType = 'home' | 'detail' | 'cart' | 'success' | 'refund-policy';
+export type ViewType = 'home' | 'detail' | 'cart' | 'success' | 'refund-policy' | 'track-order';
 
 export interface CheckoutDetails {
   fullName: string;

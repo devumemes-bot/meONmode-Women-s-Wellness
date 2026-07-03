@@ -35,3 +35,27 @@
   image-rendering: pixelated !important;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1.5deg); }
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes soft-glow {
+  0%, 100% { transform: scale(1) translate(0px, 0px); opacity: 0.3; }
+  50% { transform: scale(1.1) translate(10px, -10px); opacity: 0.45; }
+}
+.animate-soft-glow {
+  animation: soft-glow 8s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.animate-breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+

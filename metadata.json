@@ -1,6 +1,6 @@
 {
   "name": "meONmode Women's Wellness",
-  "description": "Premium Ayurvedic wellness landing page and shopping cart for meONmode® OVAIRA and FLOWELLE.",
+  "description": "Premium Ayurvedic wellness portal for meONmode® Men's & Women's collections, featuring WANTMORE, AlphaMax, OVAIRA, and FLOWELLE, alongside a centralized Customer Reviews & Ratings ecosystem.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
