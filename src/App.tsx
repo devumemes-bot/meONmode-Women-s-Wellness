@@ -45,6 +45,7 @@ import {
 import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages } from './data';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
+import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
 
 // Cookie helpers for pre-filling user data
 function getCookie(name: string): string | null {
@@ -78,6 +79,18 @@ function getProductCategory(prod: Product): string {
 
 export default function App() {
   const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  // Language switcher state
+  const [lang, setLang] = useState<'en' | 'hi'>(() => {
+    const saved = localStorage.getItem('meonmode-lang');
+    return (saved === 'hi' ? 'hi' : 'en');
+  });
+
+  useEffect(() => {
+    localStorage.setItem('meonmode-lang', lang);
+  }, [lang]);
+
+
 
   // Navigation & Cart States
   const [currentView, setCurrentView] = useState<ViewType>('home');
@@ -120,6 +133,54 @@ export default function App() {
     setShowToast(msg);
     setTimeout(() => setShowToast(null), 3000);
   };
+
+  // Translate products dynamically based on lang
+  const translatedData = getTranslatedProducts(lang, PRODUCTS, MENS_PRODUCTS);
+  const womenProducts = translatedData.women;
+  const menProducts = translatedData.men;
+
+  const displayFAQs = activeCategory === 'all' 
+    ? [...getTranslatedFAQs(lang, false), ...getTranslatedFAQs(lang, true)]
+    : getTranslatedFAQs(lang, activeCategory === 'men');
+  const displayTestimonials = activeCategory === 'all'
+    ? [...getTranslatedTestimonials(lang, false), ...getTranslatedTestimonials(lang, true)]
+    : getTranslatedTestimonials(lang, activeCategory === 'men');
+  const displayReviews = getTranslatedReviews(lang);
+  const currentReviews = allReviews.map(rev => {
+    const matched = displayReviews.find(tr => tr.productId === rev.productId && (tr.name === rev.name || rev.name === "Priya Sharma" || rev.name === "Anjali Verma" || rev.name === "Karuna" || rev.name === "प्रिया शर्मा" || rev.name === "अंजलि वर्मा" || rev.name === "करुणा"));
+    if (matched) {
+      return {
+        ...rev,
+        name: matched.name,
+        review: matched.review,
+        title: matched.title
+      };
+    }
+    return rev;
+  });
+
+  const t = (key: keyof typeof UI_TRANSLATIONS['en'], variables?: Record<string, string | number>) => {
+    let str = UI_TRANSLATIONS[lang][key] || UI_TRANSLATIONS['en'][key] || '';
+    if (variables) {
+      Object.entries(variables).forEach(([k, v]) => {
+        str = str.replace(`{${k}}`, String(v));
+      });
+    }
+    return str;
+  };
+
+  // Translate products dynamically inside the cart
+  const translatedCart = cart.map(item => {
+    const translatedProd = womenProducts.find(p => p.id === item.product.id) || menProducts.find(p => p.id === item.product.id) || item.product;
+    return {
+      ...item,
+      product: translatedProd
+    };
+  });
+
+  const currentProduct = selectedProduct 
+    ? (womenProducts.find(p => p.id === selectedProduct.id) || menProducts.find(p => p.id === selectedProduct.id) || selectedProduct) 
+    : null;
 
   // Convert uploaded review images into Base64 URLs for localized persistence
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,17 +237,15 @@ export default function App() {
   };
 
   const getProductStockStatus = (productId: string) => {
-    if (productId === 'flowelle' || productId === 'wantmore-men') {
-      return { status: 'out_of_stock', text: '🔴 OUT OF STOCK' };
-    }
-    const counts: Record<string, number> = {
-      'combo-kit': 12,
-      'ovaira': 7,
-      'alphamax-men': 5,
-      'mens-combo': 8
+    const indicators: Record<string, { status: string; text: string; count: number }> = {
+      'combo-kit': { status: 'selling_fast', text: t('stockSellingFast'), count: 50 },
+      'ovaira': { status: 'limited_stock', text: t('stockLimited'), count: 50 },
+      'flowelle': { status: 'in_stock', text: t('stockInStock'), count: 100 },
+      'wantmore-men': { status: 'ready_to_ship', text: t('stockReady'), count: 100 },
+      'alphamax-men': { status: 'selling_fast', text: t('stockSellingFast'), count: 50 },
+      'mens-combo': { status: 'limited_stock', text: t('stockLimited'), count: 50 }
     };
-    const count = counts[productId] || 7;
-    return { status: 'low_stock', text: `⚠️ LOW STOCK: ONLY ${count} LEFT!`, count };
+    return indicators[productId] || { status: 'in_stock', text: t('stockInStock'), count: 100 };
   };
 
   // Form Details
@@ -213,6 +272,7 @@ export default function App() {
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const [searchCategory, setSearchCategory] = useState<'All' | 'Capsules' | 'Syrups' | 'Combos' | 'Powder'>('All');
   const [lastOrderId, setLastOrderId] = useState<string>('');
+  const [showInvoice, setShowInvoice] = useState<boolean>(false);
   const [trackingOrderIdInput, setTrackingOrderIdInput] = useState<string>('');
   const [orderHistory, setOrderHistory] = useState<string[]>(() => {
     try {
@@ -498,20 +558,23 @@ export default function App() {
       return;
     }
 
-    // Generate cart text details
-    const cartSummary = cart.map(item => 
+    // Generate cart text details using translatedCart to support the selected language (Hindi/English)
+    const cartSummary = translatedCart.map(item => 
       `${item.product.name} x ${item.quantity} - Rs. ${(item.product.price * item.quantity).toLocaleString('en-IN')}`
     ).join('\n');
 
-    const subtotal = Math.round(getCartTotal() / 1.18);
-    const gst = getCartTotal() - subtotal;
+    const totalAmount = getCartTotal();
+    const taxableValue = Math.round((totalAmount / 1.05) * 100) / 100;
+    const totalGst = Math.round((totalAmount - taxableValue) * 100) / 100;
+    const cgst = Math.round((totalGst / 2) * 100) / 100;
+    const sgst = Math.round((totalGst / 2) * 100) / 100;
     const isCod = paymentMethod === 'cod';
-    const advancePaid = isCod ? 150 : getCartTotal();
-    const balanceDue = isCod ? getCartTotal() - 150 : 0;
+    const advancePaid = isCod ? 150 : totalAmount;
+    const balanceDue = isCod ? totalAmount - 150 : 0;
 
     const paymentLine = isCod 
-      ? `• Mandatory COD Advance Paid: Rs. 150\n• Balance Due at Delivery: Rs. ${balanceDue.toLocaleString('en-IN')}\n[Rs. ${getCartTotal().toLocaleString('en-IN')} - Rs. 150 = Rs. ${balanceDue.toLocaleString('en-IN')}]`
-      : `• Prepaid Full Amount Paid: Rs. ${getCartTotal().toLocaleString('en-IN')}`;
+      ? `• Mandatory COD Advance Paid: Rs. 150\n• Balance Due at Delivery: Rs. ${balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}\n[Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})} - Rs. 150 = Rs. ${balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}]`
+      : `• Prepaid Full Amount Paid: Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
 
     // Generate a unique Order ID
     const randomOrderNum = Math.floor(100000 + Math.random() * 900000);
@@ -532,9 +595,11 @@ export default function App() {
 *Order Summary:*
 ${cartSummary}
 
-Subtotal: Rs. ${subtotal.toLocaleString('en-IN')}
-GST (18%): Rs. ${gst.toLocaleString('en-IN')}
-*Total Product Bill: Rs. ${getCartTotal().toLocaleString('en-IN')}*
+Taxable Value: Rs. ${taxableValue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+CGST (2.5%): Rs. ${cgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+SGST (2.5%): Rs. ${sgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+Total GST (5%): Rs. ${totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+*Grand Total (Inclusive of 5% GST): Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}*
 
 *Payment & Delivery Breakdown:*
 ${paymentLine}
@@ -577,7 +642,7 @@ Please process and confirm this parcel for dispatch.`;
             : 'bg-[#5C1D13] text-[#FDFEFE]'
       }`}>
         <Lock className="w-3.5 h-3.5 text-[#E5A93C]" />
-        <span>100% Discreet Packaging. Free Shipping across India. Cash on Delivery Available.</span>
+        <span>{t('freeShipping')}</span>
       </div>
 
       {/* Global Navigation Header */}
@@ -709,7 +774,7 @@ Please process and confirm this parcel for dispatch.`;
                 <div className="space-y-1.5 max-h-[180px] overflow-y-auto custom-scrollbar">
                   <span className="block text-[8px] uppercase font-bold text-[#E5A93C] font-mono tracking-wider">Matching Remedies</span>
                   {(() => {
-                    const allProductsList = [...PRODUCTS, ...MENS_PRODUCTS];
+                    const allProductsList = [...womenProducts, ...menProducts];
                     const matched = allProductsList.filter(prod => {
                       // Filter by text search
                       const q = searchQuery.toLowerCase();
@@ -850,6 +915,32 @@ Please process and confirm this parcel for dispatch.`;
             </nav>
 
 
+
+            {/* Language Switcher */}
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5 text-[10px] sm:text-xs">
+              <button
+                type="button"
+                onClick={() => setLang('en')}
+                className={`px-2 py-1 rounded-full font-extrabold transition-all cursor-pointer ${
+                  lang === 'en'
+                    ? 'bg-[#E5A93C] text-[#2D120B] shadow-sm font-black'
+                    : 'text-white/80 hover:text-white'
+                }`}
+              >
+                🇬🇧 EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang('hi')}
+                className={`px-2 py-1 rounded-full font-extrabold transition-all cursor-pointer ${
+                  lang === 'hi'
+                    ? 'bg-[#E5A93C] text-[#2D120B] shadow-sm font-black'
+                    : 'text-white/80 hover:text-white'
+                }`}
+              >
+                🇮🇳 हिन्दी
+              </button>
+            </div>
 
             {/* Cart Button */}
             <button 
@@ -1171,64 +1262,64 @@ Please process and confirm this parcel for dispatch.`;
                         : 'bg-[#E5A93C]/10 border-amber-500/30 text-[#E5A93C]'
                     }`}>
                       <Sparkles className="w-3 h-3 text-[#E5A93C]" />
-                      {activeCategory === 'all' ? "Premium Complete Rejuvenation" : "Premium Men's Vitality"}
+                      {activeCategory === 'all' ? t('heroTaglineAll') : t('heroTaglineMen')}
                     </div>
                     
                     <h1 className="font-serif text-3.5xl sm:text-5xl md:text-5.5xl lg:text-6.5xl font-extrabold tracking-tight text-white leading-[1.08]">
                       {activeCategory === 'all' ? (
                         <>
-                          Peak Wellness. <br />
-                          <span className="text-[#E5A93C] font-black">All ON Mode.</span>
+                          {t('heroTitleAll1')} <br />
+                          <span className="text-[#E5A93C] font-black">{t('heroTitleAll2')}</span>
                         </>
                       ) : (
                         <>
-                          Unleash Your <br />
-                          <span className="text-[#E5A93C] font-black">MAX Mode.</span>
+                          {t('heroTitleMen1')} <br />
+                          <span className="text-[#E5A93C] font-black">{t('heroTitleMen2')}</span>
                         </>
                       )}
                     </h1>
 
                     <p className="text-[#F7E7D9] text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-medium">
                       {activeCategory === 'all'
-                        ? "Nourish your entire system with our complete medical-grade Ayurvedic formulations. Experience hormone synergy, period regularity, robust stamina, and complete vigor."
-                        : "Elevate your strength, physical stamina, and performance with clinically tested Ayurvedic herbs that support cellular energy and vital restoration."}
+                        ? t('heroDescAll')
+                        : t('heroDescMen')}
                     </p>
 
                     {/* Highlight Specs */}
                     <div className="grid grid-cols-2 gap-3.5 max-w-md pt-1">
                       <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
                         <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>AYUSH Ministry Formulated</span>
+                        <span>{t('heroSpec1')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
                         <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>100% Clean Bioactives</span>
+                        <span>{t('heroSpec2')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
                         <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>Clinically Tested Roots</span>
+                        <span>{t('heroSpec3')}</span>
                       </div>
                       <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
                         <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>Zero Chemical Steroids</span>
+                        <span>{t('heroSpec4')}</span>
                       </div>
                     </div>
 
                     <div className="pt-3 flex flex-col sm:flex-row gap-4">
                       <button 
                         id="hero-buy-combo-btn"
-                        onClick={() => handleQuickBuy(activeCategory === 'men' ? MENS_PRODUCTS[2] : PRODUCTS[0])}
+                        onClick={() => handleQuickBuy(activeCategory === 'men' ? menProducts[2] : womenProducts[0])}
                         className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_20px_rgba(200,100,40,0.6)] hover:scale-[1.01] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <ShoppingBag className="w-4.5 h-4.5" />
-                        <span>Shop Combo Kit - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹2,199' : '₹1,999'}</span></span>
+                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹6,999' : '₹1,999'}</span></span>
                       </button>
                       <button 
                         id="hero-view-details-btn"
-                        onClick={() => handleProductClick(activeCategory === 'men' ? MENS_PRODUCTS[2] : PRODUCTS[0])}
+                        onClick={() => handleProductClick(activeCategory === 'men' ? menProducts[2] : womenProducts[0])}
                         className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm py-3.5 px-6 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] text-center cursor-pointer hover:scale-[1.01]"
                       >
-                        Learn More
+                        {t('learnMore')}
                       </button>
                     </div>
                   </div>
@@ -1435,10 +1526,10 @@ Please process and confirm this parcel for dispatch.`;
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {(() => {
                     const filteredProducts = (activeCategory === 'all' 
-                      ? [PRODUCTS[1], PRODUCTS[2], MENS_PRODUCTS[0], MENS_PRODUCTS[1], PRODUCTS[0], MENS_PRODUCTS[2]] 
+                      ? [womenProducts[1], womenProducts[2], menProducts[0], menProducts[1], womenProducts[0], menProducts[2]] 
                       : activeCategory === 'men' 
-                        ? MENS_PRODUCTS 
-                        : PRODUCTS
+                        ? menProducts 
+                        : womenProducts
                     ).filter(prod => {
                       if (!searchQuery) return true;
                       const q = searchQuery.toLowerCase();
@@ -1585,16 +1676,21 @@ Please process and confirm this parcel for dispatch.`;
 
                           {/* Pricing & Scarcity Layout */}
                           <div className="space-y-1.5 pt-1">
-                            <div className="flex items-center gap-2.5 flex-wrap">
-                              <span className="text-2xl md:text-3xl font-black text-neutral-950">
-                                ₹{prod.price.toLocaleString('en-IN')}
-                              </span>
-                              <span className="text-base font-bold line-through text-neutral-400">
-                                ₹{prod.mrp.toLocaleString('en-IN')}
-                              </span>
-                              <span className="text-xs font-extrabold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
-                                {Math.round(((prod.mrp - prod.price) / prod.mrp) * 100)}% Off
-                              </span>
+                            <div className="flex flex-col">
+                              <div className="flex items-center gap-2.5 flex-wrap">
+                                <span className="text-2xl md:text-3xl font-black text-neutral-950">
+                                  ₹{prod.price.toLocaleString('en-IN')}
+                                </span>
+                                <span className="text-base font-bold line-through text-neutral-400">
+                                  ₹{prod.mrp.toLocaleString('en-IN')}
+                                </span>
+                                <span className="text-xs font-extrabold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
+                                  {Math.round(((prod.mrp - prod.price) / prod.mrp) * 100)}% Off
+                                </span>
+                              </div>
+                              <p className="text-[10px] md:text-xs font-bold text-emerald-600 flex items-center gap-1 mt-0.5">
+                                {t('inclusiveGst')}
+                              </p>
                             </div>
                             
                             {/* Stock Alert */}
@@ -1873,7 +1969,7 @@ Please process and confirm this parcel for dispatch.`;
               {/* Dynamic Review Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10">
                 {(() => {
-                  const homeReviews = allReviews.filter(rev => {
+                  const homeReviews = currentReviews.filter(rev => {
                     const isMen = MENS_PRODUCTS.some(m => m.id === rev.productId);
                     if (activeCategory === 'men') {
                       return isMen;
@@ -2044,7 +2140,7 @@ Please process and confirm this parcel for dispatch.`;
               </div>
 
               <div className="space-y-3 max-w-3xl mx-auto pt-4 border-t border-white/5">
-                {(activeCategory === 'all' ? [...FAQS, ...MENS_FAQS] : activeCategory === 'men' ? MENS_FAQS : FAQS).map((faq, idx) => (
+                {displayFAQs.map((faq, idx) => (
                   <div 
                     key={idx}
                     className="border-b border-white/10 pb-3"
@@ -2072,8 +2168,65 @@ Please process and confirm this parcel for dispatch.`;
       )}
 
         {/* ----------------- VIEW 2: PRODUCT DETAIL VIEW ----------------- */}
-        {selectedProduct && currentView === 'detail' && (
+        {(() => {
+          if (!currentProduct || currentView !== 'detail') return null;
+          const selectedProduct = currentProduct;
+          const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
+          const prodReviews = currentReviews.filter(r => r.productId === selectedProduct.id);
+          return (
           <div className="space-y-12">
+            {/* JSON-LD Structured Data for Google Search Stars */}
+            <script 
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "Product",
+                  "name": selectedProduct.name,
+                  "image": selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.image],
+                  "description": selectedProduct.shortDescription || selectedProduct.longDescription,
+                  "sku": selectedProduct.id,
+                  "mpn": selectedProduct.id,
+                  "brand": {
+                    "@type": "Brand",
+                    "name": "meONmode"
+                  },
+                  "review": prodReviews.slice(0, 5).map(rev => ({
+                    "@type": "Review",
+                    "reviewRating": {
+                      "@type": "Rating",
+                      "ratingValue": rev.rating || 5,
+                      "bestRating": 5
+                    },
+                    "author": {
+                      "@type": "Person",
+                      "name": rev.name
+                    },
+                    "reviewBody": rev.review
+                  })),
+                  "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": Number(rating.toFixed(1)),
+                    "reviewCount": reviewsCount,
+                    "bestRating": 5,
+                    "worstRating": 1
+                  },
+                  "offers": {
+                    "@type": "Offer",
+                    "url": `${window.location.origin}${window.location.pathname}?product=${selectedProduct.id}`,
+                    "priceCurrency": "INR",
+                    "price": selectedProduct.price,
+                    "priceValidUntil": "2027-12-31",
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "availability": "https://schema.org/InStock",
+                    "seller": {
+                      "@type": "Organization",
+                      "name": "meONmode"
+                    }
+                  }
+                })
+              }}
+            />
             
             {/* Breadcrumb back navigation link */}
             <div className="flex items-center gap-2">
@@ -2286,16 +2439,26 @@ Please process and confirm this parcel for dispatch.`;
 
                       {/* Pricing & Scarcity Layout */}
                       <div className="space-y-2">
-                        <div className="flex items-center gap-2.5 flex-wrap">
-                          <span className="text-3xl font-black text-neutral-950">
-                            ₹{selectedProduct.price.toLocaleString('en-IN')}
-                          </span>
-                          <span className="text-base font-bold line-through text-neutral-400">
-                            ₹{selectedProduct.mrp.toLocaleString('en-IN')}
-                          </span>
-                          <span className="text-xs font-extrabold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
-                            {Math.round(((selectedProduct.mrp - selectedProduct.price) / selectedProduct.mrp) * 100)}% Off
-                          </span>
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <span className="text-3xl font-black text-neutral-950">
+                              ₹{selectedProduct.price.toLocaleString('en-IN')}
+                            </span>
+                            <span className="text-base font-bold line-through text-neutral-400">
+                              ₹{selectedProduct.mrp.toLocaleString('en-IN')}
+                            </span>
+                            <span className="text-xs font-extrabold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
+                              {Math.round(((selectedProduct.mrp - selectedProduct.price) / selectedProduct.mrp) * 100)}% Off
+                            </span>
+                          </div>
+                          <div className="flex flex-col gap-0.5 mt-1">
+                            <p className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                              {t('inclusiveGst')}
+                            </p>
+                            <p className="text-[10px] text-neutral-500 font-medium">
+                              ({t('priceInclusiveOfGst')})
+                            </p>
+                          </div>
                         </div>
                         
                         {/* Stock Alert */}
@@ -2786,7 +2949,7 @@ Please process and confirm this parcel for dispatch.`;
 
               {/* Individual reviews list */}
               {(() => {
-                const prodReviews = allReviews.filter(r => r.productId === selectedProduct.id);
+                const prodReviews = currentReviews.filter(r => r.productId === selectedProduct.id);
                 
                 if (prodReviews.length === 0) {
                   return (
@@ -2890,7 +3053,8 @@ Please process and confirm this parcel for dispatch.`;
             </section>
 
           </div>
-        )}
+          );
+        })()}
 
         {/* ----------------- VIEW 3: SHOPPING CART & CHECKOUT VIEW ----------------- */}
         {currentView === 'cart' && (
@@ -2970,7 +3134,7 @@ Please process and confirm this parcel for dispatch.`;
                   <h3 className="font-serif text-lg font-bold text-white">Order Summary</h3>
                   
                   <div className="space-y-3">
-                    {cart.map((item) => (
+                    {translatedCart.map((item) => (
                       <div 
                         key={item.product.id}
                         className="bg-white/5 border border-white/10 rounded-2xl p-4 flex gap-4 justify-between items-center"
@@ -3019,63 +3183,87 @@ Please process and confirm this parcel for dispatch.`;
                   </div>
 
                   {/* Price Calculations breakdown */}
-                  <div className="bg-[#4A1D05]/50 border border-white/10 rounded-2xl p-5 space-y-3 text-xs">
-                    <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>Total Original Price (MRP)</span>
-                      <span className="line-through text-white font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>₹{getCartMrpTotal().toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between text-white font-extrabold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
-                      <span>Herbal Combo Discount Savings</span>
-                      <span>-₹{(getCartMrpTotal() - getCartTotal()).toLocaleString('en-IN')}</span>
-                    </div>
+                  {(() => {
+                    const totalBill = getCartTotal();
+                    const taxableValue = Math.round((totalBill / 1.05) * 100) / 100;
+                    const totalGst = Math.round((totalBill - taxableValue) * 100) / 100;
+                    const cgst = Math.round((totalGst / 2) * 100) / 100;
+                    const sgst = Math.round((totalGst / 2) * 100) / 100;
 
-                    <div className="border-t border-white/10 my-2"></div>
-
-                    <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>Subtotal</span>
-                      <span className="text-white font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹{Math.round(getCartTotal() / 1.18).toLocaleString('en-IN')}</span>
-                    </div>
-
-                    <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>Delivery</span>
-                      <span className="text-emerald-400 font-bold uppercase tracking-wider">FREE DELIVERY</span>
-                    </div>
-
-                    <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
-                      <span>GST (18%)</span>
-                      <span className="text-white font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹{(getCartTotal() - Math.round(getCartTotal() / 1.18)).toLocaleString('en-IN')}</span>
-                    </div>
-                    
-                    <div className="border-t border-white/10 pt-3 space-y-2">
-                      <div className="flex justify-between items-baseline">
-                        <span className="font-serif text-sm font-bold text-white drop-shadow-md">Total Product Bill</span>
-                        <span 
-                          className="font-serif text-lg font-black text-white"
-                          style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}
-                        >
-                          ₹{getCartTotal().toLocaleString('en-IN')}
-                        </span>
-                      </div>
-
-                      {paymentMethod === 'cod' ? (
-                        <>
-                          <div className="flex justify-between items-baseline text-xs text-amber-300 font-extrabold">
-                            <span>Mandatory COD Advance (Instant)</span>
-                            <span>-₹150</span>
-                          </div>
-                          <div className="flex justify-between items-baseline text-sm text-emerald-400 font-extrabold border-t border-dashed border-white/10 pt-1">
-                            <span>Balance Due at Delivery</span>
-                            <span>₹{(getCartTotal() - 150).toLocaleString('en-IN')}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <div className="flex justify-between items-baseline text-xs text-emerald-400 font-extrabold">
-                          <span>Paid in Full via UPI (Instant)</span>
-                          <span>₹{getCartTotal().toLocaleString('en-IN')}</span>
+                    return (
+                      <div className="bg-[#4A1D05]/50 border border-white/10 rounded-2xl p-5 space-y-3 text-xs">
+                        <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
+                          <span>{t('originalPriceMrp')}</span>
+                          <span className="line-through text-white font-bold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>₹{getCartMrpTotal().toLocaleString('en-IN')}</span>
                         </div>
-                      )}
-                    </div>
-                  </div>
+                        <div className="flex justify-between text-white font-extrabold drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>
+                          <span>{t('herbalDiscountSavings')}</span>
+                          <span>-₹{(getCartMrpTotal() - totalBill).toLocaleString('en-IN')}</span>
+                        </div>
+
+                        <div className="border-t border-white/10 my-2"></div>
+
+                        <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
+                          <span>{t('subtotal')} ({t('priceInclusiveOfGst')})</span>
+                          <span className="text-white font-bold" style={{ textShadow: '0 1.5px 3px rgba(0,0,0,0.8)' }}>₹{totalBill.toLocaleString('en-IN')}</span>
+                        </div>
+
+                        <div className="flex justify-between text-[#F7E7D9]/80 font-semibold drop-shadow-sm">
+                          <span>{t('delivery')}</span>
+                          <span className="text-emerald-400 font-bold uppercase tracking-wider">{t('freeDelivery')}</span>
+                        </div>
+
+                        <div className="border-t border-dashed border-white/10 my-2"></div>
+
+                        <div className="flex justify-between text-[#F7E7D9]/70 text-[11px]">
+                          <span>{t('taxableValueLabel')}</span>
+                          <span className="text-neutral-300 font-medium">₹{taxableValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-[#F7E7D9]/70 text-[11px]">
+                          <span>{t('cgstLabel')}</span>
+                          <span className="text-neutral-300 font-medium">₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-[#F7E7D9]/70 text-[11px]">
+                          <span>{t('sgstLabel')}</span>
+                          <span className="text-neutral-300 font-medium">₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="flex justify-between text-[#F7E7D9]/80 font-semibold text-[11px]">
+                          <span>{t('totalGstLabel')}</span>
+                          <span className="text-white font-bold">₹{totalGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        
+                        <div className="border-t border-white/10 pt-3 space-y-2">
+                          <div className="flex justify-between items-baseline">
+                            <span className="font-serif text-sm font-bold text-white drop-shadow-md">{t('totalProductBill')}</span>
+                            <span 
+                              className="font-serif text-lg font-black text-white"
+                              style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}
+                            >
+                              ₹{totalBill.toLocaleString('en-IN')}
+                            </span>
+                          </div>
+
+                          {paymentMethod === 'cod' ? (
+                            <>
+                              <div className="flex justify-between items-baseline text-xs text-amber-300 font-extrabold">
+                                <span>{t('codAdvanceLabel')}</span>
+                                <span>-₹150</span>
+                              </div>
+                              <div className="flex justify-between items-baseline text-sm text-emerald-400 font-extrabold border-t border-dashed border-white/10 pt-1">
+                                <span>{t('balanceDueLabel')}</span>
+                                <span>₹{(totalBill - 150).toLocaleString('en-IN')}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="flex justify-between items-baseline text-xs text-emerald-400 font-extrabold">
+                              <span>{t('paidInFullLabel')}</span>
+                              <span>₹{totalBill.toLocaleString('en-IN')}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* Packaging Guarantee Box */}
                   <div className="p-4 bg-[#5C1D13] border border-[#E5A93C]/20 rounded-2xl flex gap-3 items-start">
@@ -3497,6 +3685,154 @@ Please process and confirm this parcel for dispatch.`;
                   </button>
                 </p>
               </div>
+
+              {/* GST Tax Invoice Toggle */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowInvoice(!showInvoice)}
+                  className="w-full bg-[#E5A93C]/10 hover:bg-[#E5A93C]/20 border border-[#E5A93C]/30 text-[#E5A93C] font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300"
+                >
+                  <span>📄</span>
+                  <span>{showInvoice ? "Hide GST Tax Invoice" : "View GST Tax Invoice"}</span>
+                </button>
+              </div>
+
+              {showInvoice && (
+                <div className="bg-white text-neutral-900 border border-neutral-200 rounded-2xl p-6 space-y-4 text-xs shadow-2xl animate-fade-in text-left">
+                  <div className="flex justify-between items-start border-b border-neutral-200 pb-4">
+                    <div>
+                      <h3 className="font-serif text-base font-black tracking-tight text-[#4A1D05]">meONmode Ayurvedic Wellness</h3>
+                      <p className="text-[10px] text-neutral-500 font-medium mt-0.5">meONmode Wellness LLP</p>
+                      <p className="text-[10px] text-neutral-500 leading-normal mt-1">
+                        Ayurvedic Pharmacy Licence No: DL-3234-A<br />
+                        GSTIN: 07AAGCM1314R1ZN
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <h4 className="font-sans font-black text-xs text-neutral-800 uppercase tracking-widest">{t('invoiceTitle')}</h4>
+                      <p className="text-[10px] text-neutral-500 font-medium mt-1">
+                        Invoice No: <strong>INV/2026-27/{lastOrderId}</strong><br />
+                        Date: {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 border-b border-neutral-200 pb-4">
+                    <div>
+                      <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Billed To (Customer):</p>
+                      <p className="font-black text-neutral-800 mt-1">{checkout.fullName}</p>
+                      <p className="text-neutral-600 leading-normal mt-0.5">
+                        {checkout.address}<br />
+                        Pincode: <strong>{checkout.pincode}</strong><br />
+                        Phone: {checkout.phone}
+                      </p>
+                    </div>
+                    <div className="text-right col-span-1">
+                      <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Place of Supply:</p>
+                      <p className="font-bold text-neutral-800 mt-1">Delhi / Haryana / Other (India)</p>
+                      <p className="text-neutral-500 leading-normal mt-1">
+                        Discreet Courier Shipping<br />
+                        Delivery Method: {paymentMethod === 'cod' ? 'Cash On Delivery' : 'Prepaid UPI'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Table with Goods & HSN */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-[11px] text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-neutral-300 text-neutral-500 font-bold">
+                          <th className="py-2">Description</th>
+                          <th className="py-2 text-center">HSN</th>
+                          <th className="py-2 text-center">Qty</th>
+                          <th className="py-2 text-right">Price (Incl.)</th>
+                          <th className="py-2 text-right">Taxable</th>
+                          <th className="py-2 text-right">CGST</th>
+                          <th className="py-2 text-right">SGST</th>
+                          <th className="py-2 text-right">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {translatedCart.map((item, idx) => {
+                          const itemTotal = item.product.price * item.quantity;
+                          const itemTaxable = Math.round((itemTotal / 1.05) * 100) / 100;
+                          const itemGst = Math.round((itemTotal - itemTaxable) * 100) / 100;
+                          const itemCgst = Math.round((itemGst / 2) * 100) / 100;
+                          const itemSgst = Math.round((itemGst / 2) * 100) / 100;
+
+                          return (
+                            <tr key={idx} className="border-b border-neutral-100 text-neutral-700 font-medium">
+                              <td className="py-2.5 font-bold text-neutral-800 max-w-[100px] truncate">{item.product.name}</td>
+                              <td className="py-2.5 text-center">30049011</td>
+                              <td className="py-2.5 text-center">{item.quantity}</td>
+                              <td className="py-2.5 text-right">₹{item.product.price.toLocaleString('en-IN')}</td>
+                              <td className="py-2.5 text-right">₹{itemTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                              <td className="py-2.5 text-right">₹{itemCgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                              <td className="py-2.5 text-right">₹{itemSgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                              <td className="py-2.5 text-right font-bold text-neutral-900">₹{itemTotal.toLocaleString('en-IN')}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Invoice Summary Totals */}
+                  <div className="pt-2 border-t border-neutral-200">
+                    {(() => {
+                      const totalBill = getCartTotal();
+                      const taxableValue = Math.round((totalBill / 1.05) * 100) / 100;
+                      const totalGst = Math.round((totalBill - taxableValue) * 100) / 100;
+                      const cgst = Math.round((totalGst / 2) * 100) / 100;
+                      const sgst = Math.round((totalGst / 2) * 100) / 100;
+
+                      return (
+                        <div className="space-y-1.5 text-[11px] text-neutral-600 font-medium">
+                          <div className="flex justify-between">
+                            <span>Total Taxable Value:</span>
+                            <span>₹{taxableValue.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>CGST (2.5%):</span>
+                            <span>₹{cgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>SGST (2.5%):</span>
+                            <span>₹{sgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between border-t border-neutral-100 pt-1.5 font-bold text-neutral-800">
+                            <span>Total GST (5%):</span>
+                            <span>₹{totalGst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between border-t border-neutral-200 pt-2 font-black text-xs text-[#4A1D05]">
+                            <span>Grand Total (Total Amount Payable):</span>
+                            <span>₹{totalBill.toLocaleString('en-IN')}</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* Footnote Declaration */}
+                  <div className="pt-3 border-t border-neutral-100 text-[10px] text-neutral-400 italic text-center leading-normal">
+                    This is a computer-generated GST tax invoice and does not require a physical signature.<br />
+                    Classified under HSN 30049011 (Ayurvedic Patent Medicines - GST @ 5%).
+                  </div>
+
+                  {/* Print Button */}
+                  <div className="pt-2">
+                    <button
+                      type="button"
+                      onClick={() => window.print()}
+                      className="w-full bg-[#4A1D05] hover:bg-[#5C1D13] text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <span>🖨️</span>
+                      <span>Print/Save PDF Invoice</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* CTAs */}
@@ -4355,7 +4691,7 @@ Please process and confirm this parcel for dispatch.`;
 
       {/* ----------------- INTERACTIVE PRODUCT REVIEWS MODAL ----------------- */}
       {activeReviewProduct && (() => {
-        const prodReviews = allReviews.filter(r => r.productId === activeReviewProduct.id && r.approved);
+        const prodReviews = currentReviews.filter(r => r.productId === activeReviewProduct.id && r.approved);
         const { rating, reviewsCount } = getProductRatingDetails(activeReviewProduct.id);
         
         // Calculate rating bars based on rating

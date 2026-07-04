@@ -129,8 +129,8 @@ export const MENS_PRODUCTS: Product[] = [
     id: 'wantmore-men',
     name: "meONmode® WANTMORE FOR MEN (Powder)",
     subtitle: "Maximum Strength Performance Powder",
-    price: 1299,
-    mrp: 2499,
+    price: 4999,
+    mrp: 10999,
     images: [
       'wantmore-men.jpg',
       'mens-combo.jpg'
@@ -157,8 +157,8 @@ export const MENS_PRODUCTS: Product[] = [
     id: 'alphamax-men',
     name: "meONmode® AlphaMax FOR MEN (Capsules)",
     subtitle: "Power & Energy Capsules",
-    price: 1199,
-    mrp: 1999,
+    price: 2499,
+    mrp: 5999,
     images: [
       'alphamax-men.jpg',
       'mens-combo.jpg'
@@ -185,14 +185,14 @@ export const MENS_PRODUCTS: Product[] = [
     id: 'mens-combo',
     name: "Men's Ultimate Performance Combo",
     subtitle: "WANTMORE Powder + AlphaMax Capsules",
-    price: 2199,
-    mrp: 4498,
+    price: 6999,
+    mrp: 16998,
     images: [
       'mens-combo.jpg',
       'wantmore-men.jpg',
       'alphamax-men.jpg'
     ],
-    tag: "BEST SELLER - SAVE 51%",
+    tag: "BEST SELLER - SAVE 59%",
     shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health.",
     longDescription: "The absolute premium duo stack containing WANTMORE Powder and AlphaMax Capsules. This synergy offers a dual-action therapeutic approach: while AlphaMax provides cell-level vitality and recovery throughout the day, WANTMORE Powder powers peak performance, vascular output, and stamina during high-exertion activities.",
     volumeOrQty: "250g Powder + 60 Capsules",
@@ -201,7 +201,7 @@ export const MENS_PRODUCTS: Product[] = [
       "Dual-action formula targeting complete vitality and cellular stamina",
       "Synergistic recovery of muscles and daily energy stores",
       "Enhances blood flow and natural hormonal health",
-      "Saves over 51% compared to individual purchases"
+      "Saves over 59% compared to individual purchases"
     ],
     keyIngredients: [
       { name: "Shudh Shilajit", benefit: "Cellular Energy", description: "Enriches cells with minerals and fulvic acid for rapid ATP production." },
