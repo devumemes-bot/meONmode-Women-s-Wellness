@@ -73,7 +73,8 @@ function getProductCategory(prod: Product): string {
   const name = prod.name.toLowerCase();
   const desc = prod.shortDescription?.toLowerCase() || '';
   if (prod.id.includes('combo') || prod.id.includes('kit')) return 'Combos';
-  if (name.includes('syrup') || desc.includes('syrup')) return 'Syrups';
+  if (prod.id === 'vayucore' || name.includes('vayucore') || name.includes('syrup') || desc.includes('syrup')) return 'Syrups';
+  if (name.includes('prash') || desc.includes('prash') || prod.id.includes('wantmore')) return 'Prash';
   return 'Capsules';
 }
 
@@ -243,7 +244,8 @@ export default function App() {
       'flowelle': { status: 'in_stock', text: t('stockInStock'), count: 100 },
       'wantmore-men': { status: 'ready_to_ship', text: t('stockReady'), count: 100 },
       'alphamax-men': { status: 'selling_fast', text: t('stockSellingFast'), count: 50 },
-      'mens-combo': { status: 'limited_stock', text: t('stockLimited'), count: 50 }
+      'mens-combo': { status: 'limited_stock', text: t('stockLimited'), count: 50 },
+      'vayucore': { status: 'limited_stock', text: t('stockLimited'), count: 50 }
     };
     return indicators[productId] || { status: 'in_stock', text: t('stockInStock'), count: 100 };
   };
@@ -270,7 +272,7 @@ export default function App() {
   const [showShareDropdown, setShowShareDropdown] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
-  const [searchCategory, setSearchCategory] = useState<'All' | 'Capsules' | 'Syrups' | 'Combos' | 'Powder'>('All');
+  const [searchCategory, setSearchCategory] = useState<'All' | 'Capsules' | 'Syrups' | 'Prash' | 'Combos'>('All');
   const [lastOrderId, setLastOrderId] = useState<string>('');
   const [showInvoice, setShowInvoice] = useState<boolean>(false);
   const [trackingOrderIdInput, setTrackingOrderIdInput] = useState<string>('');
@@ -749,7 +751,7 @@ Please process and confirm this parcel for dispatch.`;
                 <div className="space-y-1">
                   <span className="block text-[8px] uppercase font-bold text-[#E5A93C] font-mono tracking-wider">Filter by Type</span>
                   <div className="flex flex-wrap gap-1">
-                    {(['All', 'Capsules', 'Syrups', 'Combos'] as const).map((cat) => (
+                    {(['All', 'Capsules', 'Syrups', 'Prash', 'Combos'] as const).map((cat) => (
                       <button
                         key={cat}
                         type="button"
@@ -774,14 +776,18 @@ Please process and confirm this parcel for dispatch.`;
                 <div className="space-y-1.5 max-h-[180px] overflow-y-auto custom-scrollbar">
                   <span className="block text-[8px] uppercase font-bold text-[#E5A93C] font-mono tracking-wider">Matching Remedies</span>
                   {(() => {
-                    const allProductsList = [...womenProducts, ...menProducts];
+                    const allProductsList = Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values());
                     const matched = allProductsList.filter(prod => {
                       // Filter by text search
                       const q = searchQuery.toLowerCase();
                       const matchesText = !q || 
                         prod.name.toLowerCase().includes(q) ||
                         prod.subtitle.toLowerCase().includes(q) ||
-                        prod.shortDescription.toLowerCase().includes(q);
+                        prod.shortDescription.toLowerCase().includes(q) ||
+                        prod.longDescription.toLowerCase().includes(q) ||
+                        prod.tag.toLowerCase().includes(q) ||
+                        prod.benefits.some(b => b.toLowerCase().includes(q)) ||
+                        prod.keyIngredients.some(i => i.name.toLowerCase().includes(q) || i.benefit.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
 
                       if (!matchesText) return false;
 
@@ -868,6 +874,15 @@ Please process and confirm this parcel for dispatch.`;
                   >
                     Men's Combo
                   </button>
+                  <button 
+                    onClick={() => {
+                      const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
+                      if (vayu) handleProductClick(vayu);
+                    }} 
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    VAYUCORE
+                  </button>
                 </>
               ) : activeCategory === 'men' ? (
                 <>
@@ -881,13 +896,22 @@ Please process and confirm this parcel for dispatch.`;
                     onClick={() => handleProductClick(MENS_PRODUCTS[0])} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'wantmore-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
-                    WANTMORE Powder
+                    WANTMORE Prash
                   </button>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[1])} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'alphamax-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     ALPHAMAX
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
+                      if (vayu) handleProductClick(vayu);
+                    }} 
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    VAYUCORE
                   </button>
                 </>
               ) : (
@@ -909,6 +933,15 @@ Please process and confirm this parcel for dispatch.`;
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'flowelle' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     FLOWELLE Syrup
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
+                      if (vayu) handleProductClick(vayu);
+                    }} 
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                  >
+                    VAYUCORE
                   </button>
                 </>
               )}
@@ -1002,7 +1035,7 @@ Please process and confirm this parcel for dispatch.`;
               <div className="inline-flex flex-wrap md:flex-nowrap justify-center p-1 rounded-3xl md:rounded-full bg-black/45 backdrop-blur-md border border-white/10 shadow-inner shadow-black/60 relative gap-1 md:gap-0">
                 <button
                   onClick={() => setActiveCategory('women')}
-                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                  className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'women'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#C86428] to-[#8B3B15]'
                       : 'text-white/60 hover:text-white'
@@ -1013,18 +1046,18 @@ Please process and confirm this parcel for dispatch.`;
                 </button>
                 <button
                   onClick={() => setActiveCategory('men')}
-                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                  className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'men'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] border border-[#D4AF37]/25'
                       : 'text-white/60 hover:text-white'
                   }`}
                 >
-                  <span>🧔</span>
+                  <span>👨</span>
                   <span>Men's</span>
                 </button>
                 <button
                   onClick={() => setActiveCategory('all')}
-                  className={`relative z-10 px-4 md:px-6 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+                  className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'all'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#8C5D3A] to-[#3B2314] border border-[#E5A93C]/25'
                       : 'text-white/60 hover:text-white'
@@ -1312,7 +1345,7 @@ Please process and confirm this parcel for dispatch.`;
                         className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_20px_rgba(200,100,40,0.6)] hover:scale-[1.01] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <ShoppingBag className="w-4.5 h-4.5" />
-                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹6,999' : '₹1,999'}</span></span>
+                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹5,999' : '₹1,999'}</span></span>
                       </button>
                       <button 
                         id="hero-view-details-btn"
@@ -1352,7 +1385,7 @@ Please process and confirm this parcel for dispatch.`;
                         title="Click to view details"
                       >
                         <img 
-                          src={activeCategory === 'men' ? 'mens-combo.jpg' : 'https://i.postimg.cc/BQm4ZB0G/IMG-2935.png'} 
+                          src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/BQm4ZB0G/IMG-2935.png'} 
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
                           loading="lazy"
                           className="w-full h-auto max-w-full object-contain block mx-auto rounded-2xl crisp-img transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 animate-float"
@@ -1361,7 +1394,7 @@ Please process and confirm this parcel for dispatch.`;
                       </button>
                       {/* Glassmorphic price tag pill */}
                       <div className="absolute top-3 right-3 bg-[#5C1D13]/90 backdrop-blur-md border-2 border-amber-400 text-white font-extrabold px-3 py-1 rounded-full text-[10px] shadow-[0_0_10px_rgba(251,191,36,0.5)] drop-shadow-md">
-                        {activeCategory === 'all' ? 'Save Up to 51%' : 'Save 51%'}
+                        {activeCategory === 'all' ? 'Save Up to 57%' : 'Save 57%'}
                       </div>
                     </div>
                   </div>
@@ -1506,7 +1539,7 @@ Please process and confirm this parcel for dispatch.`;
                 </h2>
                 <p className="text-[#F7E7D9]/90 max-w-lg mx-auto text-sm">
                   {activeCategory === 'all'
-                    ? "Restore physical vigor, elevate stamina, balance hormones, and regularize your natural system with clinical-grade Ayurvedic formulations."
+                    ? "Restore physical vigor, elevate stamina, balance hormones, improve digestive health, and regularize your natural system with clinical-grade Ayurvedic formulations."
                     : activeCategory === 'men'
                       ? "Restore physical vigor, elevate stamina, and optimize cellular energy with clinical-grade Ayurvedic formulations."
                       : "Whether you need comprehensive restoration or targeted balance, choose our clinically verified herbal regimens."}
@@ -1516,7 +1549,7 @@ Please process and confirm this parcel for dispatch.`;
               {/* Dynamic Catalog Section */}
               <div className="space-y-6">
                 <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                  <span className="text-xl">{activeCategory === 'all' ? "✨" : activeCategory === 'men' ? "🧔" : "👩"}</span>
+                  <span className="text-xl">{activeCategory === 'all' ? "✨" : activeCategory === 'men' ? "👨" : "👩"}</span>
                   <h3 className="font-serif text-lg font-bold text-white tracking-wide">
                     {activeCategory === 'all' ? "Complete Ayurvedic Reset Protocol" : activeCategory === 'men' ? "Men's Premium Vitality Protocol" : "Women's Hormonal Reset Protocol"}
                   </h3>
@@ -1525,8 +1558,9 @@ Please process and confirm this parcel for dispatch.`;
                 {/* Grid of Product Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {(() => {
+                    const allUnique = Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values());
                     const filteredProducts = (activeCategory === 'all' 
-                      ? [womenProducts[1], womenProducts[2], menProducts[0], menProducts[1], womenProducts[0], menProducts[2]] 
+                      ? allUnique 
                       : activeCategory === 'men' 
                         ? menProducts 
                         : womenProducts
@@ -1536,7 +1570,8 @@ Please process and confirm this parcel for dispatch.`;
                       return prod.name.toLowerCase().includes(q) ||
                              prod.subtitle.toLowerCase().includes(q) ||
                              prod.shortDescription.toLowerCase().includes(q) ||
-                             prod.longDescription.toLowerCase().includes(q);
+                             prod.longDescription.toLowerCase().includes(q) ||
+                             prod.benefits.some(b => b.toLowerCase().includes(q));
                     });
 
                     if (filteredProducts.length === 0) {
@@ -1874,7 +1909,7 @@ Please process and confirm this parcel for dispatch.`;
 
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                 <img 
-                  src={activeCategory === 'men' ? 'wantmore-men.jpg' : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'} 
+                  src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'} 
                   alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
                   loading="lazy"
                   className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
@@ -3050,6 +3085,73 @@ Please process and confirm this parcel for dispatch.`;
                   </div>
                 );
               })()}
+            </section>
+
+            {/* Related Products Section */}
+            <section className="bg-gradient-to-br from-[#230d07] via-[#3a1508] to-[#1a0803] border border-[#E5A93C]/20 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
+                <div>
+                  <h3 className="font-serif text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                    <span>🌿</span> Related Ayurvedic Remedies & Protocols
+                  </h3>
+                  <p className="text-xs text-neutral-300">Complementary formulas for complete holistic health</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentView('home');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="text-xs font-bold text-[#E5A93C] hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  View All Products →
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {(() => {
+                  const allUnique = Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values());
+                  const related = allUnique.filter(p => p.id !== selectedProduct.id);
+                  return related.map(rel => (
+                    <div 
+                      key={rel.id} 
+                      onClick={() => {
+                        handleProductClick(rel);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="bg-black/30 border border-white/10 hover:border-[#E5A93C]/40 rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer flex flex-col justify-between space-y-3 group"
+                    >
+                      <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
+                        <img 
+                          src={rel.images && rel.images.length > 0 ? rel.images[0] : ''} 
+                          alt={rel.name} 
+                          className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#E5A93C]/10 text-[#E5A93C] border border-[#E5A93C]/20">
+                          {rel.tag}
+                        </span>
+                        <h4 className="font-serif font-bold text-white text-sm group-hover:text-[#E5A93C] transition-colors line-clamp-1">
+                          {rel.name}
+                        </h4>
+                        <p className="text-[10px] text-neutral-300 line-clamp-2 leading-tight">
+                          {rel.shortDescription}
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center pt-2 border-t border-white/10">
+                        <div>
+                          <span className="text-xs font-black text-amber-300">₹{rel.price}</span>
+                          <span className="text-[10px] text-neutral-400 line-through ml-1">₹{rel.mrp}</span>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#E5A93C] group-hover:translate-x-1 transition-transform">
+                          View Details →
+                        </span>
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
             </section>
 
           </div>

@@ -47,7 +47,7 @@ export const PRODUCTS: Product[] = [
     name: "meONmode® OVAIRA Capsules",
     subtitle: "PCOS/PCOD Care & Hormonal Wellness",
     price: 1199,
-    mrp: 1899,
+    mrp: 1999,
     images: [
       'https://i.postimg.cc/FFGxTYvK/IMG-2904.png',
       'https://i.postimg.cc/sfKJTMzY/IMG-2905.png',
@@ -127,19 +127,18 @@ export const PRODUCTS: Product[] = [
 export const MENS_PRODUCTS: Product[] = [
   {
     id: 'wantmore-men',
-    name: "meONmode® WANTMORE FOR MEN (Powder)",
-    subtitle: "Maximum Strength Performance Powder",
-    price: 4999,
-    mrp: 10999,
+    name: "meONmode® WANTMORE FOR MEN (Prash)",
+    subtitle: "Maximum Strength Performance Prash",
+    price: 4499,
+    mrp: 8999,
     images: [
-      'wantmore-men.jpg',
-      'mens-combo.jpg'
+      'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png'
     ],
     tag: "STAMINA BOOSTER",
-    shortDescription: "Clinically balanced premium powder formulation designed to optimize strength, stamina, and physical endurance.",
-    longDescription: "meONmode® WANTMORE FOR MEN is a premium strength and endurance powder designed for peak physical performance. Formulated by expert Ayurvedic doctors, it incorporates standard extracts of pure herbs that naturally elevate vigor, enhance muscular endurance, and combat chronic fatigue.",
-    volumeOrQty: "250g Powder",
-    dosage: "Take 1-2 scoops (5g) daily with lukewarm milk or water after meals.",
+    shortDescription: "Clinically balanced premium Prash formulation designed to optimize strength, stamina, and physical endurance.",
+    longDescription: "meONmode® WANTMORE FOR MEN is a premium strength and endurance Prash designed for peak physical performance. Formulated by expert Ayurvedic doctors, it incorporates standard extracts of pure herbs that naturally elevate vigor, enhance muscular endurance, and combat chronic fatigue.",
+    volumeOrQty: "200g Prash",
+    dosage: "Take 1-2 teaspoons (5g-10g) daily with lukewarm milk or water after meals.",
     benefits: [
       "Boosts natural physical stamina and athletic output",
       "Supports lean muscle recovery and protein synthesis",
@@ -158,10 +157,9 @@ export const MENS_PRODUCTS: Product[] = [
     name: "meONmode® AlphaMax FOR MEN (Capsules)",
     subtitle: "Power & Energy Capsules",
     price: 2499,
-    mrp: 5999,
+    mrp: 4999,
     images: [
-      'alphamax-men.jpg',
-      'mens-combo.jpg'
+      'https://i.postimg.cc/GtknmHyY/879404D5-1DBE-4DAD-A868-ACDDEF70C56F.png'
     ],
     tag: "ENERGY & VITALITY",
     shortDescription: "60 veg capsules packed with organic extracts to optimize cellular energy, vitality, and health.",
@@ -184,24 +182,22 @@ export const MENS_PRODUCTS: Product[] = [
   {
     id: 'mens-combo',
     name: "Men's Ultimate Performance Combo",
-    subtitle: "WANTMORE Powder + AlphaMax Capsules",
-    price: 6999,
-    mrp: 16998,
+    subtitle: "WANTMORE Prash + AlphaMax Capsules",
+    price: 5999,
+    mrp: 13998,
     images: [
-      'mens-combo.jpg',
-      'wantmore-men.jpg',
-      'alphamax-men.jpg'
+      'https://i.postimg.cc/T1XN3QGv/86164C6E-8C99-4C84-87C7-477EB98232DF.png'
     ],
-    tag: "BEST SELLER - SAVE 59%",
+    tag: "BEST SELLER - SAVE 57%",
     shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health.",
-    longDescription: "The absolute premium duo stack containing WANTMORE Powder and AlphaMax Capsules. This synergy offers a dual-action therapeutic approach: while AlphaMax provides cell-level vitality and recovery throughout the day, WANTMORE Powder powers peak performance, vascular output, and stamina during high-exertion activities.",
-    volumeOrQty: "250g Powder + 60 Capsules",
-    dosage: "• WANTMORE Powder: Take 1 scoop daily with milk after dinner.\n• AlphaMax Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.",
+    longDescription: "The absolute premium duo stack containing WANTMORE Prash and AlphaMax Capsules. This synergy offers a dual-action therapeutic approach: while AlphaMax provides cell-level vitality and recovery throughout the day, WANTMORE Prash powers peak performance, vascular output, and stamina during high-exertion activities.",
+    volumeOrQty: "200g Prash + 60 Capsules",
+    dosage: "• WANTMORE Prash: Take 1 teaspoon daily with milk after dinner.\n• AlphaMax Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.",
     benefits: [
       "Dual-action formula targeting complete vitality and cellular stamina",
       "Synergistic recovery of muscles and daily energy stores",
       "Enhances blood flow and natural hormonal health",
-      "Saves over 59% compared to individual purchases"
+      "Saves over 57% compared to individual purchases"
     ],
     keyIngredients: [
       { name: "Shudh Shilajit", benefit: "Cellular Energy", description: "Enriches cells with minerals and fulvic acid for rapid ATP production." },
@@ -211,6 +207,43 @@ export const MENS_PRODUCTS: Product[] = [
     reviewsCount: 915
   }
 ];
+
+export const VAYUCORE_PRODUCT: Product = {
+  id: 'vayucore',
+  name: "meONmode® VAYUCORE",
+  subtitle: "Healthy Gut. Better Life.",
+  price: 999,
+  mrp: 1999,
+  images: [
+    'https://i.postimg.cc/Z5RH4n2D/E3FB9FE6-C1DB-48D1-905E-941055523296.png'
+  ],
+  tag: "BESTSELLER - GUT HEALTH",
+  shortDescription: "VAYUCORE is a premium Ayurvedic digestive wellness liquid formulated with carefully selected herbs to support healthy digestion, reduce gas and bloating, relieve acidity, and maintain overall gut health. Suitable for daily use by adults.",
+  longDescription: "VAYUCORE is a premium Ayurvedic digestive wellness liquid crafted to support healthy digestion, eliminate persistent gas and bloating, soothe acidity, and maintain overall gut health. Formulated by expert Ayurvedic doctors using 100% natural, potent extracts including Kutki, Kalmegh, Palakya, Chirayita, Kasamarda, Kasni Beej, Kakamachi, Bhringraj, Punarnava, Zirak, Vaividang, Nishoth, Jauka, Shankh Drav, Turmeric, and Mulethi. VAYUCORE gently balances Vata, Pitta, and Kapha doshas while promoting daily digestive comfort without synthetic additions or chemicals.",
+  volumeOrQty: "450 ml Liquid",
+  dosage: "7–10 ml daily or as directed by a physician.",
+  benefits: [
+    "Supports healthy digestion & optimal nutrient absorption",
+    "Reduces persistent gas, bloating, and stomach heaviness",
+    "Helps relieve acidity, heartburn, and sour reflux",
+    "Supports gut health & liver function",
+    "Supports Vata, Pitta & Kapha balance",
+    "Natural Ayurvedic ingredients, gentle for daily use",
+    "100% Ayurvedic, Made in India, GMP Quality Manufacturing"
+  ],
+  keyIngredients: [
+    { name: "Kutki & Kalmegh", benefit: "Liver & Digestive Support", description: "Promotes healthy bile secretion and liver metabolism for smooth digestion." },
+    { name: "Chirayita & Kasni Beej", benefit: "Gut Health & Detox", description: "Helps detoxify the gastrointestinal tract and supports intestinal health." },
+    { name: "Zirak & Vaividang", benefit: "Carminative & Anti-Bloat", description: "Eases gas trapped in the intestines and reduces bloating and discomfort." },
+    { name: "Turmeric & Mulethi", benefit: "Acid Relief & Mucosal Care", description: "Soothes the stomach lining, neutralizing acidity and heartburn." }
+  ],
+  rating: 4.9,
+  reviewsCount: 428
+};
+
+// Include VAYUCORE in both collections
+PRODUCTS.push(VAYUCORE_PRODUCT);
+MENS_PRODUCTS.push(VAYUCORE_PRODUCT);
 
 export const TESTIMONIALS = [
   {
@@ -292,7 +325,7 @@ export const MENS_FAQS = [
   },
   {
     question: "Can I use both WANTMORE and AlphaMax together?",
-    answer: "Yes, they are designed to work synergistically. AlphaMax Capsules support continuous cellular recovery and vascular health, while WANTMORE Powder provides high-impact energy and power for peak performance."
+    answer: "Yes, they are designed to work synergistically. AlphaMax Capsules support continuous cellular recovery and vascular health, while WANTMORE Prash provides high-impact energy and power for peak performance."
   }
 ];
 
@@ -471,7 +504,7 @@ export const reviews: CustomerReview[] = [
     productId: "wantmore-men",
     name: "Vikram Malhotra",
     rating: 5,
-    review: "WANTMORE powder has completely upgraded my daily workouts and stamina levels. I mix it with water post-workout, and the recovery rate is phenomenally fast. No sugar crashes, just pure natural strength.",
+    review: "WANTMORE Prash has completely upgraded my daily workouts and stamina levels. I consume it with milk post-workout, and the recovery rate is phenomenally fast. No sugar crashes, just pure natural strength.",
     verified: true,
     date: "June 1, 2026",
     title: "Incredible athletic stamina boost",
@@ -493,7 +526,7 @@ export const reviews: CustomerReview[] = [
     productId: "wantmore-men",
     name: "Sandeep Yadav",
     rating: 4,
-    review: "Great quality powder that mixes cleanly. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this premium formulation.",
+    review: "Great quality Prash that tastes smooth and natural. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this premium formulation.",
     verified: true,
     date: "April 18, 2026",
     title: "Tastes extremely natural & organic",
@@ -537,7 +570,7 @@ export const reviews: CustomerReview[] = [
     productId: "mens-combo",
     name: "Arun Nair",
     rating: 5,
-    review: "This dual synergy works flawlessly. The AlphaMax capsules provide consistent cellular energy throughout the day, while the WANTMORE powder fuels peak athletic vascular flow. My gym gains and stamina have doubled!",
+    review: "This dual synergy works flawlessly. The AlphaMax capsules provide consistent cellular energy throughout the day, while the WANTMORE Prash fuels peak athletic vascular flow. My gym gains and stamina have doubled!",
     verified: true,
     date: "June 22, 2026",
     title: "The Ultimate Male Vitality Stack",
@@ -559,7 +592,7 @@ export const reviews: CustomerReview[] = [
     productId: "mens-combo",
     name: "Rohit Saxena",
     rating: 4,
-    review: "Excellent combination. I take the capsules with breakfast and the powder post-workout. I have seen clear improvements in muscle mass recovery and sustained energy during long business trips. Best stack out there.",
+    review: "Excellent combination. I take the capsules with breakfast and the Prash post-workout. I have seen clear improvements in muscle mass recovery and sustained energy during long business trips. Best stack out there.",
     verified: true,
     date: "May 14, 2026",
     title: "Highly energetic and powerful",
