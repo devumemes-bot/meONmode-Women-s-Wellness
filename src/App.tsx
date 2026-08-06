@@ -351,7 +351,7 @@ export default function App() {
     if (currentView === 'detail' && currentProduct) {
       document.title = `${currentProduct.name} | meONmode® Premium Ayurvedic Wellness`;
     } else {
-      document.title = "meONmode® | Ayurvedic Wellness | ALPHAMAX, WANTMORE, OVAIRA & VAYUCORE";
+      document.title = "meONmode® | Premium Ayurvedic Wellness";
     }
   }, [currentView, currentProduct]);
 
