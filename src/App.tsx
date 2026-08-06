@@ -346,6 +346,15 @@ export default function App() {
     }
   }, [checkout.fullName, checkout.phone, checkout.address, checkout.pincode]);
 
+  // Update browser tab title dynamically
+  useEffect(() => {
+    if (currentView === 'detail' && currentProduct) {
+      document.title = `${currentProduct.name} | meONmode® Premium Ayurvedic Wellness`;
+    } else {
+      document.title = "meONmode® | Ayurvedic Wellness | ALPHAMAX, WANTMORE, OVAIRA & VAYUCORE";
+    }
+  }, [currentView, currentProduct]);
+
   const handleSendAiMessage = async (customText?: string) => {
     const textToSend = customText || aiInput;
     if (!textToSend.trim()) return;
@@ -4519,7 +4528,7 @@ Please process and confirm this parcel for dispatch.`;
         </div>
       </footer>
 
-      {/* Floating Interactive Chat Desk (Gemini AI Doctor & WhatsApp Desk) */}
+      {/* Floating Interactive Chat Desk (meONmode® AI Doctor & WhatsApp Desk) */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
         {/* Expanded Chat Desk Card */}
         {showWhatsAppChat && (
