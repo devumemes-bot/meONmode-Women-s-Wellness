@@ -22,17 +22,13 @@
   }
   
   img {
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: crisp-edges;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -o-crisp-edges;
+    image-rendering: auto;
+    max-width: 100%;
   }
 }
 
 .crisp-img {
-  image-rendering: -webkit-optimize-contrast !important;
-  image-rendering: crisp-edges !important;
-  image-rendering: pixelated !important;
+  image-rendering: auto !important;
 }
 
 @keyframes float {

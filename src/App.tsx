@@ -1423,9 +1423,8 @@ Please process and confirm this parcel for dispatch.`;
                         <img 
                           src="https://i.postimg.cc/BQm4ZB0G/IMG-2935.png" 
                           alt="meONmode Women's Combo Kit" 
-                          loading="lazy"
-                          className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl crisp-img transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
-                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                          loading="eager"
+                          className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
                         />
                       </button>
 
@@ -1550,9 +1549,8 @@ Please process and confirm this parcel for dispatch.`;
                         <img 
                           src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/BQm4ZB0G/IMG-2935.png'} 
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
-                          loading="lazy"
-                          className="w-full h-auto max-w-full object-contain block mx-auto rounded-2xl crisp-img transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 animate-float"
-                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                          loading="eager"
+                          className="w-full h-auto max-w-full object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 animate-float"
                         />
                       </button>
                       {/* Glassmorphic price tag pill */}
@@ -1800,8 +1798,7 @@ Please process and confirm this parcel for dispatch.`;
                               src={prod.images && prod.images[0]} 
                               alt={prod.name}
                               loading="lazy"
-                              className="w-full h-auto max-w-full object-contain block mx-auto crisp-img h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
-                              style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                              className="w-full h-auto max-w-full object-contain block mx-auto h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = 'none';
@@ -2011,8 +2008,7 @@ Please process and confirm this parcel for dispatch.`;
                         src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
                         alt="100% Ayurvedic Ingredients / Roots & Bark" 
                         loading="lazy"
-                        className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
-                        style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                        className="w-full h-auto max-w-full object-contain block mx-auto"
                       />
                     </div>
                     <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
@@ -2021,8 +2017,7 @@ Please process and confirm this parcel for dispatch.`;
                         src="https://i.postimg.cc/qMRxSpMV/IMG-2912.png" 
                         alt="Why Ayurvedic capsules are better Comparison" 
                         loading="lazy"
-                        className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
-                        style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                        className="w-full h-auto max-w-full object-contain block mx-auto"
                       />
                     </div>
                   </div>
@@ -2075,8 +2070,7 @@ Please process and confirm this parcel for dispatch.`;
                   src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'} 
                   alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
                   loading="lazy"
-                  className="w-full h-auto max-w-full object-contain block mx-auto crisp-img"
-                  style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                  className="w-full h-auto max-w-full object-contain block mx-auto"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
@@ -2299,8 +2293,7 @@ Please process and confirm this parcel for dispatch.`;
                       src="1000166074.jpg" 
                       alt="meONmode Wellness Club Group" 
                       loading="lazy"
-                      className="w-full h-auto max-w-full object-contain block mx-auto crisp-img" 
-                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }} 
+                      className="w-full h-auto max-w-full object-contain block mx-auto" 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = 'none';
@@ -2527,9 +2520,8 @@ Please process and confirm this parcel for dispatch.`;
                                 <img 
                                   src={imgSrc} 
                                   alt={`${selectedProduct.name} - View ${idx + 1}`}
-                                  loading="lazy"
-                                  className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain block mx-auto crisp-img transform transition-transform duration-500 ease-out group-hover/img:scale-105"
-                                  style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                                  loading="eager"
+                                  className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain block mx-auto transform transition-transform duration-500 ease-out group-hover/img:scale-105"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.style.display = 'none';
@@ -2876,8 +2868,7 @@ Please process and confirm this parcel for dispatch.`;
                           } 
                           alt="8 Feminine Health Solutions" 
                           loading="lazy"
-                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
-                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -2900,8 +2891,7 @@ Please process and confirm this parcel for dispatch.`;
                           src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
                           alt="33-Herb Pure Formulation" 
                           loading="lazy"
-                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
-                          style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -3001,8 +2991,7 @@ Please process and confirm this parcel for dispatch.`;
                               } 
                               alt="Dosage Info" 
                               loading="lazy"
-                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
-                              style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -3020,8 +3009,7 @@ Please process and confirm this parcel for dispatch.`;
                               src="https://i.postimg.cc/dtsJKSzc/IMG-2931.png" 
                               alt="Certification badge" 
                               loading="lazy"
-                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105 crisp-img"
-                              style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -3072,8 +3060,7 @@ Please process and confirm this parcel for dispatch.`;
                       } 
                       alt="Powerful Ingredients" 
                       loading="lazy"
-                      className="w-full h-auto max-w-full object-contain block mx-auto animate-pulse-slow crisp-img"
-                      style={{ imageRendering: 'crisp-edges', WebkitImageRendering: '-webkit-optimize-contrast' }}
+                      className="w-full h-auto max-w-full object-contain block mx-auto animate-pulse-slow"
                     />
                   </div>
 
