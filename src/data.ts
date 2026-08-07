@@ -22,7 +22,7 @@ export const PRODUCTS: Product[] = [
     ],
     tag: "BEST SELLER - SAVE 47%",
     shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
-    longDescription: "The ultimate dual-action therapeutic kit designed by Ayurvedic gynecologists to target the root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort. While OVAIRA capsules regulate LH/FSH balance and resolve ovarian cysts, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a perfect, natural, 100% side-effect-free solution to help you regain control over your life.",
+    longDescription: "The ultimate dual-action therapeutic kit designed by Ayurvedic gynecologists to target the root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort. While OVAIRA capsules regulate LH/FSH balance and resolve ovarian cysts, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a perfect, natural, gentle Ayurvedic solution to help you support your daily wellness.",
     volumeOrQty: "60 Capsules + 500ml Syrup",
     dosage: "• OVAIRA Capsule: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).\n• FLOWELLE Syrup: Take 5ml in the Morning and 5ml in the Evening (After Meals).",
     benefits: [
@@ -143,7 +143,7 @@ export const MENS_PRODUCTS: Product[] = [
       "Boosts natural physical stamina and athletic output",
       "Supports lean muscle recovery and protein synthesis",
       "Reduces fatigue and revitalizes daily physical energy",
-      "100% Ayurvedic, safe & effective, zero side effects"
+      "100% Ayurvedic, safe & effective gentle formulation"
     ],
     keyIngredients: [
       { name: "Safed Musli", benefit: "Vigor Booster", description: "Renowned herb for boosting natural vigor and muscle development." },
@@ -251,7 +251,7 @@ export const TESTIMONIALS = [
     age: 28,
     location: "Mumbai",
     rating: 5,
-    title: "Cured my 2-year irregular periods!",
+    title: "Regulated my 2-year irregular periods!",
     comment: "I had PCOS since 2021. Periods would only come with pills. After using the meONmode Combo Kit for 3 months, my cycles are back to a regular 28 days naturally! Best part? My severe cramps are 90% gone."
   },
   {
@@ -397,7 +397,7 @@ export const reviews: CustomerReview[] = [
     review: "I had severe PCOS since 2021. Periods would only come with synthetic pills. After using the meONmode Combo Kit (OVAIRA + FLOWELLE) for 3 months, my cycles are back to a regular 28 days naturally! Best part? My agonizing cramps are 90% gone. Unbelievable results!",
     verified: true,
     date: "May 12, 2026",
-    title: "Cured my 2-year irregular periods!",
+    title: "Regulated my 2-year irregular periods!",
     approved: true,
     location: "Mumbai"
   },

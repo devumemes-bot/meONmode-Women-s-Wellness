@@ -156,6 +156,17 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+// SEO Sitemap & Robots.txt endpoints
+app.get("/sitemap.xml", (req, res) => {
+  res.header("Content-Type", "application/xml");
+  res.sendFile(path.join(process.cwd(), "public", "sitemap.xml"));
+});
+
+app.get("/robots.txt", (req, res) => {
+  res.header("Content-Type", "text/plain");
+  res.sendFile(path.join(process.cwd(), "public", "robots.txt"));
+});
+
 // Serve frontend assets using Vite middleware or static files
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

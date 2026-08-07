@@ -23,7 +23,7 @@ export const UI_TRANSLATIONS = {
     benefitsTitle: "Primary Benefits",
     specFormulated: "Specialized Formulations",
     ayurvedicDoc: "Ayurvedic Doctor Formulated",
-    clinicallyTested: "Clinically Tested. Zero Side Effects.",
+    clinicallyTested: "Clinically Tested. Gentle Formulation.",
     customerTestimonials: "Customer Testimonials",
     frequentlyAskedQuestions: "Frequently Asked Questions",
     unboxingVideoNotice: "Please record an unboxing video when your order arrives — required for any return/refund claims.",
@@ -492,7 +492,7 @@ export const getTranslatedTestimonials = (lang: 'en' | 'hi', isMen: boolean) => 
         age: 28,
         location: "Mumbai",
         rating: 5,
-        title: "Cured my 2-year irregular periods!",
+        title: "Regulated my 2-year irregular periods!",
         comment: "I had PCOS since 2021. Periods would only come with pills. After using the meONmode Combo Kit for 3 months, my cycles are back to a regular 28 days naturally! Best part? My severe cramps are 90% gone."
       },
       {

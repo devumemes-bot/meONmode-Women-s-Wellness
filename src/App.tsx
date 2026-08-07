@@ -69,6 +69,105 @@ function setCookie(name: string, value: string, days?: number) {
   document.cookie = name + "=" + (encodeURIComponent(value) || "") + expires + "; path=/; SameSite=Lax";
 }
 
+// Product Clean Canonical Slug Mapping
+export function getProductCleanSlug(id: string): string {
+  switch (id) {
+    case 'ovaira': return 'ovaira';
+    case 'flowelle': return 'flowelle';
+    case 'alphamax-men':
+    case 'alphamax': return 'alphamax';
+    case 'wantmore-men':
+    case 'wantmore': return 'wantmore';
+    case 'vayucore': return 'vayucore';
+    case 'combo-kit': return 'combo-kit';
+    case 'mens-combo': return 'mens-combo';
+    default: return id;
+  }
+}
+
+export function getProductFromSlug(slug: string): Product | undefined {
+  const clean = slug.toLowerCase().replace('/products/', '').replace('/', '');
+  const allProds = [...PRODUCTS, ...MENS_PRODUCTS];
+  return allProds.find(p => {
+    if (p.id === clean) return true;
+    if (clean === 'alphamax' && p.id === 'alphamax-men') return true;
+    if (clean === 'wantmore' && p.id === 'wantmore-men') return true;
+    return false;
+  });
+}
+
+export function getProductSeoData(product: Product) {
+  const slug = getProductCleanSlug(product.id);
+  const canonicalUrl = `https://meonmode.com/products/${slug}`;
+
+  switch (slug) {
+    case 'ovaira':
+      return {
+        title: "meONmode® OVAIRA Capsules | Ayurvedic PCOS & Hormonal Wellness",
+        description: "Shop meONmode OVAIRA Veg Capsules for PCOS care, hormonal balance, ovarian wellness, and clear skin. 100% Ayurvedic formula with Shatavari & Kanchnar.",
+        h1: "meONmode® OVAIRA Capsules – Ayurvedic PCOS & Hormonal Wellness",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/FFGxTYvK/IMG-2904.png"
+      };
+    case 'flowelle':
+      return {
+        title: "meONmode® FLOWELLE Drink | Ayurvedic Period Cramp & Flow Care",
+        description: "Shop meONmode FLOWELLE Ayurvedic syrup for painful period cramp relief, cycle regularity, and uterine wellness. Made with Ashok Chal & Shatavari.",
+        h1: "meONmode® FLOWELLE Drink – Ayurvedic Period Cramp & Flow Care",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/Gp7ykyY6/IMG-2916.png"
+      };
+    case 'alphamax':
+      return {
+        title: "meONmode® AlphaMax Capsules | Ayurvedic Men's Energy & Vitality",
+        description: "Shop meONmode AlphaMax Veg Capsules with Shudh Shilajit & Gokshura. Boost natural physical energy, stamina, and cellular recovery.",
+        h1: "meONmode® AlphaMax FOR MEN – Ayurvedic Power & Energy Capsules",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/GtknmHyY/879404D5-1DBE-4DAD-A868-ACDDEF70C56F.png"
+      };
+    case 'wantmore':
+      return {
+        title: "meONmode® WANTMORE Prash | Ayurvedic Men's Stamina & Vigor",
+        description: "Shop meONmode WANTMORE FOR MEN Prash for maximum physical strength, stamina, and workout recovery. Powered by Safed Musli & Ashwagandha.",
+        h1: "meONmode® WANTMORE FOR MEN – Maximum Strength Performance Prash",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+      };
+    case 'vayucore':
+      return {
+        title: "meONmode® VAYUCORE | Ayurvedic Digestive & Gut Health Liquid",
+        description: "Shop meONmode VAYUCORE Ayurvedic liquid to relieve gas, bloating, and acidity while supporting healthy digestion and gut health.",
+        h1: "meONmode® VAYUCORE – Ayurvedic Digestive & Gut Wellness",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/Z5RH4n2D/E3FB9FE6-C1DB-48D1-905E-941055523296.png"
+      };
+    case 'combo-kit':
+      return {
+        title: "meONmode® Combo Kit | OVAIRA Capsules + FLOWELLE Syrup",
+        description: "Shop meONmode Combo Kit featuring OVAIRA Capsules and FLOWELLE Syrup for complete Ayurvedic cycle care, hormonal balance, and period support.",
+        h1: "meONmode® Combo Kit – Complete Ayurvedic Reset Protocol",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/MKTmNzZd/IMG-2915.png"
+      };
+    case 'mens-combo':
+      return {
+        title: "meONmode® Men's Ultimate Performance Combo | WANTMORE + AlphaMax",
+        description: "Shop meONmode Men's Ultimate Performance Combo pairing WANTMORE Prash & AlphaMax Capsules for complete daily stamina and physical vitality.",
+        h1: "meONmode® Men's Ultimate Performance Combo – Stamina & Power Stack",
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/T1XN3QGv/86164C6E-8C99-4C84-87C7-477EB98232DF.png"
+      };
+    default:
+      return {
+        title: `${product.name} | meONmode® Premium Ayurvedic Wellness`,
+        description: product.shortDescription || product.longDescription,
+        h1: product.name,
+        canonicalUrl,
+        ogImage: product.images?.[0] || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+      };
+  }
+}
+
 function getProductCategory(prod: Product): string {
   const name = prod.name.toLowerCase();
   const desc = prod.shortDescription?.toLowerCase() || '';
@@ -346,14 +445,58 @@ export default function App() {
     }
   }, [checkout.fullName, checkout.phone, checkout.address, checkout.pincode]);
 
-  // Update browser tab title dynamically
+  // Comprehensive Dynamic Head Metadata, Canonical URL, Open Graph & Twitter Tags Updater
   useEffect(() => {
-    if (currentView === 'detail' && currentProduct) {
-      document.title = `${currentProduct.name} | meONmode® Premium Ayurvedic Wellness`;
-    } else {
-      document.title = "meONmode® | Premium Ayurvedic Wellness";
+    let seo = {
+      title: "meONmode | Ayurvedic Wellness Products",
+      description: "Discover premium Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, OVAIRA and VAYUCORE with Cash on Delivery, Free Shipping and GST Included.",
+      canonicalUrl: "https://meonmode.com/",
+      ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+    };
+
+    if (currentView === 'detail' && selectedProduct) {
+      seo = getProductSeoData(selectedProduct);
     }
-  }, [currentView, currentProduct]);
+
+    document.title = seo.title;
+
+    const setMeta = (attrName: string, attrVal: string, contentVal: string) => {
+      let el = document.querySelector(`meta[${attrName}="${attrVal}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attrName, attrVal);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', contentVal);
+    };
+
+    const setLink = (rel: string, hrefVal: string) => {
+      let el = document.querySelector(`link[rel="${rel}"]`);
+      if (!el) {
+        el = document.createElement('link');
+        el.setAttribute('rel', rel);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('href', hrefVal);
+    };
+
+    setMeta('name', 'description', seo.description);
+    setMeta('name', 'title', seo.title);
+    setLink('canonical', seo.canonicalUrl);
+
+    // Open Graph
+    setMeta('property', 'og:title', seo.title);
+    setMeta('property', 'og:description', seo.description);
+    setMeta('property', 'og:url', seo.canonicalUrl);
+    setMeta('property', 'og:image', seo.ogImage);
+    setMeta('property', 'og:site_name', 'meONmode®');
+    setMeta('property', 'og:type', 'website');
+
+    // Twitter
+    setMeta('name', 'twitter:title', seo.title);
+    setMeta('name', 'twitter:description', seo.description);
+    setMeta('name', 'twitter:image', seo.ogImage);
+  }, [currentView, selectedProduct]);
 
   const handleSendAiMessage = async (customText?: string) => {
     const textToSend = customText || aiInput;
@@ -411,39 +554,43 @@ export default function App() {
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
 
-  // Deep-linking: read URL parameters on page load
+  // Deep-linking & Route Initialization: handle /products/:slug and ?product=:id on page load & popstate
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productParam = urlParams.get('product');
-    if (productParam) {
-      // Find product in PRODUCTS or MENS_PRODUCTS
-      const allProducts = [...PRODUCTS, ...MENS_PRODUCTS];
-      const found = allProducts.find(p => p.id === productParam);
-      if (found) {
-        // Set correct category tab so it is visible
-        const isMen = MENS_PRODUCTS.some(m => m.id === productParam);
-        setActiveCategory(isMen ? 'men' : 'women');
-        setHighlightedProductId(productParam);
-        
-        // Let's scroll and/or highlight
-        setTimeout(() => {
-          const element = document.getElementById(`product-card-${productParam}`);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Keep the pulse glowing for a while then fade it
-            setTimeout(() => {
-              setHighlightedProductId(null);
-            }, 6000);
-          }
-        }, 1200);
+    const handleRoute = () => {
+      const path = window.location.pathname;
+      const urlParams = new URLSearchParams(window.location.search);
+      const productParam = urlParams.get('product');
+
+      let foundProduct: Product | undefined;
+
+      if (path.startsWith('/products/')) {
+        const slug = path.replace('/products/', '').replace('/', '');
+        foundProduct = getProductFromSlug(slug);
+      } else if (productParam) {
+        foundProduct = getProductFromSlug(productParam);
       }
-    }
+
+      if (foundProduct) {
+        setSelectedProduct(foundProduct);
+        setCurrentView('detail');
+        const isMen = MENS_PRODUCTS.some(m => m.id === foundProduct!.id);
+        setActiveCategory(isMen ? 'men' : 'women');
+      } else if (path === '/' || path === '') {
+        setCurrentView('home');
+      }
+    };
+
+    handleRoute();
+
+    window.addEventListener('popstate', handleRoute);
+    return () => window.removeEventListener('popstate', handleRoute);
   }, []);
 
   // Handle Share copy link
   const handleShareProduct = (product: Product, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const slug = getProductCleanSlug(product.id);
+    const shareUrl = `https://meonmode.com/products/${slug}`;
     
     // Copy function
     const copyToClipboard = (text: string) => {
@@ -633,6 +780,12 @@ Please process and confirm this parcel for dispatch.`;
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setCurrentView('detail');
+    const slug = getProductCleanSlug(product.id);
+    try {
+      window.history.pushState(null, '', `/products/${slug}`);
+    } catch (e) {
+      // Fallback
+    }
   };
 
   return (
@@ -1102,6 +1255,7 @@ Please process and confirm this parcel for dispatch.`;
                     {/* Main Heading & Sub Heading with Luxury Serif typography */}
                     <div className="space-y-4">
                       <h1 id="women-hero-heading" className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-[#FAF6F0] leading-[1.05]">
+                        <span className="sr-only">meONmode – Ayurvedic Wellness Products - </span>
                         Your Body. <br />
                         <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent animate-pulse">ON Mode.</span>
                       </h1>
@@ -2257,7 +2411,7 @@ Please process and confirm this parcel for dispatch.`;
                   },
                   "offers": {
                     "@type": "Offer",
-                    "url": `${window.location.origin}${window.location.pathname}?product=${selectedProduct.id}`,
+                    "url": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`,
                     "priceCurrency": "INR",
                     "price": selectedProduct.price,
                     "priceValidUntil": "2027-12-31",
@@ -2471,9 +2625,9 @@ Please process and confirm this parcel for dispatch.`;
                         </button>
 
                         {/* Main Title: Large, serif typography */}
-                        <h2 className="font-serif text-3xl md:text-4xl font-black text-neutral-950 tracking-tight leading-snug">
+                        <h1 className="font-serif text-3xl md:text-4xl font-black text-neutral-950 tracking-tight leading-snug">
                           {selectedProduct.name}
-                        </h2>
+                        </h1>
 
                         {/* Subtitle: slightly tracked out uppercase sans-serif text */}
                         <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-neutral-500 mt-1">
