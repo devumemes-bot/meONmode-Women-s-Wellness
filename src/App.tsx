@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
   ChevronRight, 
@@ -40,9 +41,13 @@ import {
   Clipboard,
   Bell,
   Pill,
-  Flower2
+  Flower2,
+  Phone
 } from 'lucide-react';
 import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages } from './data';
+import { BLOG_POSTS } from './blogData';
+import { BlogListing } from './components/BlogListing';
+import { BlogArticle } from './components/BlogArticle';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
@@ -104,7 +109,7 @@ export function getProductSeoData(product: Product) {
     case 'ovaira':
       return {
         title: "meONmode® OVAIRA Capsules | Ayurvedic PCOS & Hormonal Wellness",
-        description: "Shop meONmode OVAIRA Veg Capsules for PCOS care, hormonal balance, ovarian wellness, and clear skin. 100% Ayurvedic formula with Shatavari & Kanchnar.",
+        description: "Shop meONmode OVAIRA Veg Capsules for PCOS care, hormonal balance, ovarian wellness, and clear skin. Ayurvedic formula with Shatavari & Kanchnar.",
         h1: "meONmode® OVAIRA Capsules – Ayurvedic PCOS & Hormonal Wellness",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://i.postimg.cc/FFGxTYvK/IMG-2904.png"
@@ -204,7 +209,7 @@ export default function App() {
   // Centralized Reviews Database State (Persisted in LocalStorage)
   const [allReviews, setAllReviews] = useState<CustomerReview[]>(() => {
     try {
-      const saved = localStorage.getItem('meonmode_reviews');
+      const saved = localStorage.getItem('meonmode_reviews_v5');
       return saved ? JSON.parse(saved) : reviews;
     } catch (e) {
       return reviews;
@@ -213,7 +218,7 @@ export default function App() {
 
   // Auto-save reviews
   useEffect(() => {
-    localStorage.setItem('meonmode_reviews', JSON.stringify(allReviews));
+    localStorage.setItem('meonmode_reviews_v5', JSON.stringify(allReviews));
   }, [allReviews]);
 
   // Review System Modal / Sheet States
@@ -333,7 +338,7 @@ export default function App() {
 
   const isMenProduct = (prod: Product | null) => {
     if (!prod) return false;
-    return MENS_PRODUCTS.some(m => m.id === prod.id);
+    return prod.id === 'wantmore-men' || prod.id === 'alphamax-men' || prod.id === 'mens-combo';
   };
 
   const getProductStockStatus = (productId: string) => {
@@ -375,6 +380,22 @@ export default function App() {
   const [lastOrderId, setLastOrderId] = useState<string>('');
   const [showInvoice, setShowInvoice] = useState<boolean>(false);
   const [trackingOrderIdInput, setTrackingOrderIdInput] = useState<string>('');
+  
+  // SECURE PAYMENT GATEWAY & VERIFICATION STATES
+  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [pendingPaymentOrder, setPendingPaymentOrder] = useState<any | null>(null);
+  const [paymentRefInput, setPaymentRefInput] = useState<string>('');
+  const [showGatewayModal, setShowGatewayModal] = useState<boolean>(false);
+  const [lastVerifiedOrder, setLastVerifiedOrder] = useState<any | null>(() => {
+    try {
+      const saved = sessionStorage.getItem('meonmode_verified_order');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
   const [orderHistory, setOrderHistory] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('meonmode_order_history');
@@ -383,6 +404,258 @@ export default function App() {
       return [];
     }
   });
+
+  const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>('pmos-kya-hai-pcod-se-alag');
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Synchronize HashRouter location <-> currentView
+  useEffect(() => {
+    const path = location.pathname.toLowerCase();
+    if (path === '/cart') {
+      if (currentView !== 'cart') setCurrentView('cart');
+    } else if (path === '/orders' || path === '/order-history' || path === '/track-order') {
+      if (currentView !== 'order-history') setCurrentView('order-history');
+    } else if (path === '/refund-policy') {
+      if (currentView !== 'refund-policy') setCurrentView('refund-policy');
+    } else if (path === '/success') {
+      if (lastVerifiedOrder) {
+        if (currentView !== 'success') setCurrentView('success');
+      } else {
+        navigate('/cart', { replace: true });
+      }
+    } else if (path === '/blog' || path === '/blog/') {
+      if (currentView !== 'blog') setCurrentView('blog');
+    } else if (path.startsWith('/blog/')) {
+      const slug = path.split('/blog/')[1]?.split('/')[0];
+      if (slug) {
+        setSelectedBlogSlug(slug);
+        if (currentView !== 'blog-article') setCurrentView('blog-article');
+      } else {
+        if (currentView !== 'blog') setCurrentView('blog');
+      }
+    } else if (path.startsWith('/product/')) {
+      const prodId = path.split('/product/')[1];
+      const allProds = [...PRODUCTS, ...MENS_PRODUCTS];
+      const match = allProds.find(p => p.id === prodId);
+      if (match) {
+        setSelectedProduct(match);
+        if (currentView !== 'detail') setCurrentView('detail');
+      }
+    } else if (path === '/' || path === '') {
+      if (currentView !== 'home') setCurrentView('home');
+    }
+  }, [location.pathname]);
+
+  // View navigation helper that updates hash route
+  const navigateToView = (view: ViewType, product?: Product, blogSlug?: string) => {
+    setCurrentView(view);
+    if (view === 'home') navigate('/');
+    else if (view === 'cart') navigate('/cart');
+    else if (view === 'order-history' || view === 'track-order') navigate('/orders');
+    else if (view === 'refund-policy') navigate('/refund-policy');
+    else if (view === 'success') navigate('/success');
+    else if (view === 'blog') navigate('/blog');
+    else if (view === 'blog-article') {
+      const slug = blogSlug || selectedBlogSlug;
+      setSelectedBlogSlug(slug);
+      navigate(`/blog/${slug}`);
+    }
+    else if (view === 'detail') {
+      if (product) {
+        setSelectedProduct(product);
+        navigate(`/product/${product.id}`);
+      }
+    }
+  };
+
+  // Order History by Mobile Number States
+  const [orderHistoryPhoneInput, setOrderHistoryPhoneInput] = useState<string>(() => {
+    try {
+      return localStorage.getItem('meonmode_phone_lookup') || '';
+    } catch (e) {
+      return '';
+    }
+  });
+  const [orderHistoryOrders, setOrderHistoryOrders] = useState<any[]>([]);
+  const [isLoadingOrderHistory, setIsLoadingOrderHistory] = useState<boolean>(false);
+  const [orderHistorySearchError, setOrderHistorySearchError] = useState<string | null>(null);
+  const [selectedInvoiceModalOrder, setSelectedInvoiceModalOrder] = useState<any | null>(null);
+
+  const handleLookupOrdersByPhone = async (phoneToQuery?: string) => {
+    const rawNum = phoneToQuery !== undefined ? phoneToQuery : orderHistoryPhoneInput;
+    const cleanPhone = rawNum.replace(/\D/g, '').slice(-10);
+
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setOrderHistorySearchError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setIsLoadingOrderHistory(true);
+    setOrderHistorySearchError(null);
+
+    try {
+      localStorage.setItem('meonmode_phone_lookup', cleanPhone);
+      const res = await fetch(`/api/orders-by-phone/${cleanPhone}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to query order history from server.');
+      }
+
+      let fetched: any[] = data.orders || [];
+
+      // Also merge lastVerifiedOrder if matches phone and not present
+      if (lastVerifiedOrder && lastVerifiedOrder.checkoutDetails?.phone?.replace(/\D/g, '').slice(-10) === cleanPhone) {
+        if (!fetched.some(o => o.orderId === lastVerifiedOrder.orderId)) {
+          fetched.unshift(lastVerifiedOrder);
+        }
+      }
+
+      setOrderHistoryOrders(fetched);
+      if (fetched.length === 0) {
+        setOrderHistorySearchError(`No verified orders found for mobile number +91 ${cleanPhone}. Please ensure you completed payment verification during checkout.`);
+      }
+    } catch (err: any) {
+      console.error("Order history lookup error:", err);
+      setOrderHistorySearchError(err.message || "Failed to search order history.");
+    } finally {
+      setIsLoadingOrderHistory(false);
+    }
+  };
+
+  // Auto-search if phone input already filled when switching to order-history view
+  useEffect(() => {
+    if (currentView === 'order-history' && orderHistoryPhoneInput.replace(/\D/g, '').length >= 10 && orderHistoryOrders.length === 0 && !isLoadingOrderHistory) {
+      handleLookupOrdersByPhone(orderHistoryPhoneInput);
+    }
+  }, [currentView]);
+
+  // Verify server status on view change to prevent direct URL/state bypass
+  useEffect(() => {
+    if (currentView === 'success') {
+      if (!lastVerifiedOrder || !lastVerifiedOrder.orderId || !lastVerifiedOrder.orderVerificationToken) {
+        // Direct unverified access attempt blocked
+        setCurrentView('cart');
+        setPaymentError('Unverified order access blocked. Payment must be verified by server before order confirmation.');
+        return;
+      }
+
+      // Re-query backend server to confirm order authenticity
+      fetch(`/api/orders/${lastVerifiedOrder.orderId}?token=${lastVerifiedOrder.orderVerificationToken}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success || !data.order) {
+            setLastVerifiedOrder(null);
+            sessionStorage.removeItem('meonmode_verified_order');
+            setCurrentView('cart');
+            setPaymentError('Payment verification expired or unverified on server. Order was NOT confirmed.');
+          }
+        })
+        .catch(() => {
+          // Keep cached order if offline
+        });
+    }
+  }, [currentView]);
+
+  // Dynamic Razorpay SDK script loader
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      if ((window as any).Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // Helper function to send verification payload to backend /api/verify-payment
+  const verifyPaymentOnServer = async (verifyPayload: any) => {
+    setIsProcessingPayment(true);
+    setPaymentError(null);
+
+    try {
+      const res = await fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(verifyPayload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.verified || !data.success) {
+        throw new Error(data.error || "Payment verification failed. Order was NOT confirmed.");
+      }
+
+      // Success: Save verified order details
+      setLastVerifiedOrder(data.order);
+      setLastOrderId(data.orderId);
+      sessionStorage.setItem('meonmode_verified_order', JSON.stringify(data.order));
+      saveOrderToHistory(data.orderId);
+
+      // Clear cart ONLY AFTER payment is verified
+      setCart([]);
+
+      setShowGatewayModal(false);
+      setIsProcessingPayment(false);
+      setPaymentRefInput('');
+      setCurrentView('success');
+
+    } catch (err: any) {
+      console.error("Payment Verification Error:", err);
+      setIsProcessingPayment(false);
+      setPaymentError(err.message || "Payment verification failed. Your order was NOT confirmed.");
+    }
+  };
+
+  // Helper function to trigger WhatsApp confirmation for verified orders only
+  const triggerWhatsAppConfirmation = () => {
+    if (!lastVerifiedOrder) return;
+
+    const cartSummary = lastVerifiedOrder.items.map((item: any) => 
+      `${item.name} x ${item.quantity} - Rs. ${(item.price * item.quantity).toLocaleString('en-IN')}`
+    ).join('\n');
+
+    const isCod = lastVerifiedOrder.paymentMethod === 'cod';
+    const paymentLine = isCod 
+      ? `• Mandatory COD Advance Paid: Rs. 150 (Verified Txn Ref: ${lastVerifiedOrder.paymentId})\n• Balance Due at Delivery: Rs. ${lastVerifiedOrder.balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`
+      : `• Prepaid Full Amount Paid: Rs. ${lastVerifiedOrder.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})} (Verified Txn Ref: ${lastVerifiedOrder.paymentId})`;
+
+    const textPayload = `*VERIFIED ORDER - meONmode*
+*Order ID:* ${lastVerifiedOrder.orderId}
+*Payment Status:* VERIFIED SUCCESS ✓ (Ref: ${lastVerifiedOrder.paymentId})
+───────────────────────
+*Customer Delivery Details:*
+• Name: ${lastVerifiedOrder.checkoutDetails.fullName}
+• Phone Number: ${lastVerifiedOrder.checkoutDetails.phone}
+• Full Address: ${lastVerifiedOrder.checkoutDetails.address}
+• Pincode: ${lastVerifiedOrder.checkoutDetails.pincode}
+
+*Order Summary:*
+${cartSummary}
+
+Taxable Value: Rs. ${lastVerifiedOrder.taxableValue.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+CGST (2.5%): Rs. ${lastVerifiedOrder.cgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+SGST (2.5%): Rs. ${lastVerifiedOrder.sgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+Total GST (5%): Rs. ${lastVerifiedOrder.totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+*Grand Total: Rs. ${lastVerifiedOrder.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})}*
+
+*Payment Breakdown:*
+${paymentLine}
+
+*Payment Method:* ${isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}
+───────────────────────
+Payment has been cryptographically verified on the backend server. Please dispatch this parcel.`;
+
+    const encodedPayload = encodeURIComponent(textPayload);
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodedPayload}`;
+    window.open(whatsappUrl, '_blank');
+  };
 
   const saveOrderToHistory = (orderId: string) => {
     const clean = orderId.trim().toUpperCase();
@@ -702,7 +975,7 @@ export default function App() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
@@ -716,65 +989,86 @@ export default function App() {
       return;
     }
 
-    // Generate cart text details using translatedCart to support the selected language (Hindi/English)
-    const cartSummary = translatedCart.map(item => 
-      `${item.product.name} x ${item.quantity} - Rs. ${(item.product.price * item.quantity).toLocaleString('en-IN')}`
-    ).join('\n');
+    setIsProcessingPayment(true);
+    setPaymentError(null);
 
-    const totalAmount = getCartTotal();
-    const taxableValue = Math.round((totalAmount / 1.05) * 100) / 100;
-    const totalGst = Math.round((totalAmount - taxableValue) * 100) / 100;
-    const cgst = Math.round((totalGst / 2) * 100) / 100;
-    const sgst = Math.round((totalGst / 2) * 100) / 100;
-    const isCod = paymentMethod === 'cod';
-    const advancePaid = isCod ? 150 : totalAmount;
-    const balanceDue = isCod ? totalAmount - 150 : 0;
+    try {
+      const payload = {
+        items: cart.map(item => ({
+          id: item.product.id,
+          name: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price
+        })),
+        checkoutDetails: checkout,
+        paymentMethod
+      };
 
-    const paymentLine = isCod 
-      ? `• Mandatory COD Advance Paid: Rs. 150\n• Balance Due at Delivery: Rs. ${balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}\n[Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})} - Rs. 150 = Rs. ${balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}]`
-      : `• Prepaid Full Amount Paid: Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2})}`;
+      const res = await fetch('/api/create-payment-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-    // Generate a unique Order ID
-    const randomOrderNum = Math.floor(100000 + Math.random() * 900000);
-    const generatedOrderId = `MOM-${randomOrderNum}`;
-    setLastOrderId(generatedOrderId);
-    saveOrderToHistory(generatedOrderId);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to initialize payment order.");
+      }
 
-    // Create the specified WhatsApp payload
-    const textPayload = `*NEW ORDER - meONmode*
-*Order ID:* ${generatedOrderId}
-───────────────────────
-*Customer Delivery Details:*
-• Name: ${checkout.fullName.trim()}
-• Phone Number: ${checkout.phone.trim()}
-• Full Address: ${checkout.address.trim()}
-• Pincode: ${checkout.pincode.trim()}
+      setPendingPaymentOrder(data);
 
-*Order Summary:*
-${cartSummary}
+      if (data.mode === 'razorpay') {
+        const loaded = await loadRazorpayScript();
+        if (loaded && (window as any).Razorpay) {
+          const options = {
+            key: data.keyId,
+            amount: Math.round(data.amount * 100),
+            currency: data.currency || 'INR',
+            name: 'meONmode® Wellness',
+            description: paymentMethod === 'cod' ? '₹150 COD Advance Payment' : 'Prepaid Order Payment',
+            order_id: data.razorpayOrderId,
+            prefill: {
+              name: checkout.fullName,
+              contact: checkout.phone
+            },
+            theme: {
+              color: '#C86428'
+            },
+            handler: async (response: any) => {
+              verifyPaymentOnServer({
+                orderId: data.orderId,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature
+              });
+            },
+            modal: {
+              ondismiss: () => {
+                setIsProcessingPayment(false);
+                setPaymentError('Payment window was closed before completion. Order was NOT confirmed.');
+              }
+            }
+          };
 
-Taxable Value: Rs. ${taxableValue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-CGST (2.5%): Rs. ${cgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-SGST (2.5%): Rs. ${sgst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-Total GST (5%): Rs. ${totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-*Grand Total (Inclusive of 5% GST): Rs. ${totalAmount.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}*
+          const rzp = new (window as any).Razorpay(options);
+          rzp.on('payment.failed', (resp: any) => {
+            setIsProcessingPayment(false);
+            setPaymentError(`Payment Failed: ${resp.error?.description || 'Transaction declined by bank.'}`);
+          });
+          rzp.open();
+          return;
+        }
+      }
 
-*Payment & Delivery Breakdown:*
-${paymentLine}
+      // Gateway / Reference Challenge Mode
+      setShowGatewayModal(true);
+      setIsProcessingPayment(false);
 
-*Payment Method:* ${isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}
-───────────────────────
-Please process and confirm this parcel for dispatch.`;
-
-    // Encode payload
-    const encodedPayload = encodeURIComponent(textPayload);
-    const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodedPayload}`;
-
-    // Open WhatsApp in a new tab
-    window.open(whatsappUrl, '_blank');
-
-    // Switch view to Order Success
-    setCurrentView('success');
+    } catch (err: any) {
+      console.error("Checkout Payment Error:", err);
+      setIsProcessingPayment(false);
+      setPaymentError(err.message || "Payment initialization failed. Please try again.");
+    }
   };
 
   const handleProductClick = (product: Product) => {
@@ -1010,14 +1304,42 @@ Please process and confirm this parcel for dispatch.`;
             {/* Nav links for desktop */}
             <nav className="hidden lg:flex items-center gap-5 text-xs font-medium">
               <button 
-                onClick={() => currentView !== 'success' && setCurrentView('home')} 
+                onClick={() => navigateToView('home')} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Home
               </button>
 
               <button 
-                onClick={() => currentView !== 'success' && setCurrentView('refund-policy')} 
+                onClick={() => {
+                  setActiveCategory('women');
+                  navigateToView('home');
+                }} 
+                className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'women' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+              >
+                Women
+              </button>
+
+              <button 
+                onClick={() => {
+                  setActiveCategory('men');
+                  navigateToView('home');
+                }} 
+                className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'men' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+              >
+                Men
+              </button>
+
+              <button 
+                onClick={() => navigateToView('blog')} 
+                className={`transition-colors hover:text-[#E5A93C] cursor-pointer flex items-center gap-1.5 ${currentView === 'blog' || currentView === 'blog-article' ? 'text-[#E8621A] font-extrabold' : 'text-white/80'}`}
+              >
+                <span>Blog</span>
+                <span className="text-[9px] bg-[#E8621A] text-white px-1.5 py-0.2 rounded-full font-bold">Health Tips</span>
+              </button>
+
+              <button 
+                onClick={() => navigateToView('refund-policy')} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${currentView === 'refund-policy' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Return Policy
@@ -1137,6 +1459,21 @@ Please process and confirm this parcel for dispatch.`;
               </button>
             </div>
 
+            {/* Order History Button */}
+            <button
+              id="header-orders-btn"
+              onClick={() => navigateToView('order-history')}
+              className={`relative p-2 rounded-full transition-all flex items-center justify-center cursor-pointer border ${
+                currentView === 'order-history'
+                  ? 'bg-[#E5A93C] text-[#2D120B] border-[#E5A93C] font-black shadow-sm'
+                  : 'bg-white/5 hover:bg-white/10 text-white hover:text-[#E5A93C] border-white/10'
+              }`}
+              title="Order History & Payment Verification"
+              aria-label="Order History"
+            >
+              <Package className="w-4.5 h-4.5" />
+            </button>
+
             {/* Cart Button */}
             <button 
               id="header-cart-btn"
@@ -1144,7 +1481,7 @@ Please process and confirm this parcel for dispatch.`;
                 if (currentView !== 'success') {
                   setCheckoutStep(1);
                   setPaymentMethod('cod');
-                  setCurrentView('cart');
+                  navigateToView('cart');
                 }
               }}
               className="relative p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-center group cursor-pointer"
@@ -1350,7 +1687,7 @@ Please process and confirm this parcel for dispatch.`;
                     {/* Trust Features styled as Premium Trust Cards */}
                     <div id="women-hero-trust-grid" className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {[
-                        '100% Ayurvedic',
+                        'Ayurvedic',
                         'Premium Herbal Ingredients',
                         'No Artificial Colors',
                         'No Heavy Metals',
@@ -2006,7 +2343,7 @@ Please process and confirm this parcel for dispatch.`;
                       <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">100% Raw Roots & Bark</span>
                       <img 
                         src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
-                        alt="100% Ayurvedic Ingredients / Roots & Bark" 
+                        alt="Ayurvedic Ingredients / Roots & Bark" 
                         loading="lazy"
                         className="w-full h-auto max-w-full object-contain block mx-auto"
                       />
@@ -2162,11 +2499,12 @@ Please process and confirm this parcel for dispatch.`;
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10">
                 {(() => {
                   const homeReviews = currentReviews.filter(rev => {
-                    const isMen = MENS_PRODUCTS.some(m => m.id === rev.productId);
+                    const isMen = rev.productId === 'wantmore-men' || rev.productId === 'alphamax-men' || rev.productId === 'mens-combo';
+                    const isWomen = rev.productId === 'combo-kit' || rev.productId === 'ovaira' || rev.productId === 'flowelle';
                     if (activeCategory === 'men') {
                       return isMen;
                     } else if (activeCategory === 'women') {
-                      return !isMen;
+                      return isWomen;
                     }
                     return true;
                   });
@@ -2253,7 +2591,7 @@ Please process and confirm this parcel for dispatch.`;
                           </div>
                           <div className="text-[10px] text-[#C86428] font-bold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 bg-[#C86428]/30 rounded-full"></span>
-                            <span>Product: {prod?.name || "meONmode Remedy"}</span>
+                            <span>Product: {rev.productId === 'mens-combo' ? "Men's Combo" : (prod?.name || "meONmode Remedy")}</span>
                           </div>
                         </div>
                       </div>
@@ -3831,17 +4169,45 @@ Please process and confirm this parcel for dispatch.`;
                               </div>
                             )}
 
+                            {/* Payment Error Banner */}
+                            {paymentError && (
+                              <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4 text-left text-xs text-red-900 space-y-1 animate-bounce">
+                                <div className="font-extrabold flex items-center gap-1.5 text-red-700 text-sm">
+                                  <span>⚠️</span>
+                                  <span>Payment Verification Failure</span>
+                                </div>
+                                <p className="font-semibold text-red-800 leading-relaxed">{paymentError}</p>
+                                <p className="text-[11px] text-red-600 font-bold pt-1">
+                                  Your order was NOT confirmed. Please complete the ₹150 advance / prepaid payment to process your order.
+                                </p>
+                              </div>
+                            )}
+
                             <button 
-                              id="whatsapp-confirm-btn"
+                              id="pay-confirm-btn"
                               type="submit"
-                              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2.5 transition-all hover:shadow-[0_0_15px_rgba(200,100,40,0.5)] shadow-lg active:scale-95 duration-200"
+                              disabled={isProcessingPayment}
+                              className="w-full bg-[#C86428] hover:bg-[#A8521F] disabled:bg-neutral-400 text-white font-extrabold text-base py-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-95 duration-200 cursor-pointer"
                             >
-                              <Send className="w-5 h-5" />
-                              <span>Confirm Order via WhatsApp</span>
+                              {isProcessingPayment ? (
+                                <>
+                                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                                  <span>Securing Payment & Verifying with Server...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-5 h-5" />
+                                  <span>
+                                    {paymentMethod === 'cod' 
+                                      ? "PAY ₹150 ADVANCE TO CONFIRM ORDER" 
+                                      : `PAY FULL AMOUNT ₹${getCartTotal().toLocaleString('en-IN')} TO CONFIRM`}
+                                  </span>
+                                </>
+                              )}
                             </button>
                             
-                            <span className="block text-center text-[10px] text-neutral-400 mt-2.5">
-                              *Upon clicking, your order details will compile instantly. Please hit "Send" in WhatsApp to register. Your screen here will update automatically.
+                            <span className="block text-center text-[10px] text-neutral-500 font-semibold mt-2.5">
+                              🔒 256-bit Bank Encrypted Gateway. Orders are confirmed strictly upon verified payment.
                             </span>
                           </div>
                         </>
@@ -3852,6 +4218,130 @@ Please process and confirm this parcel for dispatch.`;
 
               </div>
             )}
+          </div>
+        )}
+
+        {/* SECURE PAYMENT GATEWAY & VERIFICATION MODAL */}
+        {showGatewayModal && pendingPaymentOrder && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-5 text-neutral-900 shadow-2xl relative border border-amber-200 text-left">
+              <div className="flex justify-between items-center border-b border-neutral-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-6 h-6 text-[#C86428]" />
+                  <div>
+                    <h3 className="font-extrabold text-base text-[#4A1D05]">meONmode® Secure Payment Gateway</h3>
+                    <p className="text-[10px] text-neutral-500 font-mono">Order Ref: {pendingPaymentOrder.orderId}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowGatewayModal(false);
+                    setPaymentError("Payment verification cancelled. Your order was NOT confirmed.");
+                  }}
+                  className="text-neutral-400 hover:text-neutral-600 font-bold text-lg p-1"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-neutral-600 font-semibold">Payment Amount:</span>
+                  <span className="font-black text-[#C86428] text-sm font-mono">
+                    ₹{pendingPaymentOrder.amount.toLocaleString('en-IN')}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-neutral-600 font-semibold">Payment Purpose:</span>
+                  <span className="font-bold text-neutral-800">
+                    {pendingPaymentOrder.paymentMethod === 'cod' ? 'Mandatory ₹150 COD Advance' : '100% Prepaid Full Payment'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center space-y-3 bg-neutral-50 p-4 rounded-2xl border border-neutral-200 text-center">
+                <span className="text-[11px] font-extrabold text-neutral-700 uppercase tracking-wider">Pay via Any UPI App</span>
+                
+                <a
+                  href={`upi://pay?pa=9350302092m@pnb&pn=MEONMODE%20ENTERPRISES&am=${pendingPaymentOrder.amount}&cu=INR`}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow"
+                >
+                  <span>📲 Click to Pay ₹{pendingPaymentOrder.amount} in GPay / PhonePe / Paytm</span>
+                </a>
+
+                <div className="bg-white p-2 rounded-xl border border-neutral-200 shadow-inner">
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                      `upi://pay?pa=9350302092m@pnb&pn=MEONMODE ENTERPRISES&am=${pendingPaymentOrder.amount}&cu=INR`
+                    )}`}
+                    alt="meONmode UPI Payment QR Code"
+                    className="w-40 h-40 block object-contain"
+                  />
+                </div>
+
+                <div className="text-xs font-mono font-bold text-[#4A1D05] bg-white px-3 py-1.5 rounded-lg border border-neutral-200">
+                  UPI ID: 9350302092m@pnb
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-extrabold text-neutral-800">
+                  Enter 12-Digit UPI Transaction Reference / UTR Number <span className="text-red-500">*</span>
+                </label>
+                <p className="text-[10px] text-neutral-500 leading-tight">
+                  After paying in Google Pay, PhonePe, Paytm, or BHIM, copy the 12-digit UTR/Ref No. from the receipt and paste below to confirm your order.
+                </p>
+                <input
+                  type="text"
+                  value={paymentRefInput}
+                  onChange={(e) => setPaymentRefInput(e.target.value)}
+                  placeholder="e.g. 423189012345"
+                  className="w-full px-3.5 py-3 text-sm font-mono border-2 border-neutral-300 rounded-xl focus:border-[#C86428] focus:ring-0 outline-none font-bold"
+                />
+              </div>
+
+              <div className="space-y-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!paymentRefInput.trim()) {
+                      alert("Please enter the 12-digit UPI Transaction Reference / UTR number from your payment app.");
+                      return;
+                    }
+                    verifyPaymentOnServer({
+                      orderId: pendingPaymentOrder.orderId,
+                      paymentChallengeToken: pendingPaymentOrder.paymentChallengeToken,
+                      paymentRefId: paymentRefInput.trim()
+                    });
+                  }}
+                  disabled={isProcessingPayment}
+                  className="w-full bg-[#C86428] hover:bg-[#A8521F] disabled:bg-neutral-400 text-white font-extrabold text-sm py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+                >
+                  {isProcessingPayment ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      <span>Verifying Payment with Gateway...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="w-4 h-4" />
+                      <span>VERIFY PAYMENT & CONFIRM ORDER</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowGatewayModal(false);
+                    setPaymentError("Payment verification cancelled. Your order was NOT confirmed.");
+                  }}
+                  className="w-full text-center text-xs text-neutral-500 hover:text-neutral-700 py-1 font-semibold cursor-pointer"
+                >
+                  Cancel Payment
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -3868,14 +4358,67 @@ Please process and confirm this parcel for dispatch.`;
             </div>
 
             <div className="space-y-3">
-              <h1 className="font-serif text-3xl md:text-4xl font-extrabold text-white">Order Passed to WhatsApp!</h1>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-extrabold uppercase tracking-widest font-mono">
+                <ShieldCheck className="w-4 h-4" />
+                <span>SERVER PAYMENT VERIFIED</span>
+              </div>
+              <h1 className="font-serif text-3xl md:text-4xl font-extrabold text-white">Order Confirmed & Verified!</h1>
               <p className="text-[#E5A93C] font-serif text-base font-bold italic">"Your wellness journey has officially begun."</p>
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4 text-sm text-left">
               <p className="text-white/90 leading-relaxed text-xs md:text-sm">
-                We have successfully compiled your delivery options and initiated the WhatsApp link. Our meONmode dispatch team is validating pincodes right now.
+                Your payment has been cryptographically verified on our backend server. Your order is registered for priority dispatch.
               </p>
+
+              {/* Verified Order & Payment Token Card */}
+              {lastVerifiedOrder && (
+                <div className="p-4 bg-emerald-950/40 border-2 border-emerald-500/50 rounded-xl space-y-2 text-xs text-white">
+                  <div className="flex justify-between items-center border-b border-emerald-500/20 pb-2">
+                    <span className="text-emerald-300 font-bold">Verified Order ID:</span>
+                    <span className="font-mono font-black text-[#E5A93C] text-sm bg-black/60 px-2.5 py-1 rounded border border-white/10 flex items-center gap-1.5">
+                      {lastVerifiedOrder.orderId}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(lastVerifiedOrder.orderId);
+                          setShowToast("Order ID copied!");
+                          setTimeout(() => setShowToast(null), 3000);
+                        }}
+                        className="text-white/60 hover:text-white transition-colors cursor-pointer p-0.5"
+                        title="Copy Order ID"
+                      >
+                        <Clipboard className="w-3.5 h-3.5" />
+                      </button>
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-1 text-[11px]">
+                    <span className="text-neutral-400">Payment Ref / Txn ID:</span>
+                    <span className="font-mono font-bold text-emerald-400">{lastVerifiedOrder.paymentId}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-neutral-400">Payment Verification Status:</span>
+                    <span className="font-bold text-emerald-400 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5" /> VERIFIED SUCCESS
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Pass to WhatsApp Dispatch Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={triggerWhatsAppConfirmation}
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm py-4 rounded-xl flex items-center justify-center gap-2.5 shadow-xl hover:shadow-emerald-900/50 transition-all cursor-pointer"
+                >
+                  <Send className="w-5 h-5" />
+                  <span>📱 Pass Verified Order to WhatsApp Desk for Dispatch</span>
+                </button>
+                <span className="block text-center text-[10px] text-neutral-400 mt-2">
+                  *Clicking opens WhatsApp with your server-verified order receipt pre-filled.
+                </span>
+              </div>
 
               <div className="p-3 bg-[#5C1D13] border border-white/5 rounded-xl flex gap-3 items-start">
                 <Lock className="w-4 h-4 text-[#E5A93C] shrink-0 mt-0.5" />
@@ -4241,372 +4784,471 @@ Please process and confirm this parcel for dispatch.`;
           </div>
         )}
 
-        {/* ----------------- VIEW 6: TRACK ORDER LOGISTICS VIEW - DEACTIVATED ----------------- */}
-        {false && currentView === 'track-order' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+        {/* ----------------- VIEW 6: ORDER HISTORY & PAYMENT VERIFICATION VIEW ----------------- */}
+        {currentView === 'order-history' && (
+          <div className="max-w-4xl mx-auto space-y-8 py-4 animate-fade-in text-left">
             <div className="flex items-center gap-3 border-b border-white/10 pb-4">
               <button
-                onClick={() => setCurrentView('home')}
+                onClick={() => navigateToView('home')}
                 className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
                 aria-label="Back to home"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">Track Order Shipment</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Ayurvedic Logistics & Dispatch Hub</p>
-              </div>
-            </div>
-
-            {/* Order Tracking Input Card */}
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
-              <div className="space-y-2">
-                <label className="block text-xs uppercase font-extrabold text-neutral-300 tracking-wider">
-                  Enter WhatsApp Order ID
-                </label>
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-grow">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40">
-                      <Package className="w-4 h-4" />
-                    </span>
-                    <input
-                      type="text"
-                      placeholder="e.g. MOM-482910"
-                      value={trackingOrderIdInput}
-                      onChange={(e) => setTrackingOrderIdInput(e.target.value)}
-                      className="w-full bg-black/30 border border-white/10 hover:border-white/20 focus:border-[#E5A93C] focus:ring-1 focus:ring-[#E5A93C] rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-white/30 focus:outline-none transition-all uppercase"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (!trackingOrderIdInput.trim()) {
-                        alert("Please enter a valid Order ID to track.");
-                      } else {
-                        saveOrderToHistory(trackingOrderIdInput);
-                      }
-                    }}
-                    className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs px-6 py-3 rounded-xl transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    Track Status
-                  </button>
-                </div>
-              </div>
-
-              {/* My Orders History View */}
-              {orderHistory.length > 0 && (
-                <div className="pt-4 border-t border-white/5 space-y-2.5 text-left">
-                  <div className="flex items-center justify-between">
-                    <span className="block text-[10px] uppercase font-extrabold text-neutral-400 tracking-wider">
-                      📋 My Tracking History ({orderHistory.length})
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOrderHistory([]);
-                        localStorage.removeItem('meonmode_order_history');
-                      }}
-                      className="text-[10px] text-red-400/70 hover:text-red-400 transition-colors cursor-pointer"
-                    >
-                      Clear History
-                    </button>
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {orderHistory.map((id) => (
-                      <button
-                        key={id}
-                        type="button"
-                        onClick={() => setTrackingOrderIdInput(id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all cursor-pointer ${
-                          trackingOrderIdInput.toUpperCase().trim() === id.toUpperCase().trim()
-                            ? 'bg-[#E5A93C]/20 border-[#E5A93C] text-[#E5A93C] scale-105'
-                            : 'bg-white/5 border-white/5 text-white/80 hover:bg-white/10 hover:border-white/10'
-                        }`}
-                      >
-                        <Package className="w-3.5 h-3.5 opacity-60" />
-                        <span>{id}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Detected recent Order ID suggestion */}
-              {lastOrderId && !orderHistory.includes(lastOrderId.toUpperCase().trim()) && (
-                <div className="bg-[#E5A93C]/10 border border-[#E5A93C]/20 rounded-xl p-3 flex items-center justify-between text-xs text-[#E5A93C]">
-                  <div className="flex items-center gap-2">
-                    <span className="animate-pulse">🟢</span>
-                    <span>Detected recent order ID: <strong>{lastOrderId}</strong></span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setTrackingOrderIdInput(lastOrderId);
-                      saveOrderToHistory(lastOrderId);
-                    }}
-                    className="underline hover:text-white transition-colors cursor-pointer font-bold"
-                  >
-                    Auto-Fill & Save ID
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* Display Shipment Tracking Results if there's input */}
-            {trackingOrderIdInput.trim().length >= 4 ? (() => {
-              const details = (() => {
-                const cleanId = trackingOrderIdInput.toUpperCase().trim();
-                
-                // If it matches the user's freshly placed order
-                if (lastOrderId && cleanId === lastOrderId.toUpperCase().trim()) {
-                  return {
-                    orderId: cleanId,
-                    status: "Confirmed",
-                    statusColor: "bg-amber-500/20 text-[#E5A93C] border-amber-500/30",
-                    carrier: "Delhivery Express",
-                    trackingNumber: "DEL" + Math.floor(100000000 + Math.random() * 900000000),
-                    dispatchDate: "Awaiting Dispatch (Usually within 12 hours)",
-                    estimatedDelivery: "2-4 Business Days",
-                    destination: "Your Registered Shipping Address",
-                    milestones: [
-                      { title: "Order Confirmed via WhatsApp", description: "Your order details have been successfully received and validated by our fulfillment desk.", date: "Just now", completed: true, active: true },
-                      { title: "Prescription verification & Pharmacist approval", description: "Our certified Ayurvedic experts are checking your order requirements.", date: "Pending Verification", completed: false, active: false },
-                      { title: "Packaging & Discreet Labelling", description: "Double-walled cardboard with 100% discreet packaging. No product name displayed on outer label.", date: "Pending packaging", completed: false, active: false },
-                      { title: "Dispatched from Delhi Warehouse", description: "Package handed over to carrier partners for fast air-route transit.", date: "Pending dispatch", completed: false, active: false },
-                      { title: "Delivered", description: "Package delivered safely. Thank you for choosing meONmode®.", date: "Pending delivery", completed: false, active: false },
-                    ]
-                  };
-                }
-
-                // Generate deterministic details based on the order ID hash
-                let numHash = 0;
-                for (let i = 0; i < cleanId.length; i++) {
-                  numHash += cleanId.charCodeAt(i);
-                }
-                
-                const statusIndex = numHash % 4; // 4 statuses
-                const carriers = ["Delhivery Express", "Blue Dart Premium", "Xpressbees Courier", "Shadowfax Air"];
-                const carrier = carriers[numHash % carriers.length];
-                const trackingNo = "MOM" + (10000000 + (numHash * 1337) % 90000000);
-                
-                const cities = ["Mumbai, MH", "Bengaluru, KA", "New Delhi, DL", "Pune, MH", "Hyderabad, TG", "Chennai, TN", "Kolkata, WB", "Ahmedabad, GJ"];
-                const destination = cities[numHash % cities.length];
-
-                const milestones = [];
-                
-                if (statusIndex === 0) {
-                  milestones.push(
-                    { title: "Order Placed & Confirmed", description: "Order verified and processed into our fulfillment queue.", date: "2 days ago", completed: true, active: false },
-                    { title: "Pharmacist Verified", description: "Prescription checked and certified by Chief Ayurvedic Officer.", date: "1 day ago", completed: true, active: true },
-                    { title: "Awaiting Courier Pickup", description: "Packed in discreet outer cover and catalogued.", date: "Pending", completed: false, active: false },
-                    { title: "Dispatched", description: "Dispatched from Delhi central sorting hub.", date: "Pending", completed: false, active: false },
-                    { title: "Delivered", description: "Handed over safely.", date: "Pending", completed: false, active: false }
-                  );
-                  return {
-                    orderId: cleanId,
-                    status: "Processing & Approved",
-                    statusColor: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-                    carrier: "Awaiting Courier Partner",
-                    trackingNumber: "Awaiting Dispatch",
-                    dispatchDate: "Scheduled within 12 Hours",
-                    estimatedDelivery: "3-5 Business Days",
-                    destination,
-                    milestones
-                  };
-                } else if (statusIndex === 1) {
-                  milestones.push(
-                    { title: "Order Placed & Confirmed", description: "Verified and validated by our fulfillment desk.", date: "3 days ago", completed: true, active: false },
-                    { title: "Medical Approval & Quality Passed", description: "Formulations double-checked for sealed freshness.", date: "3 days ago", completed: true, active: false },
-                    { title: "Handed Over to Carrier", description: `Dispatched via ${carrier} Air Transport.`, date: "2 days ago", completed: true, active: false },
-                    { title: "In Transit - Near Destination Hub", description: "Consignment sorted and routing to final delivery center.", date: "Today", completed: true, active: true },
-                    { title: "Delivered", description: "Handed over safely.", date: "Pending", completed: false, active: false }
-                  );
-                  return {
-                    orderId: cleanId,
-                    status: "In Transit",
-                    statusColor: "bg-indigo-500/20 text-indigo-400 border-indigo-500/30",
-                    carrier,
-                    trackingNumber: trackingNo,
-                    dispatchDate: "2 days ago",
-                    estimatedDelivery: "1-2 Business Days",
-                    destination,
-                    milestones
-                  };
-                } else if (statusIndex === 2) {
-                  milestones.push(
-                    { title: "Order Placed & Confirmed", description: "Fulfillment queue confirmation complete.", date: "4 days ago", completed: true, active: false },
-                    { title: "Dispatched from Warehouse", description: `Shipped via ${carrier} Express Priority Air.`, date: "3 days ago", completed: true, active: false },
-                    { title: "Reached Local Destination Facility", description: "Received at delivery warehouse near destination.", date: "1 day ago", completed: true, active: false },
-                    { title: "Out for Delivery", description: "Dispatched with premium carrier associate. Pay COD amount to dispatch personnel upon receipt.", date: "Today - Active", completed: true, active: true },
-                    { title: "Delivered", description: "Handed over safely.", date: "Pending", completed: false, active: false }
-                  );
-                  return {
-                    orderId: cleanId,
-                    status: "Out for Delivery",
-                    statusColor: "bg-[#E5A93C]/20 text-[#E5A93C] border-[#E5A93C]/30 animate-pulse",
-                    carrier,
-                    trackingNumber: trackingNo,
-                    dispatchDate: "3 days ago",
-                    estimatedDelivery: "Today (Before 8 PM)",
-                    destination,
-                    milestones
-                  };
-                } else {
-                  milestones.push(
-                    { title: "Order Placed & Confirmed", description: "Validated by meONmode clinical advisors.", date: "7 days ago", completed: true, active: false },
-                    { title: "Dispatched", description: `Dispatched from Central Warehouse with priority handling.`, date: "6 days ago", completed: true, active: false },
-                    { title: "In Transit & Sorted", description: "Sorted at local facility and out with delivery agent.", date: "5 days ago", completed: true, active: false },
-                    { title: "Delivered Successfully", description: "Consignment delivered in discreet brown packaging. Handed over safely.", date: "4 days ago", completed: true, active: true }
-                  );
-                  return {
-                    orderId: cleanId,
-                    status: "Delivered Successfully",
-                    statusColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-                    carrier,
-                    trackingNumber: trackingNo,
-                    dispatchDate: "6 days ago",
-                    estimatedDelivery: "Delivered 4 days ago",
-                    destination,
-                    milestones
-                  };
-                }
-              })();
-
-              return (
-                <div className="space-y-6 animate-fade-in text-white">
-                  {/* Results Summary Card */}
-                  <div className="bg-[#1C110D]/90 border border-white/10 rounded-3xl p-6 shadow-xl space-y-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                      <div>
-                        <div className="text-xs text-neutral-400">Order Reference</div>
-                        <div className="text-lg font-bold font-serif text-[#E5A93C]">{details.orderId}</div>
-                      </div>
-                      <div>
-                        <span className={`inline-block text-xs font-extrabold px-3 py-1.5 rounded-full border ${details.statusColor}`}>
-                          ● {details.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Meta info grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                      <div className="space-y-1">
-                        <span className="text-neutral-400 block">Courier Partner</span>
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <Truck className="w-3.5 h-3.5 text-[#E5A93C]" />
-                          {details.carrier}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-neutral-400 block">AWB Tracking No.</span>
-                        <span className="font-bold text-white flex items-center gap-1.5 font-mono">
-                          {details.trackingNumber}
-                          {details.trackingNumber !== "Pending Dispatch" && details.trackingNumber !== "Awaiting Dispatch" && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard.writeText(details.trackingNumber);
-                                setShowToast("AWB tracking number copied!");
-                                setTimeout(() => setShowToast(null), 3000);
-                              }}
-                              className="text-[#E5A93C] hover:text-white transition-colors p-0.5"
-                              title="Copy AWB Tracking Number"
-                            >
-                              <Clipboard className="w-3.5 h-3.5 cursor-pointer" />
-                            </button>
-                          )}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-neutral-400 block">Estimated Delivery</span>
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-[#E5A93C]" />
-                          {details.estimatedDelivery}
-                        </span>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-neutral-400 block">Ship To Destination</span>
-                        <span className="font-bold text-[#E5A93C] flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5" />
-                          {details.destination}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Shipment Milestone Stepper Card */}
-                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl space-y-6">
-                    <h3 className="font-serif text-lg font-bold text-white">Live Tracking Log</h3>
-                    
-                    <div className="relative border-l-2 border-white/10 pl-6 ml-3.5 space-y-8">
-                      {details.milestones.map((milestone, idx) => {
-                        return (
-                          <div key={idx} className="relative">
-                            {/* Marker Icon */}
-                            <div className={`absolute -left-[35px] top-0.5 w-6 h-6 rounded-full flex items-center justify-center border-2 text-[10px] ${
-                              milestone.completed 
-                                ? milestone.active 
-                                  ? 'bg-[#E5A93C] border-[#E5A93C] text-black ring-4 ring-[#E5A93C]/20 animate-pulse'
-                                  : 'bg-[#C86428] border-[#C86428] text-white'
-                                : 'bg-[#1C110D] border-white/20 text-white/40'
-                            }`}>
-                              {milestone.completed ? '✓' : idx + 1}
-                            </div>
-
-                            {/* Milestone Text Details */}
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between gap-4">
-                                <h4 className={`font-serif text-sm font-bold ${milestone.completed ? 'text-white' : 'text-white/40'}`}>
-                                  {milestone.title}
-                                </h4>
-                                <span className={`text-[10px] font-semibold uppercase px-2 py-0.5 rounded ${
-                                  milestone.completed 
-                                    ? milestone.active 
-                                      ? 'bg-[#E5A93C]/20 text-[#E5A93C]'
-                                      : 'bg-white/10 text-white/60'
-                                    : 'bg-white/5 text-white/20'
-                                }`}>
-                                  {milestone.date}
-                                </span>
-                              </div>
-                              <p className={`text-xs leading-relaxed ${milestone.completed ? 'text-neutral-300' : 'text-neutral-500'}`}>
-                                {milestone.description}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Logistics Contact Help */}
-                  <div className="text-center p-4 bg-gradient-to-r from-emerald-600/10 to-emerald-800/10 border border-emerald-500/20 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white">
-                    <span className="text-left font-medium">
-                      🚚 <strong>AWB dispatch mismatch?</strong> Sometimes carriers take 12-24 hours to index newly generated AWB barcodes in their tracking systems.
-                    </span>
-                    <a
-                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20have%20an%20issue%20with%20my%20order%20shipment%20tracking.%20Please%20help."
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2.5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
-                    >
-                      <span>Help Desk</span>
-                    </a>
-                  </div>
-                </div>
-              );
-            })() : (
-              <div className="text-center py-16 px-4 bg-white/5 border border-white/10 rounded-3xl space-y-3">
-                <span className="text-4xl block">📦</span>
-                <h4 className="font-serif text-lg font-bold text-white">Ready for Tracking</h4>
-                <p className="text-neutral-400 text-xs max-w-sm mx-auto leading-relaxed">
-                  Enter your meONmode WhatsApp Order ID above to request live logistics telemetry, dispatch status, carrier assignments, and milestone tracking logs.
+                <h1 className="font-serif text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
+                  <Package className="w-6 h-6 text-[#E5A93C]" />
+                  <span>Order History & Verification</span>
+                </h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-0.5">
+                  meONmode Verified Customer Order Hub
                 </p>
               </div>
+            </div>
+
+            {/* Search Box Card */}
+            <div className="bg-gradient-to-br from-[#4A1D05] to-[#2D120B] border border-[#E5A93C]/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
+              <div className="space-y-1">
+                <h3 className="text-base font-serif font-extrabold text-white flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[#E5A93C]" />
+                  <span>Look Up Orders by Registered Phone Number</span>
+                </h3>
+                <p className="text-xs text-white/70 leading-relaxed">
+                  Enter your 10-digit mobile number used during checkout to view all server-verified orders, payment status, dispatch receipts, and tax invoices.
+                </p>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleLookupOrdersByPhone();
+                }}
+                className="space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="relative flex-grow">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold font-mono">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      value={orderHistoryPhoneInput}
+                      onChange={(e) => setOrderHistoryPhoneInput(e.target.value)}
+                      placeholder="e.g. 98765 43210"
+                      maxLength={13}
+                      className="w-full bg-black/40 border-2 border-white/20 focus:border-[#E5A93C] rounded-2xl pl-14 pr-4 py-3 text-sm font-mono text-white placeholder-white/40 focus:outline-none transition-all font-bold"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoadingOrderHistory}
+                    className="bg-[#C86428] hover:bg-[#A8521F] disabled:bg-neutral-600 text-white font-extrabold text-sm px-6 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    {isLoadingOrderHistory ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        <span>Searching Server...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4" />
+                        <span>Search My Orders</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {/* Quick Chip Badges for Recently Saved Local Orders */}
+                {(lastVerifiedOrder || orderHistory.length > 0) && (
+                  <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="text-white/60 font-medium text-[11px]">Recent Orders on Device:</span>
+                    {lastVerifiedOrder && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (lastVerifiedOrder.checkoutDetails?.phone) {
+                            setOrderHistoryPhoneInput(lastVerifiedOrder.checkoutDetails.phone);
+                            handleLookupOrdersByPhone(lastVerifiedOrder.checkoutDetails.phone);
+                          } else {
+                            setOrderHistoryOrders([lastVerifiedOrder]);
+                          }
+                        }}
+                        className="bg-[#E5A93C]/20 hover:bg-[#E5A93C]/30 text-[#E5A93C] border border-[#E5A93C]/40 px-3 py-1 rounded-full font-mono font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>{lastVerifiedOrder.orderId} (Verified)</span>
+                      </button>
+                    )}
+                    {orderHistory.filter(id => id !== lastVerifiedOrder?.orderId).map((oid) => (
+                      <span
+                        key={oid}
+                        className="bg-white/10 text-white/80 border border-white/15 px-2.5 py-1 rounded-full font-mono font-medium text-[11px]"
+                      >
+                        {oid}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </form>
+            </div>
+
+            {/* Search Error / Notice Banner */}
+            {orderHistorySearchError && (
+              <div className="bg-amber-950/60 border-2 border-amber-500/40 rounded-2xl p-4 text-xs text-amber-200 leading-relaxed space-y-1">
+                <div className="font-extrabold flex items-center gap-1.5 text-amber-400 text-sm">
+                  <span>ℹ️</span>
+                  <span>Order Search Notice</span>
+                </div>
+                <p>{orderHistorySearchError}</p>
+              </div>
             )}
+
+            {/* Order Results Cards */}
+            {orderHistoryOrders.length > 0 && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                  <h2 className="font-serif text-lg font-bold text-white flex items-center gap-2">
+                    <span>Found {orderHistoryOrders.length} Verified Order{orderHistoryOrders.length > 1 ? 's' : ''}</span>
+                  </h2>
+                  <span className="text-xs text-[#E5A93C] font-mono font-semibold">
+                    Server-Authoritative Status
+                  </span>
+                </div>
+
+                {orderHistoryOrders.map((ord: any, index: number) => {
+                  const isCod = ord.paymentMethod === 'cod';
+                  return (
+                    <div
+                      key={ord.orderId || index}
+                      className="bg-white/5 border border-white/15 hover:border-[#E5A93C]/40 rounded-3xl p-5 md:p-7 space-y-5 shadow-2xl transition-all text-white text-xs"
+                    >
+                      {/* Order Header Badge & ID */}
+                      <div className="flex flex-wrap justify-between items-start gap-3 border-b border-white/10 pb-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-lg font-black text-[#E5A93C] font-mono tracking-tight">
+                              {ord.orderId}
+                            </span>
+                            <span className="bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 font-mono">
+                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>Verified Payment</span>
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-neutral-400 mt-1">
+                            Verified Date: {ord.verifiedAt ? new Date(ord.verifiedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Verified'}
+                          </p>
+                        </div>
+
+                        <div className="text-right font-mono">
+                          <span className="text-[10px] text-neutral-400 block uppercase font-sans">Payment Reference / UTR</span>
+                          <span className="text-xs font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-500/30 inline-block mt-0.5">
+                            {ord.paymentId || 'Verified'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer & Shipping Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-black/30 p-4 rounded-2xl border border-white/5">
+                        <div className="space-y-1">
+                          <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider">
+                            Customer Delivery Address
+                          </span>
+                          <p className="font-bold text-sm text-white">{ord.checkoutDetails?.fullName}</p>
+                          <p className="text-neutral-300 leading-relaxed text-[11px]">
+                            {ord.checkoutDetails?.address}<br />
+                            Pincode: <strong className="text-white">{ord.checkoutDetails?.pincode}</strong><br />
+                            Phone: <span className="font-mono">{ord.checkoutDetails?.phone}</span>
+                          </p>
+                        </div>
+
+                        <div className="space-y-1 md:text-right border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4">
+                          <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider">
+                            Payment Breakdown
+                          </span>
+                          <p className="text-neutral-200 font-medium">
+                            Method: <strong className="text-white uppercase">{isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}</strong>
+                          </p>
+                          <p className="text-emerald-400 font-bold">
+                            {isCod 
+                              ? `COD Advance Paid: ₹150 (Verified)` 
+                              : `Full Amount Paid: ₹${(ord.grandTotal || 0).toLocaleString('en-IN')} (Verified)`}
+                          </p>
+                          {isCod && (
+                            <p className="text-amber-300 font-extrabold">
+                              Balance Due at Delivery: ₹{(ord.balanceDue || 0).toLocaleString('en-IN')}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Order Items Table */}
+                      <div className="space-y-2">
+                        <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider block">
+                          Purchased Remedies & Items
+                        </span>
+                        <div className="space-y-2">
+                          {ord.items && ord.items.map((item: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 text-xs"
+                            >
+                              <div>
+                                <span className="font-bold text-white text-sm">{item.name}</span>
+                                <span className="text-neutral-400 text-[11px] block">
+                                  Qty: {item.quantity} × ₹{Number(item.price).toLocaleString('en-IN')}
+                                </span>
+                              </div>
+                              <span className="font-mono font-bold text-[#E5A93C] text-sm">
+                                ₹{(Number(item.price) * Number(item.quantity)).toLocaleString('en-IN')}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Tax Breakdown */}
+                      <div className="border-t border-white/10 pt-3 flex flex-wrap justify-between items-center text-[11px] text-neutral-300 gap-2">
+                        <div>
+                          <span>Taxable Value: ₹{(ord.taxableValue || 0).toLocaleString('en-IN')} | </span>
+                          <span>GST (5%): ₹{(ord.totalGst || 0).toLocaleString('en-IN')}</span>
+                        </div>
+                        <div className="text-sm font-extrabold text-white font-mono">
+                          Grand Total: <span className="text-[#E5A93C] text-base">₹{(ord.grandTotal || 0).toLocaleString('en-IN')}</span>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const cartSummary = ord.items.map((item: any) => 
+                              `${item.name} x ${item.quantity} - Rs. ${(item.price * item.quantity).toLocaleString('en-IN')}`
+                            ).join('\n');
+
+                            const paymentLine = isCod 
+                              ? `• Mandatory COD Advance Paid: Rs. 150 (Verified Txn Ref: ${ord.paymentId})\n• Balance Due at Delivery: Rs. ${ord.balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`
+                              : `• Prepaid Full Amount Paid: Rs. ${ord.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})} (Verified Txn Ref: ${ord.paymentId})`;
+
+                            const textPayload = `*VERIFIED ORDER - meONmode*
+*Order ID:* ${ord.orderId}
+*Payment Status:* VERIFIED SUCCESS ✓ (Ref: ${ord.paymentId})
+───────────────────────
+*Customer Delivery Details:*
+• Name: ${ord.checkoutDetails.fullName}
+• Phone Number: ${ord.checkoutDetails.phone}
+• Full Address: ${ord.checkoutDetails.address}
+• Pincode: ${ord.checkoutDetails.pincode}
+
+*Order Summary:*
+${cartSummary}
+
+Taxable Value: Rs. ${ord.taxableValue.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+CGST (2.5%): Rs. ${ord.cgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+SGST (2.5%): Rs. ${ord.sgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+Total GST (5%): Rs. ${ord.totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
+*Grand Total: Rs. ${ord.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})}*
+
+*Payment Breakdown:*
+${paymentLine}
+
+*Payment Method:* ${isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}
+───────────────────────
+Payment has been cryptographically verified on the backend server. Please dispatch this parcel.`;
+
+                            const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodeURIComponent(textPayload)}`;
+                            window.open(whatsappUrl, '_blank');
+                          }}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition-colors cursor-pointer"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span>📱 Pass Receipt to WhatsApp Dispatch</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedInvoiceModalOrder(ord)}
+                          className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                        >
+                          <Clipboard className="w-4 h-4 text-[#E5A93C]" />
+                          <span>📄 View GST Tax Invoice</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="text-center pt-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
           </div>
         )}
+
+        {/* Tax Invoice Modal for Order History */}
+        {selectedInvoiceModalOrder && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
+            <div className="bg-white text-neutral-900 rounded-3xl max-w-2xl w-full p-6 md:p-8 space-y-4 text-xs shadow-2xl relative border border-neutral-200 text-left my-8">
+              <div className="flex justify-between items-center border-b border-neutral-200 pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-6 h-6 text-[#C86428]" />
+                  <div>
+                    <h3 className="font-serif text-base font-black tracking-tight text-[#4A1D05]">GST Tax Invoice - meONmode®</h3>
+                    <p className="text-[10px] text-neutral-500 font-mono">Order ID: {selectedInvoiceModalOrder.orderId}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedInvoiceModalOrder(null)}
+                  className="text-neutral-400 hover:text-neutral-600 font-bold text-xl p-1 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="flex justify-between items-start border-b border-neutral-200 pb-4">
+                <div>
+                  <h4 className="font-serif text-sm font-black text-[#4A1D05]">meONmode Wellness LLP</h4>
+                  <p className="text-[10px] text-neutral-500 leading-normal mt-1">
+                    Ayurvedic Pharmacy Licence No: DL-3234-A<br />
+                    GSTIN: 07AAGCM1314R1ZN
+                  </p>
+                </div>
+                <div className="text-right">
+                  <h5 className="font-sans font-black text-xs text-neutral-800 uppercase tracking-widest">OFFICIAL TAX INVOICE</h5>
+                  <p className="text-[10px] text-neutral-500 font-medium mt-1">
+                    Invoice No: <strong>INV/2026-27/{selectedInvoiceModalOrder.orderId}</strong><br />
+                    Verified Payment Txn ID: <strong className="text-emerald-700">{selectedInvoiceModalOrder.paymentId}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 border-b border-neutral-200 pb-4">
+                <div>
+                  <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Billed To (Customer):</p>
+                  <p className="font-black text-neutral-800 mt-1">{selectedInvoiceModalOrder.checkoutDetails?.fullName}</p>
+                  <p className="text-neutral-600 leading-normal mt-0.5 text-[11px]">
+                    {selectedInvoiceModalOrder.checkoutDetails?.address}<br />
+                    Pincode: <strong>{selectedInvoiceModalOrder.checkoutDetails?.pincode}</strong><br />
+                    Phone: {selectedInvoiceModalOrder.checkoutDetails?.phone}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Payment Method:</p>
+                  <p className="font-bold text-neutral-800 mt-1 uppercase">{selectedInvoiceModalOrder.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}</p>
+                  <p className="text-emerald-700 font-extrabold text-[11px] mt-0.5">
+                    Verified Status: ✓ VERIFIED SUCCESS
+                  </p>
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-[11px] text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-neutral-300 text-neutral-500 font-bold">
+                      <th className="py-2">Description</th>
+                      <th className="py-2 text-center">Qty</th>
+                      <th className="py-2 text-right">Price</th>
+                      <th className="py-2 text-right">Taxable</th>
+                      <th className="py-2 text-right">CGST</th>
+                      <th className="py-2 text-right">SGST</th>
+                      <th className="py-2 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedInvoiceModalOrder.items?.map((item: any, idx: number) => {
+                      const itemTotal = Number(item.price) * Number(item.quantity);
+                      const itemTaxable = Math.round((itemTotal / 1.05) * 100) / 100;
+                      const itemGst = Math.round((itemTotal - itemTaxable) * 100) / 100;
+                      const itemCgst = Math.round((itemGst / 2) * 100) / 100;
+                      const itemSgst = Math.round((itemGst / 2) * 100) / 100;
+
+                      return (
+                        <tr key={idx} className="border-b border-neutral-100 text-neutral-700 font-medium">
+                          <td className="py-2 font-bold text-neutral-800">{item.name}</td>
+                          <td className="py-2 text-center">{item.quantity}</td>
+                          <td className="py-2 text-right">₹{Number(item.price).toLocaleString('en-IN')}</td>
+                          <td className="py-2 text-right">₹{itemTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                          <td className="py-2 text-right">₹{itemCgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                          <td className="py-2 text-right">₹{itemSgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                          <td className="py-2 text-right font-bold text-neutral-900">₹{itemTotal.toLocaleString('en-IN')}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Totals */}
+              <div className="space-y-1.5 text-[11px] text-neutral-600 font-medium pt-2 border-t border-neutral-200">
+                <div className="flex justify-between">
+                  <span>Taxable Value:</span>
+                  <span>₹{(selectedInvoiceModalOrder.taxableValue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CGST (2.5%):</span>
+                  <span>₹{(selectedInvoiceModalOrder.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>SGST (2.5%):</span>
+                  <span>₹{(selectedInvoiceModalOrder.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+                <div className="flex justify-between font-black text-sm text-[#4A1D05] pt-1 border-t border-neutral-200">
+                  <span>Grand Total (Inclusive of 5% GST):</span>
+                  <span>₹{(selectedInvoiceModalOrder.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-3">
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 bg-[#C86428] hover:bg-[#A8521F] text-white font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow cursor-pointer"
+                >
+                  <span>🖨️ Print Invoice</span>
+                </button>
+                <button
+                  onClick={() => setSelectedInvoiceModalOrder(null)}
+                  className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-extrabold text-xs py-3 px-6 rounded-xl cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 7: BLOG LISTING VIEW ----------------- */}
+        {currentView === 'blog' && (
+          <BlogListing
+            onSelectArticle={(slug) => navigateToView('blog-article', undefined, slug)}
+            onGoHome={() => navigateToView('home')}
+            onSelectProduct={(product) => navigateToView('detail', product)}
+          />
+        )}
+
+        {/* ----------------- VIEW 8: BLOG ARTICLE DETAIL VIEW ----------------- */}
+        {currentView === 'blog-article' && (() => {
+          const matchedPost = BLOG_POSTS.find(p => p.slug === selectedBlogSlug) || BLOG_POSTS[0];
+          return (
+            <BlogArticle
+              post={matchedPost}
+              onGoBackToBlog={() => navigateToView('blog')}
+              onSelectArticle={(slug) => navigateToView('blog-article', undefined, slug)}
+              onSelectProduct={(product) => navigateToView('detail', product)}
+              onAddToCart={(product) => {
+                addToCart(product);
+                showToastNotification(`Added ${product.name} to Cart`);
+              }}
+            />
+          );
+        })()}
 
       </main>
 
@@ -4628,6 +5270,51 @@ Please process and confirm this parcel for dispatch.`;
           <div className="space-y-1 bg-[#4A1D05]/30 p-4 rounded-xl border border-white/5">
             <span className="font-serif block text-sm font-bold text-white">Privacy Packed</span>
             <p className="text-[10px]">Completely unmarked plain brown corrugated outer boxes.</p>
+          </div>
+        </div>
+
+        {/* Health Tips Footer Section */}
+        <div className="max-w-4xl mx-auto border-t border-white/10 pt-6 pb-2 text-left space-y-3">
+          <h4 className="font-serif text-sm font-bold text-[#E5A93C] uppercase tracking-wider text-center md:text-left">
+            Popular Health Tips & Guides (Hindi)
+          </h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs text-white/80">
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'pmos-kya-hai-pcod-se-alag')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • PMOS Kya Hai? PCOD Se Kaise Alag Hai
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'white-discharge-shwet-pradar-ayurvedic')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • White Discharge (Safed Pani) Ayurvedic Ilaj
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'pcod-diet-plan-hindi')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • PCOD Diet Plan Hindi Complete Chart
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'kanchnar-guggul-fayde-pcod')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • Kanchnar Guggul Ke Fayde Cysts Me
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'ashwagandha-shilajit-mard-shakti')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • Ashwagandha & Shilajit For Men
+            </button>
+            <button 
+              onClick={() => navigateToView('blog')}
+              className="text-[#E8621A] font-bold hover:underline text-left cursor-pointer"
+            >
+              • Saare Articles Dekhein (meonmode.com/blog) →
+            </button>
           </div>
         </div>
 
@@ -4654,12 +5341,20 @@ Please process and confirm this parcel for dispatch.`;
             </a>
           </div>
 
-          <div className="flex justify-center gap-6 text-xs text-[#E5A93C] font-semibold mb-2">
+          <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-[#E5A93C] font-semibold mb-2">
             <button 
-              onClick={() => setCurrentView('refund-policy')} 
+              onClick={() => navigateToView('refund-policy')} 
               className="hover:underline cursor-pointer"
             >
               Refund & Return Policy
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('order-history')} 
+              className="hover:underline cursor-pointer flex items-center gap-1.5"
+            >
+              <Package className="w-3.5 h-3.5" />
+              <span>Order History & Verification</span>
             </button>
           </div>
           <p>© 2026 meONmode® Ayurvedic Wellness. All rights reserved.</p>

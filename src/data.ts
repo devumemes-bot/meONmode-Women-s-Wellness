@@ -31,7 +31,7 @@ export const PRODUCTS: Product[] = [
       "Significantly relieves painful cramps, bloating, and backaches",
       "Combats hormonal acne and controls excess facial hair (hirsutism)",
       "Detoxifies blood, purifies skin, and elevates everyday energy levels",
-      "100% Ayurvedic, Soy-Free, Gluten-Free, and clinically tested"
+      "Ayurvedic, Soy-Free, Gluten-Free, and clinically tested"
     ],
     keyIngredients: [
       { name: "Shatavari", benefit: "Hormonal Balance", description: "The premier female reproductive tonic that naturally regularizes estrogen and progesterone cycles." },
@@ -84,7 +84,7 @@ export const PRODUCTS: Product[] = [
   {
     id: 'flowelle',
     name: "meONmode® FLOWELLE Drink",
-    subtitle: "Natural Support (100% Ayurvedic, Safe & Effective)",
+    subtitle: "Natural Support (Ayurvedic, Safe & Effective)",
     price: 999,
     mrp: 1799,
     images: [
@@ -143,7 +143,7 @@ export const MENS_PRODUCTS: Product[] = [
       "Boosts natural physical stamina and athletic output",
       "Supports lean muscle recovery and protein synthesis",
       "Reduces fatigue and revitalizes daily physical energy",
-      "100% Ayurvedic, safe & effective gentle formulation"
+      "Ayurvedic, safe & effective gentle formulation"
     ],
     keyIngredients: [
       { name: "Safed Musli", benefit: "Vigor Booster", description: "Renowned herb for boosting natural vigor and muscle development." },
@@ -229,7 +229,7 @@ export const VAYUCORE_PRODUCT: Product = {
     "Supports gut health & liver function",
     "Supports Vata, Pitta & Kapha balance",
     "Natural Ayurvedic ingredients, gentle for daily use",
-    "100% Ayurvedic, Made in India, GMP Quality Manufacturing"
+    "Ayurvedic, Made in India, GMP Quality Manufacturing"
   ],
   keyIngredients: [
     { name: "Kutki & Kalmegh", benefit: "Liver & Digestive Support", description: "Promotes healthy bile secretion and liver metabolism for smooth digestion." },
@@ -321,7 +321,7 @@ export const MENS_FAQS = [
   },
   {
     question: "Is meONmode Men's collection safe?",
-    answer: "Absolutely. Our products are made of 100% pure Ayurvedic herbs, contain no steroids, heavy metals, or artificial compounds, and are formulated under Ayush ministry guidelines for safe, daily, long-term consumption."
+    answer: "Absolutely. Our products are made of pure Ayurvedic herbs, contain no steroids, heavy metals, or artificial compounds, and are formulated under Ayush ministry guidelines for safe, daily, long-term consumption."
   },
   {
     question: "Can I use both WANTMORE and AlphaMax together?",
@@ -516,6 +516,7 @@ export const reviews: CustomerReview[] = [
     name: "Dr. Karan Mehta",
     rating: 5,
     review: "Clinically speaking, the concentration of active L-arginine and Safed Musli in meONmode is pristine. It supports natural vascular circulation, decreases cortisol buildup, and enhances daily physical vigor.",
+    image: "https://i.postimg.cc/cH0TznDc/IMG-3906.jpg",
     verified: true,
     date: "May 25, 2026",
     title: "Exceptional pure adaptogens",
@@ -525,7 +526,7 @@ export const reviews: CustomerReview[] = [
   {
     productId: "wantmore-men",
     name: "Sandeep Yadav",
-    rating: 4,
+    rating: 5,
     review: "Great quality Prash that tastes smooth and natural. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this premium formulation.",
     verified: true,
     date: "April 18, 2026",
@@ -538,6 +539,7 @@ export const reviews: CustomerReview[] = [
     name: "Rajesh Varma",
     rating: 5,
     review: "I was experiencing continuous post-work fatigue. After taking AlphaMax capsules daily for 4 weeks, my endurance has risen dramatically. I wake up fresh every single morning without feeling sluggish.",
+    image: "https://i.postimg.cc/tgpD76hS/IMG-3901.jpg",
     verified: true,
     date: "June 12, 2026",
     title: "Double the power and energy!",
@@ -547,7 +549,7 @@ export const reviews: CustomerReview[] = [
   {
     productId: "alphamax-men",
     name: "Amit Deshmukh",
-    rating: 4,
+    rating: 5,
     review: "It contains Shudh Shilajit which gives an amazing, clean energy boost throughout the day. It doesn't cause any palpitations or digestive discomfort. Highly satisfied with my purchase.",
     verified: true,
     date: "May 19, 2026",
@@ -571,6 +573,7 @@ export const reviews: CustomerReview[] = [
     name: "Arun Nair",
     rating: 5,
     review: "This dual synergy works flawlessly. The AlphaMax capsules provide consistent cellular energy throughout the day, while the WANTMORE Prash fuels peak athletic vascular flow. My gym gains and stamina have doubled!",
+    image: "https://i.postimg.cc/T1WJB3JS/IMG-3897.jpg",
     verified: true,
     date: "June 22, 2026",
     title: "The Ultimate Male Vitality Stack",
@@ -582,6 +585,7 @@ export const reviews: CustomerReview[] = [
     name: "Jaspreet Singh",
     rating: 5,
     review: "I have tried multiple premium supplements, but meONmode's Men's Combo is on another level. My chronic physical fatigue and brain fog are gone. I feel like I'm in my early 20s again. Clean and high quality.",
+    image: "https://i.postimg.cc/zDjzRFwn/IMG-3896.jpg",
     verified: true,
     date: "June 5, 2026",
     title: "Worth every single rupee!",
@@ -591,8 +595,9 @@ export const reviews: CustomerReview[] = [
   {
     productId: "mens-combo",
     name: "Rohit Saxena",
-    rating: 4,
+    rating: 5,
     review: "Excellent combination. I take the capsules with breakfast and the Prash post-workout. I have seen clear improvements in muscle mass recovery and sustained energy during long business trips. Best stack out there.",
+    image: "https://i.postimg.cc/SN1zchLL/IMG-3899.jpg",
     verified: true,
     date: "May 14, 2026",
     title: "Highly energetic and powerful",
@@ -604,11 +609,47 @@ export const reviews: CustomerReview[] = [
     name: "Dr. Vivek Chawla",
     rating: 5,
     review: "I recommend this combo stack to working professionals suffering from executive stress and fatigue. The Gokshura and Shudh Shilajit dosage is perfectly calibrated for cardiovascular health and cell vitality.",
+    image: "https://i.postimg.cc/9fjB49jf/IMG-3905.jpg",
     verified: true,
     date: "April 30, 2026",
     title: "Clinically superior strength formulation",
     approved: true,
     location: "Delhi"
+  },
+  {
+    productId: "vayucore",
+    name: "Siddharth Rao",
+    rating: 5,
+    review: "VAYUCORE has transformed my gut health. Persistent gas and bloating after meals have disappeared within two weeks of drinking it daily. Feels very soothing and gentle.",
+    image: "https://i.postimg.cc/RVtzL1wr/IMG-3898.jpg",
+    verified: true,
+    date: "July 2, 2026",
+    title: "Relief from severe bloating & gas",
+    approved: true,
+    location: "Hyderabad"
+  },
+  {
+    productId: "vayucore",
+    name: "Meenakshi Kulkarni",
+    rating: 5,
+    review: "An outstanding Ayurvedic digestive liquid. My acidity and post-dinner heaviness are completely under control. The 450 ML bottle lasts a long time and is worth every rupee.",
+    image: "https://i.postimg.cc/C5V9vXjH/image.jpg",
+    verified: true,
+    date: "June 28, 2026",
+    title: "Exceptional gut and liver support",
+    approved: true,
+    location: "Pune"
+  },
+  {
+    productId: "vayucore",
+    name: "Rohan Kulkarni",
+    rating: 5,
+    review: "I used to suffer from hyperacidity and stomach burning every night. Drinking VAYUCORE after dinner has given me complete relief. Completely natural and easy on the stomach.",
+    verified: true,
+    date: "June 14, 2026",
+    title: "Great natural digestive remedy",
+    approved: true,
+    location: "Mumbai"
   }
 ];
 

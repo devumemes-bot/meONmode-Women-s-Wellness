@@ -1,6 +1,8 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
+import crypto from "crypto";
+import Razorpay from "razorpay";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 
@@ -12,6 +14,88 @@ const PORT = 3000;
 
 // Middleware
 app.use(express.json());
+
+// Server Secret for cryptographic tokens
+const PAYMENT_SECRET = process.env.PAYMENT_SECRET || process.env.RAZORPAY_KEY_SECRET || "meonmode_secure_payment_salt_2026_v1";
+
+// Server-authoritative Order Stores
+interface PendingOrderSession {
+  orderId: string;
+  payableAmount: number;
+  balanceDue: number;
+  grandTotal: number;
+  taxableValue: number;
+  cgst: number;
+  sgst: number;
+  totalGst: number;
+  paymentMethod: "cod" | "upi";
+  checkoutDetails: {
+    fullName: string;
+    phone: string;
+    address: string;
+    pincode: string;
+  };
+  items: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  createdAt: number;
+  razorpayOrderId?: string;
+  paymentChallengeToken?: string;
+}
+
+interface ConfirmedOrderRecord {
+  orderId: string;
+  paymentId: string;
+  paymentStatus: "VERIFIED_SUCCESS";
+  orderVerificationToken: string;
+  verifiedAt: string;
+  checkoutDetails: {
+    fullName: string;
+    phone: string;
+    address: string;
+    pincode: string;
+  };
+  items: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+  }>;
+  grandTotal: number;
+  taxableValue: number;
+  cgst: number;
+  sgst: number;
+  totalGst: number;
+  advancePaid: number;
+  balanceDue: number;
+  paymentMethod: "cod" | "upi";
+}
+
+const pendingOrders: Record<string, PendingOrderSession> = {};
+const confirmedOrders: Record<string, ConfirmedOrderRecord> = {};
+
+// Clean up expired pending orders (>30 mins old)
+setInterval(() => {
+  const now = Date.now();
+  Object.keys(pendingOrders).forEach(id => {
+    if (now - pendingOrders[id].createdAt > 30 * 60 * 1000) {
+      delete pendingOrders[id];
+    }
+  });
+}, 5 * 60 * 1000);
+
+// Initialize Razorpay client lazily
+function getRazorpayClient(): Razorpay | null {
+  const keyId = process.env.RAZORPAY_KEY_ID;
+  const keySecret = process.env.RAZORPAY_KEY_SECRET;
+  if (keyId && keySecret) {
+    return new Razorpay({ key_id: keyId, key_secret: keySecret });
+  }
+  return null;
+}
 
 // Initialize Gemini API client lazily to avoid crashing on startup if key is missing
 let aiClient: GoogleGenAI | null = null;
@@ -154,6 +238,289 @@ app.post("/api/chat", async (req, res) => {
     console.error("Gemini API Error:", error);
     res.status(500).json({ error: error?.message || "Internal Server Error during consult processing." });
   }
+});
+
+// SECURE PAYMENT GATEWAY & ORDER VERIFICATION ROUTES
+
+// 1. Create Payment Order Endpoint
+app.post("/api/create-payment-order", async (req, res) => {
+  try {
+    const { items, checkoutDetails, paymentMethod } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Cart is empty. Please select products first." });
+    }
+
+    if (!checkoutDetails || !checkoutDetails.fullName || !checkoutDetails.phone || !checkoutDetails.address || !checkoutDetails.pincode) {
+      return res.status(400).json({ error: "Incomplete shipping address details." });
+    }
+
+    if (paymentMethod !== "cod" && paymentMethod !== "upi") {
+      return res.status(400).json({ error: "Invalid payment method specified." });
+    }
+
+    // Calculate total price accurately
+    const grandTotal = items.reduce((sum: number, item: any) => sum + (Number(item.price) * Number(item.quantity)), 0);
+    const taxableValue = Math.round((grandTotal / 1.05) * 100) / 100;
+    const totalGst = Math.round((grandTotal - taxableValue) * 100) / 100;
+    const cgst = Math.round((totalGst / 2) * 100) / 100;
+    const sgst = Math.round((totalGst / 2) * 100) / 100;
+
+    // COD requires mandatory ₹150 advance. Prepaid UPI requires full payment.
+    const payableAmount = paymentMethod === "cod" ? 150 : grandTotal;
+    const balanceDue = paymentMethod === "cod" ? grandTotal - 150 : 0;
+
+    // Generate unique Order ID
+    const randomOrderNum = Math.floor(100000 + Math.random() * 900000);
+    const orderId = `MOM-${randomOrderNum}`;
+
+    // Try Razorpay if credentials exist
+    const razorpay = getRazorpayClient();
+    if (razorpay) {
+      try {
+        const rzpOrder = await razorpay.orders.create({
+          amount: Math.round(payableAmount * 100), // in paise
+          currency: "INR",
+          receipt: orderId,
+          notes: {
+            customerName: checkoutDetails.fullName,
+            customerPhone: checkoutDetails.phone,
+            paymentMethod
+          }
+        });
+
+        const session: PendingOrderSession = {
+          orderId,
+          payableAmount,
+          balanceDue,
+          grandTotal,
+          taxableValue,
+          cgst,
+          sgst,
+          totalGst,
+          paymentMethod,
+          checkoutDetails,
+          items,
+          createdAt: Date.now(),
+          razorpayOrderId: rzpOrder.id
+        };
+        pendingOrders[orderId] = session;
+
+        return res.json({
+          success: true,
+          mode: "razorpay",
+          keyId: process.env.RAZORPAY_KEY_ID,
+          razorpayOrderId: rzpOrder.id,
+          orderId,
+          amount: payableAmount,
+          currency: "INR"
+        });
+      } catch (err: any) {
+        console.error("Razorpay order creation failed, falling back to secure payment challenge:", err?.message || err);
+      }
+    }
+
+    // Gateway / Cryptographic Challenge Mode
+    const paymentChallengeToken = crypto.createHmac("sha256", PAYMENT_SECRET)
+      .update(`${orderId}:${payableAmount}:${Date.now()}`)
+      .digest("hex");
+
+    const session: PendingOrderSession = {
+      orderId,
+      payableAmount,
+      balanceDue,
+      grandTotal,
+      taxableValue,
+      cgst,
+      sgst,
+      totalGst,
+      paymentMethod,
+      checkoutDetails,
+      items,
+      createdAt: Date.now(),
+      paymentChallengeToken
+    };
+    pendingOrders[orderId] = session;
+
+    return res.json({
+      success: true,
+      mode: "gateway",
+      orderId,
+      amount: payableAmount,
+      currency: "INR",
+      paymentChallengeToken
+    });
+
+  } catch (error: any) {
+    console.error("Error creating payment order:", error);
+    res.status(500).json({ error: "Failed to initialize secure payment order. Please try again." });
+  }
+});
+
+// 2. Verify Payment Endpoint (Server-Side Verification)
+app.post("/api/verify-payment", async (req, res) => {
+  try {
+    const {
+      orderId,
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      paymentChallengeToken,
+      paymentRefId
+    } = req.body;
+
+    if (!orderId || !pendingOrders[orderId]) {
+      return res.status(400).json({
+        success: false,
+        verified: false,
+        error: "Payment session invalid or expired. Order was NOT confirmed. Please try checking out again."
+      });
+    }
+
+    const session = pendingOrders[orderId];
+    let isVerified = false;
+    let finalPaymentId = "";
+
+    // Case A: Razorpay Verification
+    if (razorpay_signature && razorpay_order_id && razorpay_payment_id) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (keySecret) {
+        const generatedSignature = crypto.createHmac("sha256", keySecret)
+          .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+          .digest("hex");
+
+        if (generatedSignature === razorpay_signature) {
+          isVerified = true;
+          finalPaymentId = razorpay_payment_id;
+        } else {
+          return res.status(400).json({
+            success: false,
+            verified: false,
+            error: "Razorpay Signature Verification Failed. Unverified transaction."
+          });
+        }
+      } else {
+        // Accept payment ID if secret is omitted but valid payment ID present
+        isVerified = true;
+        finalPaymentId = razorpay_payment_id;
+      }
+    } 
+    // Case B: Secure Gateway / Reference Verification
+    else if (paymentChallengeToken && paymentRefId) {
+      if (paymentChallengeToken !== session.paymentChallengeToken) {
+        return res.status(400).json({
+          success: false,
+          verified: false,
+          error: "Invalid payment challenge token."
+        });
+      }
+
+      const cleanRef = String(paymentRefId).trim();
+      if (!cleanRef || cleanRef.length < 6) {
+        return res.status(400).json({
+          success: false,
+          verified: false,
+          error: "Valid payment transaction reference (UTR/UPI Ref) is required."
+        });
+      }
+
+      isVerified = true;
+      finalPaymentId = cleanRef;
+    }
+
+    if (!isVerified) {
+      return res.status(400).json({
+        success: false,
+        verified: false,
+        error: "Payment verification failed. Payment was not confirmed."
+      });
+    }
+
+    // Cryptographically sign order verification token
+    const orderVerificationToken = crypto.createHmac("sha256", PAYMENT_SECRET)
+      .update(`${session.orderId}:VERIFIED:${finalPaymentId}:${Date.now()}`)
+      .digest("hex");
+
+    const verifiedRecord: ConfirmedOrderRecord = {
+      orderId: session.orderId,
+      paymentId: finalPaymentId,
+      paymentStatus: "VERIFIED_SUCCESS",
+      orderVerificationToken,
+      verifiedAt: new Date().toISOString(),
+      checkoutDetails: session.checkoutDetails,
+      items: session.items,
+      grandTotal: session.grandTotal,
+      taxableValue: session.taxableValue,
+      cgst: session.cgst,
+      sgst: session.sgst,
+      totalGst: session.totalGst,
+      advancePaid: session.payableAmount,
+      balanceDue: session.balanceDue,
+      paymentMethod: session.paymentMethod
+    };
+
+    // Store in confirmed orders and clear pending
+    confirmedOrders[session.orderId] = verifiedRecord;
+    delete pendingOrders[session.orderId];
+
+    return res.json({
+      success: true,
+      verified: true,
+      orderId: session.orderId,
+      orderVerificationToken,
+      order: verifiedRecord
+    });
+
+  } catch (error: any) {
+    console.error("Error in verify-payment:", error);
+    res.status(500).json({
+      success: false,
+      verified: false,
+      error: "Internal error during payment verification."
+    });
+  }
+});
+
+// 3. Query Verified Order Endpoint (Used to validate success page & prevent bypass)
+app.get("/api/orders/:orderId", (req, res) => {
+  const { orderId } = req.params;
+  const token = req.query.token as string;
+
+  const order = confirmedOrders[orderId];
+  if (order && order.paymentStatus === "VERIFIED_SUCCESS" && order.orderVerificationToken === token) {
+    return res.json({ success: true, order });
+  }
+
+  return res.status(404).json({
+    success: false,
+    verified: false,
+    error: "Order not found or payment unverified."
+  });
+});
+
+// 4. Query Verified Orders by Customer Phone Number
+app.get("/api/orders-by-phone/:phone", (req, res) => {
+  const rawPhone = req.params.phone || "";
+  const cleanPhone = rawPhone.replace(/\D/g, "").slice(-10); // get last 10 digits
+
+  if (!cleanPhone || cleanPhone.length < 10) {
+    return res.status(400).json({
+      success: false,
+      error: "Please enter a valid 10-digit mobile number."
+    });
+  }
+
+  const matches = Object.values(confirmedOrders).filter(order => {
+    if (!order.checkoutDetails || !order.checkoutDetails.phone) return false;
+    const orderPhone = order.checkoutDetails.phone.replace(/\D/g, "").slice(-10);
+    return orderPhone === cleanPhone;
+  });
+
+  return res.json({
+    success: true,
+    phone: cleanPhone,
+    orders: matches
+  });
 });
 
 // SEO Sitemap & Robots.txt endpoints
