@@ -164,7 +164,7 @@ export function getProductSeoData(product: Product) {
       };
     default:
       return {
-        title: `${product.name} | meONmode® Premium Ayurvedic Wellness`,
+        title: `${product.name} | meONmode® Ayurvedic Wellness`,
         description: product.shortDescription || product.longDescription,
         h1: product.name,
         canonicalUrl,
@@ -185,17 +185,8 @@ function getProductCategory(prod: Product): string {
 export default function App() {
   const chatEndRef = React.useRef<HTMLDivElement>(null);
 
-  // Language switcher state
-  const [lang, setLang] = useState<'en' | 'hi'>(() => {
-    const saved = localStorage.getItem('meonmode-lang');
-    return (saved === 'hi' ? 'hi' : 'en');
-  });
-
-  useEffect(() => {
-    localStorage.setItem('meonmode-lang', lang);
-  }, [lang]);
-
-
+  // Language state (English)
+  const lang: 'en' = 'en';
 
   // Navigation & Cart States
   const [currentView, setCurrentView] = useState<ViewType>('home');
@@ -722,7 +713,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
   useEffect(() => {
     let seo = {
       title: "meONmode | Ayurvedic Wellness Products",
-      description: "Discover premium Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, OVAIRA and VAYUCORE with Cash on Delivery, Free Shipping and GST Included.",
+      description: "Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, OVAIRA and VAYUCORE with Cash on Delivery, Free Shipping and GST Included.",
       canonicalUrl: "https://meonmode.com/",
       ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
     };
@@ -1134,7 +1125,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     setCurrentView('home');
                   }
                 }}
-                className="p-1.5 rounded-full hover:bg-white/10 text-white transition-colors flex items-center justify-center cursor-pointer"
+                className="p-1.5 rounded-full hover:bg-white/10 text-white hover:scale-105 active:scale-95 transition-all duration-200 ease-in-out flex items-center justify-center cursor-pointer"
                 aria-label="Back"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -1433,47 +1424,6 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
 
 
-            {/* Language Switcher */}
-            <div className="flex items-center bg-white/5 border border-white/10 rounded-full p-0.5 text-[10px] sm:text-xs">
-              <button
-                type="button"
-                onClick={() => setLang('en')}
-                className={`px-2 py-1 rounded-full font-extrabold transition-all cursor-pointer ${
-                  lang === 'en'
-                    ? 'bg-[#E5A93C] text-[#2D120B] shadow-sm font-black'
-                    : 'text-white/80 hover:text-white'
-                }`}
-              >
-                🇬🇧 EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang('hi')}
-                className={`px-2 py-1 rounded-full font-extrabold transition-all cursor-pointer ${
-                  lang === 'hi'
-                    ? 'bg-[#E5A93C] text-[#2D120B] shadow-sm font-black'
-                    : 'text-white/80 hover:text-white'
-                }`}
-              >
-                🇮🇳 हिन्दी
-              </button>
-            </div>
-
-            {/* Order History Button */}
-            <button
-              id="header-orders-btn"
-              onClick={() => navigateToView('order-history')}
-              className={`relative p-2 rounded-full transition-all flex items-center justify-center cursor-pointer border ${
-                currentView === 'order-history'
-                  ? 'bg-[#E5A93C] text-[#2D120B] border-[#E5A93C] font-black shadow-sm'
-                  : 'bg-white/5 hover:bg-white/10 text-white hover:text-[#E5A93C] border-white/10'
-              }`}
-              title="Order History & Payment Verification"
-              aria-label="Order History"
-            >
-              <Package className="w-4.5 h-4.5" />
-            </button>
-
             {/* Cart Button */}
             <button 
               id="header-cart-btn"
@@ -1523,10 +1473,20 @@ Payment has been cryptographically verified on the backend server. Please dispat
       {/* Main Content Area */}
       <main className="max-w-5xl mx-auto px-4 py-6 md:py-10">
 
+        {/* H1 SEO Heading */}
+        <h1 className="font-serif text-center tracking-tight pb-3 mb-6 leading-tight flex flex-col items-center justify-center gap-1">
+          <span className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight drop-shadow-md">
+            meONmode<span className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl align-super font-bold ml-0.5">®</span>
+          </span>
+          <span className="text-white text-base sm:text-lg md:text-xl font-bold tracking-wide">
+            Ayurvedic Wellness & Lifestyle Products
+          </span>
+        </h1>
+
         {/* ----------------- VIEW 1: HOME VIEW ----------------- */}
         {currentView === 'home' && (
           <div className="space-y-8">
-            {/* Premium Category Toggle Switch */}
+            {/* Category Toggle Switch */}
             <div className="flex flex-col items-center justify-center space-y-2 mb-2">
               <span className="text-xs uppercase tracking-widest font-bold font-sans text-[#E5A93C]">
                 Select Your Wellness Collection
@@ -1583,7 +1543,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
                   {/* Left Column Content */}
                   <div className="lg:col-span-7 space-y-8 text-left">
-                    {/* Small Premium Badge */}
+                    {/* Small Badge */}
                     <div id="women-hero-badge" className="inline-flex items-center gap-2 bg-[#FAF6F0]/10 border border-[#FAF6F0]/20 text-[#FAF6F0] text-xs font-black uppercase tracking-widest py-1.5 px-4 rounded-full shadow-lg backdrop-blur-md">
                       <Sparkles className="w-3.5 h-3.5 text-[#E5A93C] animate-pulse" />
                       <span>✨ Ayurvedic Women’s Wellness</span>
@@ -1597,11 +1557,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent animate-pulse">ON Mode.</span>
                       </h1>
                       <p id="women-hero-subheading" className="text-[#FAF6F0]/90 font-sans text-sm sm:text-base md:text-lg max-w-xl leading-relaxed font-medium">
-                        Support your everyday women’s wellness with premium Ayurvedic nutrition crafted for modern lifestyles.
+                        Support your everyday women’s wellness with Ayurvedic nutrition crafted for modern lifestyles.
                       </p>
                     </div>
 
-                    {/* Premium Wellness Highlight Chips arranged in two responsive rows with golden ticks */}
+                    {/* Wellness Highlight Chips arranged in two responsive rows with golden ticks */}
                     <div id="women-hero-chips-container" className="space-y-4">
                       <div className="text-[10px] uppercase font-bold text-[#E5A93C] tracking-widest font-mono flex items-center gap-1.5">
                         <Leaf className="w-3.5 h-3.5 text-[#E5A93C]" />
@@ -1651,7 +1611,25 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       </p>
                     </div>
 
-                    {/* CTA Buttons - Premium interactions with responsive focus on meONmode style */}
+                    {/* FREE Personalized Diet Plan Trust Banner */}
+                    <div id="women-hero-diet-plan-banner" className="bg-[#FAF6F0]/10 border border-[#E5A93C]/40 rounded-2xl p-3.5 flex items-center gap-3 backdrop-blur-md shadow-lg">
+                      <div className="w-8 h-8 rounded-xl bg-[#E5A93C]/20 border border-[#E5A93C]/30 flex items-center justify-center shrink-0 text-base">
+                        🥗
+                      </div>
+                      <div className="text-left">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-[#E5A93C] text-[#23120B] px-2 py-0.5 rounded-full font-sans">
+                            FREE BONUS
+                          </span>
+                          <span className="text-[10px] font-extrabold text-[#E5A93C]">Included with every product & combo</span>
+                        </div>
+                        <p className="text-xs sm:text-sm font-bold text-white leading-tight mt-0.5">
+                          FREE Personalized Diet Plan based on your body type and weight
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* CTA Buttons - Interactions with responsive focus on meONmode style */}
                     <div className="pt-2 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
                       <button 
                         id="women-hero-cta-primary"
@@ -1684,11 +1662,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       </button>
                     </div>
 
-                    {/* Trust Features styled as Premium Trust Cards */}
+                    {/* Trust Features styled as Trust Cards */}
                     <div id="women-hero-trust-grid" className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {[
                         'Ayurvedic',
-                        'Premium Herbal Ingredients',
+                        'Pure Herbal Ingredients',
                         'No Artificial Colors',
                         'No Heavy Metals',
                         'Made for Women’s Wellness',
@@ -1736,7 +1714,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <div className="absolute inset-4 border border-[#E5A93C]/20 rounded-[1.8rem] pointer-events-none z-10"></div>
                       <div className="absolute inset-5 border border-[#E5A93C]/10 rounded-[1.6rem] pointer-events-none z-10"></div>
 
-                      {/* Premium gold batch harvest badge */}
+                      {/* Gold batch harvest badge */}
                       <div className="absolute top-6 left-6 bg-[#4A1D05] text-[#E5A93C] px-3 py-1 rounded-md border border-[#E5A93C]/30 z-20 shadow-md">
                         <span className="text-[9px] uppercase tracking-widest font-black font-mono flex items-center gap-1">
                           ✨ Gold Batch Harvest
@@ -1837,14 +1815,32 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       </div>
                     </div>
 
-                    <div className="pt-3 flex flex-col sm:flex-row gap-4">
+                    {/* FREE Personalized Diet Plan Trust Banner */}
+                    <div id="hero-diet-plan-banner" className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center gap-3 max-w-md shadow-md">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 text-base">
+                        🥗
+                      </div>
+                      <div className="text-left">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-black uppercase tracking-wider bg-[#E5A93C] text-[#23120B] px-2 py-0.5 rounded-full font-sans">
+                            FREE BONUS
+                          </span>
+                          <span className="text-[10px] font-extrabold text-[#E5A93C]">Included with every product</span>
+                        </div>
+                        <p className="text-xs sm:text-sm font-bold text-white leading-tight mt-0.5">
+                          FREE Personalized Diet Plan based on your body type and weight
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex flex-col sm:flex-row gap-4">
                       <button 
                         id="hero-buy-combo-btn"
                         onClick={() => handleQuickBuy(activeCategory === 'men' ? menProducts[2] : womenProducts[0])}
                         className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_20px_rgba(200,100,40,0.6)] hover:scale-[1.01] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <ShoppingBag className="w-4.5 h-4.5" />
-                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹5,999' : '₹1,999'}</span></span>
+                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹6,999' : '₹1,999'}</span></span>
                       </button>
                       <button 
                         id="hero-view-details-btn"
@@ -2049,7 +2045,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <div className="flex items-center gap-2 border-b border-white/10 pb-2">
                   <span className="text-xl">{activeCategory === 'all' ? "✨" : activeCategory === 'men' ? "👨" : "👩"}</span>
                   <h3 className="font-serif text-lg font-bold text-white tracking-wide">
-                    {activeCategory === 'all' ? "Complete Ayurvedic Reset Protocol" : activeCategory === 'men' ? "Men's Premium Vitality Protocol" : "Women's Hormonal Reset Protocol"}
+                    {activeCategory === 'all' ? "Complete Ayurvedic Reset Protocol" : activeCategory === 'men' ? "Men's Vitality Protocol" : "Women's Hormonal Reset Protocol"}
                   </h3>
                 </div>
                   
@@ -2251,6 +2247,19 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                 </div>
                               );
                             })()}
+                          </div>
+
+                          {/* FREE Personalized Diet Plan Trust Badge */}
+                          <div className="bg-[#FAF6F0] border border-[#E5A93C]/40 rounded-xl p-2.5 flex items-center gap-2.5 text-left shadow-xs">
+                            <span className="text-base shrink-0">🥗</span>
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-extrabold text-[#4A1D05] leading-tight">
+                                <span className="text-[#C86428] font-black uppercase text-[9px] bg-[#E5A93C]/20 px-1.5 py-0.5 rounded-md mr-1 inline-block">
+                                  FREE BONUS
+                                </span>
+                                FREE Personalized Diet Plan based on your body type and weight
+                              </p>
+                            </div>
                           </div>
 
                           {/* Action Buttons Design & Alignment */}
@@ -2476,7 +2485,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </section>
 
-            {/* Bento Block 7: Premium Dynamic Customer Reviews Section (Col Span 12) */}
+            {/* Bento Block 7: Dynamic Customer Reviews Section (Col Span 12) */}
             <section id="review-gallery" className="lg:col-span-12 space-y-8 relative overflow-hidden bg-[#23120b]/30 border-2 border-[#FAF6F0]/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md">
               {/* Soft glowing background element */}
               <div className="absolute top-12 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#E5A93C]/5 via-[#C86428]/5 to-transparent rounded-full blur-[100px] pointer-events-none"></div>
@@ -2690,6 +2699,38 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     )}
                   </div>
                 ))}
+              </div>
+            </section>
+
+            {/* Bento Block 9: SEO & Ayurvedic Wellness Knowledge Base */}
+            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl text-[#F7E7D9]/90">
+              <div className="space-y-2 border-b border-white/10 pb-4">
+                <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">Ayurvedic Heritage & Modern Wellness</span>
+                <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
+                  Holistic Ayurvedic Wellness by meONmode®
+                </h2>
+              </div>
+
+              <div className="space-y-4 text-xs md:text-sm leading-relaxed font-sans text-neutral-300">
+                <p>
+                  Welcome to <strong className="text-white font-semibold">meONmode®</strong>, India’s premier destination for science-backed Ayurvedic wellness and restorative lifestyle formulations. Rooted in ancient Vedic herbal wisdom and validated by modern pharmacological standardization, meONmode crafts 100% natural, potent, and toxin-free formulations tailored specifically for modern men and women. Every remedy is produced using standardized extracts, rich in active phytochemicals, to harmonize vital doshas (Vata, Pitta, Kapha), rekindle metabolic vitality, and nurture long-term vitality.
+                </p>
+
+                <p>
+                  Our flagship <strong className="text-[#E5A93C] font-semibold">Men’s Wellness Collection</strong> centers on two synergistic formulations: <strong className="text-white font-semibold">ALPHAMAX</strong> capsules and <strong className="text-white font-semibold">WANTMORE</strong> Prash. ALPHAMAX delivers an advanced cell-vitality and endurance matrix combining certified Grade-A Himalayan Shudh Shilajit (rich in fulvic acid and 84+ minerals), Ashwagandha, Safed Musli, Gokshura, and bioavailability enhancers to support physical vigor, healthy circulation, and everyday resilience. WANTMORE is an energizing, low-glycemic Ayurvedic Prash formulated for active stamina, muscular endurance, and rapid recovery without synthetic caffeine jitters or sugar spikes.
+                </p>
+
+                <p>
+                  For women’s reproductive and endocrine balance, our <strong className="text-[#E5A93C] font-semibold">Women’s Health Collection</strong> features <strong className="text-white font-semibold">OVAIRA</strong> and <strong className="text-white font-semibold">FLOWELLE</strong>. OVAIRA is specifically designed to support hormonal balance, ovarian health, and uterine strength while addressing root causes of PCOS/PCOD, irregular periods, and stubborn cramping. Formulated with Shatavari, Lodhra, Ashoka, and Kanchnar Guggulu, it promotes natural menstrual rhythm and emotional equilibrium. FLOWELLE provides gentle botanical support for healthy menstrual volume, pelvic comfort, and vibrant daily energy.
+                </p>
+
+                <p>
+                  For gut health and metabolic balance, our specialized remedy <strong className="text-white font-semibold">VAYUCORE</strong> provides an authentic 450 ML Ayurvedic digestive liquid formulation. Enriched with traditional carminative and hepatoprotective herbs like Triphala, Ajwain, Hing, and Jeera, VAYUCORE quickly relieves severe flatulence, chronic gastric distension, acid reflux, and heavy post-meal sluggishness by soothing the gastrointestinal lining and restoring natural digestive agni.
+                </p>
+
+                <p>
+                  At meONmode, we make wellness accessible and completely transparent: enjoy <strong className="text-white font-semibold">100% Free Express Shipping</strong> across all PIN codes in India, flexible <strong className="text-white font-semibold">Cash on Delivery (COD)</strong> with no advance payment required, all prices inclusive of GST, and strictly <strong className="text-white font-semibold">100% Discreet & Private Packaging</strong> with zero external product names or markings to guarantee complete personal privacy.
+                </p>
               </div>
             </section>
           </div>
@@ -3114,7 +3155,28 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               <span>Shipped in 24 Hrs</span>
                             </div>
 
-                            {/* Premium COD Information Badge */}
+                            {/* FREE Personalized Diet Plan Banner */}
+                            <div id="detail-diet-plan-banner" className="bg-[#FAF6F0] border-2 border-[#E5A93C]/40 p-4 rounded-2xl flex items-start gap-3 mt-4 text-left shadow-xs">
+                              <div className="w-8 h-8 rounded-xl bg-[#E5A93C]/20 border border-[#E5A93C]/30 flex items-center justify-center shrink-0 text-base mt-0.5">
+                                🥗
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="text-[9px] font-black uppercase tracking-wider bg-[#5C1D13] text-[#E5A93C] px-2 py-0.5 rounded-full font-sans">
+                                    FREE BONUS INCLUDED
+                                  </span>
+                                  <span className="text-[10px] font-extrabold text-[#C86428]">Customized for You</span>
+                                </div>
+                                <h4 className="text-xs sm:text-sm font-black text-[#4A1D05] leading-snug">
+                                  FREE Personalized Diet Plan based on your body type and weight
+                                </h4>
+                                <p className="text-[11px] text-[#4A1D05]/85 leading-relaxed font-medium">
+                                  Every product order includes a 1-on-1 personalized Ayurvedic nutrition and meal guide formulated around your exact body weight and dosha balance.
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* COD Information Badge */}
                             <div id="detail-cod-info-badge" className="bg-[#FAF6F0] border border-[#E5A93C]/30 p-4 rounded-2xl flex items-start gap-3 mt-4 text-left">
                               <Truck className="w-5 h-5 text-[#C86428] shrink-0 mt-0.5" />
                               <div className="space-y-1">
@@ -3693,11 +3755,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         
                         {remaining > 0 ? (
                           <p className="text-xs text-[#F7E7D9] leading-relaxed">
-                            Spend <span className="font-black text-amber-300">₹{remaining.toLocaleString('en-IN')}</span> more to unlock <span className="font-bold text-emerald-300 underline">Free Premium Ayurvedic Samples</span> in your shipment!
+                            Spend <span className="font-black text-amber-300">₹{remaining.toLocaleString('en-IN')}</span> more to unlock <span className="font-bold text-emerald-300 underline">Free Ayurvedic Samples</span> in your shipment!
                           </p>
                         ) : (
                           <p className="text-xs text-emerald-400 font-bold leading-relaxed flex items-center gap-1.5 animate-pulse">
-                            🎉 Loyalty Reward Unlocked! Free premium Ayurvedic samples have been added to your package.
+                            🎉 Loyalty Reward Unlocked! Free Ayurvedic samples have been added to your package.
                           </p>
                         )}
                         
@@ -3770,6 +3832,24 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </div>
                       </div>
                     ))}
+                  </div>
+
+                  {/* FREE Diet Plan Cart Item Banner */}
+                  <div className="bg-gradient-to-r from-[#FAF6F0]/10 to-[#E5A93C]/10 border border-[#E5A93C]/30 rounded-2xl p-3.5 flex gap-3 items-center">
+                    <div className="w-8 h-8 rounded-xl bg-[#E5A93C]/20 border border-[#E5A93C]/30 flex items-center justify-center shrink-0 text-base">
+                      🥗
+                    </div>
+                    <div className="flex-grow space-y-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider bg-[#E5A93C] text-[#23120B] px-1.5 py-0.2 rounded font-mono">
+                          FREE BONUS
+                        </span>
+                        <span className="text-[10px] text-emerald-400 font-bold">Auto-Included</span>
+                      </div>
+                      <h4 className="font-serif font-bold text-xs text-white">FREE Personalized Diet Plan based on your body type and weight</h4>
+                      <p className="text-[10px] text-[#F7E7D9]/80">Formulated around your body weight & Ayurvedic doshas.</p>
+                    </div>
+                    <span className="text-xs font-black text-emerald-400 shrink-0">₹0 (FREE)</span>
                   </div>
 
                   {/* Price Calculations breakdown */}
@@ -5319,26 +5399,41 @@ Payment has been cryptographically verified on the backend server. Please dispat
         </div>
 
         <div className="border-t border-white/5 pt-8 text-[11px] text-neutral-400 max-w-2xl mx-auto space-y-3">
-          {/* Social Media Buttons */}
-          <div className="flex flex-wrap justify-center items-center gap-3 mb-4">
-            <a 
-              href="https://instagram.com/meonmode_" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#E5A93C]/10 hover:bg-[#E5A93C]/20 border border-[#E5A93C]/30 text-[#E5A93C] font-extrabold text-xs px-4 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <Instagram className="w-4 h-4" />
-              <span>Instagram (@meonmode_)</span>
-            </a>
-            <a 
-              href="https://facebook.com/meonmode" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 bg-[#E5A93C]/10 hover:bg-[#E5A93C]/20 border border-[#E5A93C]/30 text-[#E5A93C] font-extrabold text-xs px-4 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <Facebook className="w-4 h-4" />
-              <span>Facebook (Me on mode)</span>
-            </a>
+          {/* Social Media Sharing & Connect Buttons */}
+          <div className="space-y-3 mb-6">
+            <p className="text-xs uppercase tracking-widest font-bold text-[#E5A93C]">Connect & Share with meONmode®</p>
+            <div className="flex flex-wrap justify-center items-center gap-3">
+              <a 
+                href="https://instagram.com/meonmode_" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-[#E5A93C]/10 hover:bg-[#E5A93C]/20 border border-[#E5A93C]/30 text-[#E5A93C] font-extrabold text-xs px-4 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+                title="Follow meONmode on Instagram"
+              >
+                <Instagram className="w-4 h-4 text-[#E5A93C]" />
+                <span>Instagram</span>
+              </a>
+              <a 
+                href="https://api.whatsapp.com/send?text=Discover%20authentic%20Ayurvedic%20wellness%20products%20at%20meONmode%20with%20Free%20Shipping%20and%20COD%3A%20https%3A%2F%2Fmeonmode.com%2F" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-extrabold text-xs px-4 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+                title="Share meONmode on WhatsApp"
+              >
+                <MessageCircle className="w-4 h-4 text-emerald-400" />
+                <span>Share on WhatsApp</span>
+              </a>
+              <a 
+                href="https://facebook.com/meonmode" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-[#E5A93C]/10 hover:bg-[#E5A93C]/20 border border-[#E5A93C]/30 text-[#E5A93C] font-extrabold text-xs px-4 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+                title="Follow meONmode on Facebook"
+              >
+                <Facebook className="w-4 h-4 text-[#E5A93C]" />
+                <span>Facebook</span>
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-[#E5A93C] font-semibold mb-2">
@@ -5534,7 +5629,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         { id: 'general', label: '🌿 General Consult', text: "Hello meONmode Team, I would like to consult with a wellness advisor about my health journey." },
                         { id: 'pcos', label: '🌸 PCOS Specially Formulated', text: "Hello meONmode Team, I want to consult about PCOS Specially Formulated capsules and get custom guidance for hormone regularity." },
                         { id: 'women', label: '🩸 Women\'s Regularity', text: "Hello meONmode Team, I want to inquire about your Ayurvedic solutions for period regularity and uterine wellness." },
-                        { id: 'men', label: '⚡ Men\'s Vigor & Stamina', text: "Hello meONmode Team, I want to consult about Premium Men\'s Vitality solutions and daily stamina support." },
+                        { id: 'men', label: '⚡ Men\'s Vigor & Stamina', text: "Hello meONmode Team, I want to consult about Men\'s Vitality solutions and daily stamina support." },
                         { id: 'order', label: '📦 Order Shipping Help', text: `Hello meONmode Team, I need help tracking my order status.${lastOrderId ? ` My Order ID is ${lastOrderId}.` : ''}` }
                       ].map((topic) => (
                         <button
@@ -5579,7 +5674,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           : whatsAppTopic === 'women'
                             ? "Hello meONmode Team, I want to inquire about your Ayurvedic solutions for period regularity and uterine wellness."
                             : whatsAppTopic === 'men'
-                              ? "Hello meONmode Team, I want to consult about Premium Men's Vitality solutions and daily stamina support."
+                              ? "Hello meONmode Team, I want to consult about Men's Vitality solutions and daily stamina support."
                               : whatsAppTopic === 'order'
                                 ? `Hello meONmode Team, I need help tracking my order status.${lastOrderId ? ` My Order ID is ${lastOrderId}.` : ''}`
                                 : "Hello meONmode Team, I would like to consult with a wellness advisor about my health journey."
@@ -5884,7 +5979,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
               <div className="space-y-1.5">
                 <h3 className="font-serif text-xl font-black">Restock Notification</h3>
                 <p className="text-xs text-neutral-500 max-w-xs mx-auto leading-relaxed">
-                  Be the first to know when the premium <strong className="text-[#4A1D05]">{notifyMeProduct.name}</strong> is back in our temperature-controlled Ayurvedic warehouse.
+                  Be the first to know when <strong className="text-[#4A1D05]">{notifyMeProduct.name}</strong> is back in our temperature-controlled Ayurvedic warehouse.
                 </p>
               </div>
 
@@ -5894,7 +5989,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <span>🎉</span> Alert Activated Successfully!
                   </p>
                   <p className="text-[10px] text-emerald-700/90 leading-relaxed font-medium">
-                    We've registered <strong className="underline">{notifyEmail}</strong>. You'll receive an instant premium alert the second our herbal extraction process is complete.
+                    We've registered <strong className="underline">{notifyEmail}</strong>. You'll receive an instant alert the second our herbal extraction process is complete.
                   </p>
                   <button
                     type="button"
@@ -6131,7 +6226,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
 
 
-      {/* ----------------- PREMIUM DYNAMIC LIGHTBOX WITH ZOOM ----------------- */}
+      {/* ----------------- DYNAMIC LIGHTBOX WITH ZOOM ----------------- */}
       {lightboxImage && (
         <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center bg-black/95 backdrop-blur-xl animate-fade-in p-4">
           {/* Top bar controls */}

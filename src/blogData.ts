@@ -582,7 +582,7 @@ export const BLOG_POSTS: BlogPost[] = [
         id: "wantmore-formula",
         title: "4. WANTMORE — Complete Vitality & Stamina Herbal Formula",
         paragraphs: [
-          "WANTMORE by meONmode® specially design kiya gaya premium formula hai jo purushon ki weakness, fatigue aur low drive ko 30 dino mein natural way mein door karta hai."
+          "WANTMORE by meONmode® specially design kiya gaya formula hai jo purushon ki weakness, fatigue aur low drive ko 30 dino mein natural way mein door karta hai."
         ],
         productMention: {
           productId: "wantmore-men",

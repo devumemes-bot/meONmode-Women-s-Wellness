@@ -99,7 +99,7 @@ export const PRODUCTS: Product[] = [
       'https://i.postimg.cc/1tbVd1vY/IMG-2924.png'
     ],
     tag: "100% PAIN-FREE PERIODS",
-    shortDescription: "500ml Premium Syrup to relieve painful period cramps and restore perfect cycle volume.",
+    shortDescription: "500ml Syrup to relieve painful period cramps and restore perfect cycle volume.",
     longDescription: "Formulated specifically to regulate flow, alleviate severe period pains, and purify blood. Sourced as per Bharat Pharmacopoeia standards, FLOWELLE contains highly potent standardised extracts of Ashok Chal, Shatavari, Gokhru, and Ashwagandha. It works as a direct uterine tonic to strengthen reproductive muscles, ease pelvic contractions, and solve multiple hormonal health issues naturally without side effects.",
     volumeOrQty: "500 ml",
     dosage: "Step 1: Pour 5-10ml of FLOWELLE Syrup using the measuring cap.\nStep 2: Mix it well in a glass of water until evenly blended.\nStep 3: Drink it daily after your meals (Morning and Evening) as a part of your wellness routine.",
@@ -135,8 +135,8 @@ export const MENS_PRODUCTS: Product[] = [
       'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png'
     ],
     tag: "STAMINA BOOSTER",
-    shortDescription: "Clinically balanced premium Prash formulation designed to optimize strength, stamina, and physical endurance.",
-    longDescription: "meONmode® WANTMORE FOR MEN is a premium strength and endurance Prash designed for peak physical performance. Formulated by expert Ayurvedic doctors, it incorporates standard extracts of pure herbs that naturally elevate vigor, enhance muscular endurance, and combat chronic fatigue.",
+    shortDescription: "Clinically balanced Prash formulation designed to optimize strength, stamina, and physical endurance.",
+    longDescription: "meONmode® WANTMORE FOR MEN is a strength and endurance Prash designed for peak physical performance. Formulated by expert Ayurvedic doctors, it incorporates standard extracts of pure herbs that naturally elevate vigor, enhance muscular endurance, and combat chronic fatigue.",
     volumeOrQty: "200g Prash",
     dosage: "Take 1-2 teaspoons (5g-10g) daily with lukewarm milk or water after meals.",
     benefits: [
@@ -182,26 +182,28 @@ export const MENS_PRODUCTS: Product[] = [
   {
     id: 'mens-combo',
     name: "Men's Ultimate Performance Combo",
-    subtitle: "WANTMORE Prash + AlphaMax Capsules",
-    price: 5999,
-    mrp: 13998,
+    subtitle: "WANTMORE Prash + ALPHAMAX Capsules + FREE VAYUCORE",
+    price: 6999,
+    mrp: 15997,
     images: [
       'https://i.postimg.cc/T1XN3QGv/86164C6E-8C99-4C84-87C7-477EB98232DF.png'
     ],
-    tag: "BEST SELLER - SAVE 57%",
-    shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health.",
-    longDescription: "The absolute premium duo stack containing WANTMORE Prash and AlphaMax Capsules. This synergy offers a dual-action therapeutic approach: while AlphaMax provides cell-level vitality and recovery throughout the day, WANTMORE Prash powers peak performance, vascular output, and stamina during high-exertion activities.",
-    volumeOrQty: "200g Prash + 60 Capsules",
-    dosage: "• WANTMORE Prash: Take 1 teaspoon daily with milk after dinner.\n• AlphaMax Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.",
+    tag: "BEST SELLER - SAVE 56% + FREE VAYUCORE",
+    shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health, now bundled with a FREE full-size bottle of VAYUCORE Ayurvedic Digestive Liquid (450 ML).",
+    longDescription: "The absolute performance stack combining WANTMORE Prash, ALPHAMAX Capsules, and a complimentary full-size bottle of VAYUCORE Ayurvedic Digestive Liquid (450 ML). This complete synergy offers multi-target vitality: ALPHAMAX provides cell-level vitality and cellular recovery throughout the day, WANTMORE Prash powers peak athletic endurance and vascular output, while VAYUCORE ensures optimal gut absorption, zero bloating, and deep metabolic harmony.",
+    volumeOrQty: "200g Prash + 60 Capsules + 450ml VAYUCORE (Free)",
+    dosage: "• WANTMORE Prash: Take 1 teaspoon daily with milk after dinner.\n• ALPHAMAX Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.\n• VAYUCORE Liquid: Take 7–10 ml daily after meals.",
     benefits: [
-      "Dual-action formula targeting complete vitality and cellular stamina",
+      "Dual-action formula targeting complete male vitality and cellular stamina",
+      "Includes 1x FREE Full-Size VAYUCORE 450 ML Digestive Tonic (Worth ₹1,999)",
       "Synergistic recovery of muscles and daily energy stores",
-      "Enhances blood flow and natural hormonal health",
-      "Saves over 57% compared to individual purchases"
+      "Enhances blood flow, natural hormonal health, and gut nutrient absorption",
+      "Save 56% compared to individual retail purchases"
     ],
     keyIngredients: [
       { name: "Shudh Shilajit", benefit: "Cellular Energy", description: "Enriches cells with minerals and fulvic acid for rapid ATP production." },
-      { name: "Safed Musli", benefit: "Physical Vigor", description: "Restores deep tissue strength and boosts physical performance." }
+      { name: "Safed Musli", benefit: "Physical Vigor", description: "Restores deep tissue strength and boosts physical performance." },
+      { name: "Kutki & Kalmegh (Vayucore)", benefit: "Digestive Fire & Detox", description: "Enhances nutrient bioavailability and soothes acidity and bloating." }
     ],
     rating: 5.0,
     reviewsCount: 915
@@ -218,8 +220,8 @@ export const VAYUCORE_PRODUCT: Product = {
     'https://i.postimg.cc/Z5RH4n2D/E3FB9FE6-C1DB-48D1-905E-941055523296.png'
   ],
   tag: "BESTSELLER - GUT HEALTH",
-  shortDescription: "VAYUCORE is a premium Ayurvedic digestive wellness liquid formulated with carefully selected herbs to support healthy digestion, reduce gas and bloating, relieve acidity, and maintain overall gut health. Suitable for daily use by adults.",
-  longDescription: "VAYUCORE is a premium Ayurvedic digestive wellness liquid crafted to support healthy digestion, eliminate persistent gas and bloating, soothe acidity, and maintain overall gut health. Formulated by expert Ayurvedic doctors using 100% natural, potent extracts including Kutki, Kalmegh, Palakya, Chirayita, Kasamarda, Kasni Beej, Kakamachi, Bhringraj, Punarnava, Zirak, Vaividang, Nishoth, Jauka, Shankh Drav, Turmeric, and Mulethi. VAYUCORE gently balances Vata, Pitta, and Kapha doshas while promoting daily digestive comfort without synthetic additions or chemicals.",
+  shortDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid formulated with carefully selected herbs to support healthy digestion, reduce gas and bloating, relieve acidity, and maintain overall gut health. Suitable for daily use by adults.",
+  longDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid crafted to support healthy digestion, eliminate persistent gas and bloating, soothe acidity, and maintain overall gut health. Formulated by expert Ayurvedic doctors using 100% natural, potent extracts including Kutki, Kalmegh, Palakya, Chirayita, Kasamarda, Kasni Beej, Kakamachi, Bhringraj, Punarnava, Zirak, Vaividang, Nishoth, Jauka, Shankh Drav, Turmeric, and Mulethi. VAYUCORE gently balances Vata, Pitta, and Kapha doshas while promoting daily digestive comfort without synthetic additions or chemicals.",
   volumeOrQty: "450 ml Liquid",
   dosage: "7–10 ml daily or as directed by a physician.",
   benefits: [
@@ -527,7 +529,7 @@ export const reviews: CustomerReview[] = [
     productId: "wantmore-men",
     name: "Sandeep Yadav",
     rating: 5,
-    review: "Great quality Prash that tastes smooth and natural. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this premium formulation.",
+    review: "Great quality Prash that tastes smooth and natural. I feel much less fatigued during my high-stress corporate job and have sustained energy for evening gym sessions. Highly recommend this formulation.",
     verified: true,
     date: "April 18, 2026",
     title: "Tastes extremely natural & organic",
@@ -584,7 +586,7 @@ export const reviews: CustomerReview[] = [
     productId: "mens-combo",
     name: "Jaspreet Singh",
     rating: 5,
-    review: "I have tried multiple premium supplements, but meONmode's Men's Combo is on another level. My chronic physical fatigue and brain fog are gone. I feel like I'm in my early 20s again. Clean and high quality.",
+    review: "I have tried multiple supplements, but meONmode's Men's Combo is on another level. My chronic physical fatigue and brain fog are gone. I feel like I'm in my early 20s again. Clean and high quality.",
     image: "https://i.postimg.cc/zDjzRFwn/IMG-3896.jpg",
     verified: true,
     date: "June 5, 2026",
