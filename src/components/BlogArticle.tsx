@@ -260,6 +260,10 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
               <img
                 src={post.featuredImage}
                 alt={post.title}
+                loading="lazy"
+                decoding="async"
+                width="800"
+                height="420"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
@@ -381,6 +385,10 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                       <img
                         src={relatedProduct.images[0]}
                         alt={relatedProduct.name}
+                        loading="lazy"
+                        decoding="async"
+                        width="80"
+                        height="80"
                         className="w-20 h-20 object-contain rounded-lg border border-neutral-100 p-1"
                       />
                       <button
@@ -574,6 +582,10 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                   <img
                     src={relatedProduct.images[0]}
                     alt={relatedProduct.name}
+                    loading="lazy"
+                    decoding="async"
+                    width="112"
+                    height="112"
                     className="w-full h-full object-contain"
                   />
                 </div>

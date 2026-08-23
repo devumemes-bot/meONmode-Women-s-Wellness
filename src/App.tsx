@@ -45,12 +45,14 @@ import {
   Phone
 } from 'lucide-react';
 import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages } from './data';
-import { BLOG_POSTS } from './blogData';
-import { BlogListing } from './components/BlogListing';
-import { BlogArticle } from './components/BlogArticle';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
+import { ProductGallery } from './components/ProductGallery';
+
+// Code-split dynamic views
+const BlogListing = React.lazy(() => import('./components/BlogListing').then(m => ({ default: m.BlogListing })));
+const BlogArticleView = React.lazy(() => import('./components/BlogArticleView').then(m => ({ default: m.BlogArticleView })));
 
 // Cookie helpers for pre-filling user data
 function getCookie(name: string): string | null {
@@ -77,26 +79,31 @@ function setCookie(name: string, value: string, days?: number) {
 // Product Clean Canonical Slug Mapping
 export function getProductCleanSlug(id: string): string {
   switch (id) {
-    case 'ovaira': return 'ovaira';
     case 'flowelle': return 'flowelle';
-    case 'alphamax-men':
-    case 'alphamax': return 'alphamax';
+    case 'ovaira': return 'ovaira';
     case 'wantmore-men':
     case 'wantmore': return 'wantmore';
+    case 'alphamax-men':
+    case 'alphamax': return 'alphamax';
     case 'vayucore': return 'vayucore';
-    case 'combo-kit': return 'combo-kit';
-    case 'mens-combo': return 'mens-combo';
+    case 'combo-kit': return 'female-combo-kit';
+    case 'mens-combo': return 'mens-ultimate-performance-combo';
     default: return id;
   }
 }
 
 export function getProductFromSlug(slug: string): Product | undefined {
-  const clean = slug.toLowerCase().replace('/products/', '').replace('/', '');
+  const clean = slug.toLowerCase().replace('/products/', '').replace('/product/', '').replace('/', '').trim();
   const allProds = [...PRODUCTS, ...MENS_PRODUCTS];
   return allProds.find(p => {
     if (p.id === clean) return true;
-    if (clean === 'alphamax' && p.id === 'alphamax-men') return true;
-    if (clean === 'wantmore' && p.id === 'wantmore-men') return true;
+    if (clean === 'female-combo-kit' || clean === 'combo-kit' || clean === 'womens-combo' || clean === 'women-combo') return p.id === 'combo-kit';
+    if (clean === 'mens-ultimate-performance-combo' || clean === 'mens-combo' || clean === 'men-combo') return p.id === 'mens-combo';
+    if (clean === 'wantmore' || clean === 'wantmore-men') return p.id === 'wantmore-men';
+    if (clean === 'alphamax' || clean === 'alphamax-men') return p.id === 'alphamax-men';
+    if (clean === 'flowelle') return p.id === 'flowelle';
+    if (clean === 'ovaira') return p.id === 'ovaira';
+    if (clean === 'vayucore') return p.id === 'vayucore';
     return false;
   });
 }
@@ -190,8 +197,16 @@ export default function App() {
 
   // Navigation & Cart States
   const [currentView, setCurrentView] = useState<ViewType>('home');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(PRODUCTS[0]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('meonmode_wishlist');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
   const [showToast, setShowToast] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<'women' | 'men' | 'all'>('women');
@@ -361,6 +376,7 @@ export default function App() {
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [lightboxZoom, setLightboxZoom] = useState<boolean>(false);
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
+  const [detailQuantity, setDetailQuantity] = useState<number>(1);
   const [dismissedBanner, setDismissedBanner] = useState<boolean>(false);
   const [highlightedProductId, setHighlightedProductId] = useState<string | null>(null);
   const [codAcknowledged, setCodAcknowledged] = useState<boolean>(false);
@@ -426,18 +442,29 @@ export default function App() {
       } else {
         if (currentView !== 'blog') setCurrentView('blog');
       }
-    } else if (path.startsWith('/product/')) {
-      const prodId = path.split('/product/')[1];
-      const allProds = [...PRODUCTS, ...MENS_PRODUCTS];
-      const match = allProds.find(p => p.id === prodId);
+    } else if (path.startsWith('/products/') || path.startsWith('/product/')) {
+      const slug = path.startsWith('/products/')
+        ? path.replace('/products/', '').split('/')[0]?.split('?')[0]
+        : path.replace('/product/', '').split('/')[0]?.split('?')[0];
+      const match = getProductFromSlug(slug || '');
       if (match) {
         setSelectedProduct(match);
+        setActiveImageIndex(0);
+        setDetailQuantity(1);
         if (currentView !== 'detail') setCurrentView('detail');
+        const isMen = MENS_PRODUCTS.some(m => m.id === match.id);
+        setActiveCategory(isMen ? 'men' : 'women');
       }
     } else if (path === '/' || path === '') {
       if (currentView !== 'home') setCurrentView('home');
     }
   }, [location.pathname]);
+
+  // Always reset activeImageIndex and detailQuantity when selected product changes
+  useEffect(() => {
+    setActiveImageIndex(0);
+    setDetailQuantity(1);
+  }, [selectedProduct?.id]);
 
   // View navigation helper that updates hash route
   const navigateToView = (view: ViewType, product?: Product, blogSlug?: string) => {
@@ -454,9 +481,13 @@ export default function App() {
       navigate(`/blog/${slug}`);
     }
     else if (view === 'detail') {
-      if (product) {
-        setSelectedProduct(product);
-        navigate(`/product/${product.id}`);
+      const prodToUse = product || selectedProduct;
+      if (prodToUse) {
+        setSelectedProduct(prodToUse);
+        setActiveImageIndex(0);
+        setDetailQuantity(1);
+        const slug = getProductCleanSlug(prodToUse.id);
+        navigate(`/products/${slug}`);
       }
     }
   };
@@ -661,14 +692,38 @@ Payment has been cryptographically verified on the backend server. Please dispat
     });
   };
 
-  const scrollToBuyingDetails = () => {
-    setTimeout(() => {
-      const el = document.getElementById('product-purchase-section');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 150);
+  // Wishlist toggle handler
+  const toggleWishlist = (product: Product, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setWishlist(prev => {
+      const exists = prev.includes(product.id);
+      const updated = exists ? prev.filter(id => id !== product.id) : [...prev, product.id];
+      try {
+        localStorage.setItem('meonmode_wishlist', JSON.stringify(updated));
+      } catch {}
+      showToastNotification(exists ? `${product.name} removed from Wishlist` : `❤️ ${product.name} added to Wishlist!`);
+      return updated;
+    });
   };
+
+  // Smooth scroll to Pricing & Details section taking sticky header into account
+  const scrollToPricingDetails = () => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById('pricing-details-section') || document.getElementById('product-purchase-section');
+      if (el) {
+        const headerEl = document.querySelector('header');
+        const headerOffset = headerEl ? headerEl.getBoundingClientRect().height + 20 : 80;
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth'
+        });
+      }
+    });
+  };
+
+  const scrollToBuyingDetails = scrollToPricingDetails;
 
   const [showWhatsAppChat, setShowWhatsAppChat] = useState<boolean>(false);
   const [whatsAppMessage, setWhatsAppMessage] = useState<string>('');
@@ -685,10 +740,12 @@ Payment has been cryptographically verified on the backend server. Please dispat
     }
   ]);
 
-  // Auto scroll chat to bottom
+  // Auto scroll chat to bottom only when open
   useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (showWhatsAppChat && chatEndRef.current) {
+      requestAnimationFrame(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      });
     }
   }, [aiMessages, isAiTyping, showWhatsAppChat, chatTab]);
 
@@ -1064,13 +1121,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
-    setCurrentView('detail');
-    const slug = getProductCleanSlug(product.id);
-    try {
-      window.history.pushState(null, '', `/products/${slug}`);
-    } catch (e) {
-      // Fallback
-    }
+    setActiveImageIndex(0);
+    setDetailQuantity(1);
+    setHighlightedProductId(product.id);
+    const isMen = MENS_PRODUCTS.some(m => m.id === product.id);
+    setActiveCategory(isMen ? 'men' : 'women');
+    
+    navigateToView('detail', product);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -1271,6 +1329,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               src={prod.images && prod.images[0]}
                               alt={prod.name}
                               loading="lazy"
+                              decoding="async"
+                              width="28"
+                              height="28"
                               className="w-full h-full object-contain"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -1339,13 +1400,13 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <>
                   <button 
                     onClick={() => handleProductClick(PRODUCTS[0])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Women's Combo
                   </button>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Men's Combo
                   </button>
@@ -1354,7 +1415,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
                   </button>
@@ -1363,19 +1424,19 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Men's Combo
                   </button>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[0])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'wantmore-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'wantmore-men' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     WANTMORE Prash
                   </button>
                   <button 
                     onClick={() => handleProductClick(MENS_PRODUCTS[1])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'alphamax-men' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'alphamax-men' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     ALPHAMAX
                   </button>
@@ -1384,7 +1445,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
                   </button>
@@ -1393,19 +1454,19 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <>
                   <button 
                     onClick={() => handleProductClick(PRODUCTS[0])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Combo Kit
                   </button>
                   <button 
                     onClick={() => handleProductClick(PRODUCTS[1])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'ovaira' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'ovaira' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     OVAIRA Capsules
                   </button>
                   <button 
                     onClick={() => handleProductClick(PRODUCTS[2])} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'flowelle' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'flowelle' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     FLOWELLE Syrup
                   </button>
@@ -1414,7 +1475,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
-                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' && currentView === 'detail' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+                    className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
                   </button>
@@ -1739,6 +1800,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           src="https://i.postimg.cc/BQm4ZB0G/IMG-2935.png" 
                           alt="meONmode Women's Combo Kit" 
                           loading="eager"
+                          fetchPriority="high"
+                          decoding="async"
+                          width="320"
+                          height="320"
                           className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
                         />
                       </button>
@@ -1883,6 +1948,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/BQm4ZB0G/IMG-2935.png'} 
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
                           loading="eager"
+                          fetchPriority="high"
+                          decoding="async"
+                          width="384"
+                          height="384"
                           className="w-full h-auto max-w-full object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 animate-float"
                         />
                       </button>
@@ -2095,8 +2164,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         id={`product-card-${prod.id}`}
                         key={prod.id}
                         className={`bg-[#fdfbf7] text-neutral-900 border rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transform transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${
-                          highlightedProductId === prod.id
-                            ? 'ring-4 ring-[#E5A93C] scale-[1.02] border-[#E5A93C] shadow-[0_0_25px_rgba(229,169,60,0.5)] z-20'
+                          selectedProduct?.id === prod.id || highlightedProductId === prod.id
+                            ? 'ring-4 ring-[#E5A93C] scale-[1.02] border-[#E5A93C] shadow-[0_0_30px_rgba(229,169,60,0.4)] z-20'
                             : 'border-neutral-200/60'
                         }`}
                       >
@@ -2108,21 +2177,37 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             </span>
                           )}
 
-                          {/* Floating Share Product Icon */}
-                          <button
-                            type="button"
-                            onClick={(e) => handleShareProduct(prod, e)}
-                            className="absolute top-4 right-4 z-20 p-2.5 bg-white/90 hover:bg-white text-neutral-800 hover:text-[#5C1D13] rounded-full transition-all border border-neutral-200 shadow-sm hover:scale-110 active:scale-95 cursor-pointer"
-                            title="Share Product"
-                          >
-                            <Share2 className="w-4 h-4" />
-                          </button>
+                          {/* Floating Actions: Wishlist & Share */}
+                          <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(e) => toggleWishlist(prod, e)}
+                              className={`p-2.5 rounded-full transition-all border shadow-sm hover:scale-110 active:scale-95 cursor-pointer ${
+                                wishlist.includes(prod.id)
+                                  ? 'bg-rose-50 border-rose-200 text-rose-600'
+                                  : 'bg-white/90 hover:bg-white text-neutral-600 hover:text-rose-600 border-neutral-200'
+                              }`}
+                              title={wishlist.includes(prod.id) ? "In Wishlist" : "Add to Wishlist"}
+                              aria-label="Wishlist"
+                            >
+                              <Heart className={`w-4 h-4 ${wishlist.includes(prod.id) ? 'fill-rose-600 text-rose-600' : ''}`} />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={(e) => handleShareProduct(prod, e)}
+                              className="p-2.5 bg-white/90 hover:bg-white text-neutral-800 hover:text-[#5C1D13] rounded-full transition-all border border-neutral-200 shadow-sm hover:scale-110 active:scale-95 cursor-pointer"
+                              title="Share Product"
+                              aria-label="Share Product"
+                            >
+                              <Share2 className="w-4 h-4" />
+                            </button>
+                          </div>
                           
                           <button
                             type="button"
                             onClick={() => {
                               handleProductClick(prod);
-                              scrollToBuyingDetails();
                             }}
                             className="w-full focus:outline-none cursor-pointer overflow-hidden relative flex items-center justify-center group"
                             title="Click to view pricing & details"
@@ -2131,6 +2216,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               src={prod.images && prod.images[0]} 
                               alt={prod.name}
                               loading="lazy"
+                              decoding="async"
+                              width="240"
+                              height="224"
                               className="w-full h-auto max-w-full object-contain block mx-auto h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -2187,7 +2275,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             </button>
 
                             {/* Main Title: serif typography */}
-                            <h3 className="font-serif text-xl md:text-2xl font-black text-neutral-950 tracking-tight leading-snug">
+                            <h3 
+                              onClick={() => handleProductClick(prod)}
+                              className="font-serif text-xl md:text-2xl font-black text-neutral-950 tracking-tight leading-snug hover:text-[#5C1D13] cursor-pointer transition-colors"
+                            >
                               {prod.name}
                             </h3>
 
@@ -2354,6 +2445,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
                         alt="Ayurvedic Ingredients / Roots & Bark" 
                         loading="lazy"
+                        decoding="async"
+                        width="400"
+                        height="300"
                         className="w-full h-auto max-w-full object-contain block mx-auto"
                       />
                     </div>
@@ -2363,6 +2457,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         src="https://i.postimg.cc/qMRxSpMV/IMG-2912.png" 
                         alt="Why Ayurvedic capsules are better Comparison" 
                         loading="lazy"
+                        decoding="async"
+                        width="400"
+                        height="300"
                         className="w-full h-auto max-w-full object-contain block mx-auto"
                       />
                     </div>
@@ -2416,6 +2513,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                   src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'} 
                   alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
                   loading="lazy"
+                  decoding="async"
+                  width="450"
+                  height="350"
                   className="w-full h-auto max-w-full object-contain block mx-auto"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -2544,6 +2644,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                     src={imgUrl} 
                                     alt={`${rev.name}'s Review Asset ${imgIndex + 1}`} 
                                     loading="lazy"
+                                    decoding="async"
+                                    width="300"
+                                    height="220"
                                     className="w-full h-full object-contain transition-transform duration-500 hover:scale-105 cursor-pointer rounded-xl"
                                     onClick={() => {
                                       setLightboxImage(imgUrl);
@@ -2640,6 +2743,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       src="1000166074.jpg" 
                       alt="meONmode Wellness Club Group" 
                       loading="lazy"
+                      decoding="async"
+                      width="500"
+                      height="320"
                       className="w-full h-auto max-w-full object-contain block mx-auto" 
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -2799,177 +2905,65 @@ Payment has been cryptographically verified on the backend server. Please dispat
             />
             
             {/* Breadcrumb back navigation link */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 flex-wrap">
+              <nav className="flex items-center gap-2 text-xs text-white/70 font-medium">
+                <button 
+                  onClick={() => { setCurrentView('home'); navigate('/'); }}
+                  className="hover:text-[#E5A93C] transition-colors cursor-pointer"
+                >
+                  Home
+                </button>
+                <span className="text-white/40">/</span>
+                <button 
+                  onClick={() => { setCurrentView('home'); navigate('/'); }}
+                  className="hover:text-[#E5A93C] transition-colors cursor-pointer"
+                >
+                  Products
+                </button>
+                <span className="text-white/40">/</span>
+                <span className="text-[#E5A93C] font-bold truncate max-w-[200px] sm:max-w-none">
+                  {selectedProduct.name}
+                </span>
+              </nav>
+
               <button 
-                onClick={() => setCurrentView('home')}
-                className="text-xs text-white/80 hover:text-[#E5A93C] flex items-center gap-1.5 transition-colors font-medium bg-white/5 py-1.5 px-3.5 rounded-full border border-white/10"
+                onClick={() => { setCurrentView('home'); navigate('/'); }}
+                className="text-xs text-white/90 hover:text-[#E5A93C] flex items-center gap-1.5 transition-all font-semibold bg-white/10 hover:bg-white/20 py-1.5 px-4 rounded-full border border-white/15 cursor-pointer shadow-xs"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Back to All Products</span>
+                <span>All Products</span>
               </button>
             </div>
 
             {/* Main Product Spotlight Card */}
             {(() => {
+              const isWishlisted = wishlist.includes(selectedProduct.id);
+              const discount = Math.round(((selectedProduct.mrp - selectedProduct.price) / selectedProduct.mrp) * 100);
+
               return (
                 <div className="bg-[#fdfbf7] text-neutral-900 border border-neutral-200/60 rounded-3xl overflow-hidden shadow-2xl">
                   <div className="grid grid-cols-1 md:grid-cols-12">
                     
                     {/* Image Column */}
-                    <div className="md:col-span-5 relative flex flex-col items-center justify-center overflow-hidden bg-[#FAF8F6] p-6 border-b md:border-b-0 md:border-r border-neutral-100 min-h-[350px] md:min-h-[450px]">
-                      {selectedProduct.tag && (
-                        <span className="absolute top-4 left-4 z-10 text-[10px] font-extrabold px-3 py-1.5 rounded-full tracking-wider shadow-sm bg-[#5C1D13] text-[#E5A93C] border border-[#E5A93C]/10 uppercase">
-                          {selectedProduct.tag}
-                        </span>
-                      )}
-
-                      {/* Floating share button with interactive sharing methods */}
-                      <div className="absolute top-4 right-4 z-20 flex flex-col items-end">
-                        <button
-                          type="button"
-                          onClick={() => setShowShareDropdown(!showShareDropdown)}
-                          className="p-3 rounded-full shadow-md transition-all border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 cursor-pointer flex items-center justify-center hover:scale-105 active:scale-95"
-                          title="Share Options"
-                        >
-                          <Share2 className="w-4.5 h-4.5" />
-                        </button>
-                        
-                        {showShareDropdown && (
-                          <div className="mt-2 bg-white text-neutral-900 border border-neutral-200 p-2.5 rounded-2xl shadow-2xl flex flex-col gap-2 z-30 min-w-[170px] animate-fade-in">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                handleShareProduct(selectedProduct, e);
-                                setShowShareDropdown(false);
-                              }}
-                              className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-neutral-50 rounded-xl transition-colors cursor-pointer text-[#5C1D13]"
-                            >
-                              <Copy className="w-3.5 h-3.5" />
-                              <span>Copy Link</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const shareUrl = `${window.location.origin}${window.location.pathname}?product=${selectedProduct.id}`;
-                                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out ${selectedProduct.name}: ${shareUrl}`)}`, '_blank');
-                                setShowShareDropdown(false);
-                              }}
-                              className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-[#E8F5E9] text-emerald-700 rounded-xl transition-colors cursor-pointer"
-                            >
-                              <MessageSquare className="w-3.5 h-3.5" />
-                              <span>WhatsApp</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const shareUrl = `${window.location.origin}${window.location.pathname}?product=${selectedProduct.id}`;
-                                window.open(`https://facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
-                                setShowShareDropdown(false);
-                              }}
-                              className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs font-bold hover:bg-[#E3F2FD] text-blue-700 rounded-xl transition-colors cursor-pointer"
-                            >
-                              <Facebook className="w-3.5 h-3.5" />
-                              <span>Facebook</span>
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Image Slider Component */}
-                      <div className="w-full h-full relative flex flex-col justify-between items-center flex-1">
-                        {/* Main Image Carousel Wrapper */}
-                        <div className="relative w-full overflow-hidden flex items-center justify-center flex-1 min-h-[250px] md:min-h-[350px]">
-                          {(selectedProduct.images || []).map((imgSrc, idx) => (
-                            <div
-                              key={idx}
-                              className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ease-in-out p-4 ${
-                                idx === activeImageIndex 
-                                  ? 'opacity-100 translate-x-0 scale-100 z-10' 
-                                  : 'opacity-0 pointer-events-none'
-                              } ${
-                                idx < activeImageIndex ? '-translate-x-10' : idx > activeImageIndex ? 'translate-x-10' : ''
-                              }`}
-                            >
-                              <button
-                                type="button"
-                                onClick={scrollToBuyingDetails}
-                                className="w-full h-full flex items-center justify-center focus:outline-none group/img cursor-pointer overflow-hidden relative"
-                                title="Click to view pricing & details"
-                              >
-                                <img 
-                                  src={imgSrc} 
-                                  alt={`${selectedProduct.name} - View ${idx + 1}`}
-                                  loading="eager"
-                                  className="w-full h-auto max-h-[250px] md:max-h-[350px] object-contain block mx-auto transform transition-transform duration-500 ease-out group-hover/img:scale-105"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.style.display = 'none';
-                                    const parent = target.parentElement;
-                                    if (parent) {
-                                      const existing = parent.querySelector('.slider-fallback');
-                                      if (!existing) {
-                                        const fallback = document.createElement('div');
-                                        fallback.className = "slider-fallback absolute inset-0 flex flex-col justify-center items-center p-6 text-center text-neutral-800";
-                                        fallback.innerHTML = `
-                                          <span class="p-3 bg-neutral-100 border border-neutral-200 text-[#5C1D13] rounded-full mb-2">
-                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                          </span>
-                                          <h4 class="font-serif font-extrabold text-lg text-[#5C1D13]">${selectedProduct.name}</h4>
-                                          <p class="text-[10px] text-neutral-500 mt-0.5 uppercase tracking-widest font-bold">${selectedProduct.volumeOrQty}</p>
-                                        `;
-                                        parent.appendChild(fallback);
-                                      }
-                                    }
-                                  }}
-                                />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Left and Right Navigation Arrows (Visible only if more than 1 image) */}
-                        {(selectedProduct.images || []).length > 1 && (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => setActiveImageIndex((prev) => (prev === 0 ? (selectedProduct.images || []).length - 1 : prev - 1))}
-                              className="absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-neutral-900/60 hover:bg-neutral-900/80 text-white p-2 rounded-full transition-all border border-neutral-800 active:scale-95 flex items-center justify-center cursor-pointer"
-                              aria-label="Previous image"
-                            >
-                              <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setActiveImageIndex((prev) => (prev === (selectedProduct.images || []).length - 1 ? 0 : prev + 1))}
-                              className="absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-neutral-900/60 hover:bg-neutral-900/80 text-white p-2 rounded-full transition-all border border-neutral-800 active:scale-95 flex items-center justify-center cursor-pointer"
-                              aria-label="Next image"
-                            >
-                              <ChevronRight className="w-5 h-5" />
-                            </button>
-                          </>
-                        )}
-
-                        {/* Pagination Dots (Visible only if more than 1 image) */}
-                        {(selectedProduct.images || []).length > 1 && (
-                          <div className="flex justify-center items-center gap-1.5 mt-2 z-20">
-                            {(selectedProduct.images || []).map((_, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => setActiveImageIndex(idx)}
-                                className={`h-1.5 rounded-full transition-all duration-300 ${
-                                  idx === activeImageIndex 
-                                    ? 'w-5 bg-[#5C1D13]' 
-                                    : 'w-1.5 bg-neutral-300 hover:bg-neutral-400'
-                                  }`}
-                                aria-label={`Go to slide ${idx + 1}`}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                    <div className="md:col-span-5 relative flex flex-col items-center justify-start overflow-hidden bg-[#FAF8F6] p-4 sm:p-6 border-b md:border-b-0 md:border-r border-neutral-100 min-h-[350px] md:min-h-[450px]">
+                      <ProductGallery
+                        product={selectedProduct}
+                        activeImageIndex={activeImageIndex}
+                        setActiveImageIndex={setActiveImageIndex}
+                        onImageClick={() => {
+                          const imgs = selectedProduct.images || [];
+                          if (imgs[activeImageIndex]) {
+                            setLightboxImage(imgs[activeImageIndex]);
+                            setLightboxZoom(false);
+                          }
+                        }}
+                        showShareDropdown={showShareDropdown}
+                        setShowShareDropdown={setShowShareDropdown}
+                        handleShareProduct={handleShareProduct}
+                      />
+                      <p className="text-[11px] text-neutral-400 font-medium text-center mt-2 flex items-center gap-1">
+                        <span>🔍</span> Click image for high-resolution zoom view
+                      </p>
                     </div>
 
                     {/* Info and Purchase Column */}
@@ -2977,23 +2971,44 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       
                       {/* Typography & Content Hierarchy */}
                       <div className="space-y-2">
-                        {/* Gold Star Rating Block */}
-                        <button
-                          type="button"
-                          onClick={() => setActiveReviewProduct(selectedProduct)}
-                          className="flex items-center gap-1 text-neutral-800 hover:text-[#C86428] text-xs font-bold focus:outline-none transition-colors group cursor-pointer"
-                          title="Click to view verified customer reviews"
-                        >
-                          <Star className="w-3.5 h-3.5 fill-[#E5A93C] text-[#E5A93C] group-hover:scale-110 transition-transform" />
-                          {(() => {
-                            const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
-                            return (
-                              <span className="underline decoration-dotted decoration-[#E5A93C]/60 hover:decoration-solid">
-                                {rating.toFixed(1)} ({reviewsCount.toLocaleString('en-IN')} reviews)
-                              </span>
-                            );
-                          })()}
-                        </button>
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          {/* Gold Star Rating Block */}
+                          <button
+                            type="button"
+                            onClick={() => setActiveReviewProduct(selectedProduct)}
+                            className="flex items-center gap-1 text-neutral-800 hover:text-[#C86428] text-xs font-bold focus:outline-none transition-colors group cursor-pointer"
+                            title="Click to view verified customer reviews"
+                          >
+                            <div className="flex items-center text-[#E5A93C]">
+                              {[...Array(5)].map((_, i) => (
+                                <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                              ))}
+                            </div>
+                            {(() => {
+                              const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
+                              return (
+                                <span className="underline decoration-dotted decoration-[#E5A93C]/60 hover:decoration-solid ml-1">
+                                  {rating.toFixed(1)} ({reviewsCount.toLocaleString('en-IN')} verified reviews)
+                                </span>
+                              );
+                            })()}
+                          </button>
+
+                          {/* Wishlist Button */}
+                          <button
+                            type="button"
+                            onClick={(e) => toggleWishlist(selectedProduct, e)}
+                            className={`p-2 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
+                              isWishlisted
+                                ? 'bg-rose-50 border-rose-200 text-rose-600'
+                                : 'bg-white border-neutral-200 text-neutral-600 hover:text-rose-600 hover:border-rose-200'
+                            }`}
+                            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                          >
+                            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-600 text-rose-600' : ''}`} />
+                            <span className="hidden sm:inline">{isWishlisted ? 'Wishlisted' : 'Save'}</span>
+                          </button>
+                        </div>
 
                         {/* Main Title: Large, serif typography */}
                         <h1 className="font-serif text-3xl md:text-4xl font-black text-neutral-950 tracking-tight leading-snug">
@@ -3001,8 +3016,12 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </h1>
 
                         {/* Subtitle: slightly tracked out uppercase sans-serif text */}
-                        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-neutral-500 mt-1">
-                          {selectedProduct.subtitle} • {selectedProduct.volumeOrQty}
+                        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#5C1D13] mt-1 flex items-center gap-2 flex-wrap">
+                          <span>{selectedProduct.subtitle}</span>
+                          <span className="text-neutral-300">•</span>
+                          <span className="bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-md font-mono font-bold">
+                            {selectedProduct.volumeOrQty}
+                          </span>
                         </p>
                       </div>
 
@@ -3010,22 +3029,22 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <div className="space-y-2">
                         <div className="flex flex-col">
                           <div className="flex items-center gap-2.5 flex-wrap">
-                            <span className="text-3xl font-black text-neutral-950">
+                            <span className="text-3xl sm:text-4xl font-black text-neutral-950">
                               ₹{selectedProduct.price.toLocaleString('en-IN')}
                             </span>
-                            <span className="text-base font-bold line-through text-neutral-400">
+                            <span className="text-base sm:text-lg font-bold line-through text-neutral-400">
                               ₹{selectedProduct.mrp.toLocaleString('en-IN')}
                             </span>
-                            <span className="text-xs font-extrabold px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
-                              {Math.round(((selectedProduct.mrp - selectedProduct.price) / selectedProduct.mrp) * 100)}% Off
+                            <span className="text-xs font-black px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
+                              {discount}% Off (Save ₹{(selectedProduct.mrp - selectedProduct.price).toLocaleString('en-IN')})
                             </span>
                           </div>
                           <div className="flex flex-col gap-0.5 mt-1">
                             <p className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                              {t('inclusiveGst')}
+                              <Check className="w-3.5 h-3.5" /> {t('inclusiveGst')}
                             </p>
                             <p className="text-[10px] text-neutral-500 font-medium">
-                              ({t('priceInclusiveOfGst')})
+                              ({t('priceInclusiveOfGst')}) • Free Express Shipping Pan-India
                             </p>
                           </div>
                         </div>
@@ -3040,9 +3059,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                   {stockInfo.status === 'low_stock' && (
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                   )}
-                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${stockInfo.status === 'low_stock' ? 'bg-red-500' : 'bg-neutral-400'}`}></span>
+                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${stockInfo.status === 'low_stock' ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
                                 </span>
-                                <span className={`text-[10px] font-black uppercase tracking-wider ${stockInfo.status === 'low_stock' ? 'text-red-600' : 'text-neutral-500'}`}>
+                                <span className={`text-[10px] font-black uppercase tracking-wider ${stockInfo.status === 'low_stock' ? 'text-red-600' : 'text-emerald-700'}`}>
                                   {stockInfo.text}
                                 </span>
                               </div>
@@ -3061,10 +3080,27 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       {/* Long Description */}
                       <div className="space-y-2">
                         <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-[#5C1D13]">Product Therapy Summary</h4>
-                        <p className="text-xs leading-relaxed md:text-sm text-neutral-600">
+                        <p className="text-xs leading-relaxed md:text-sm text-neutral-700">
                           {selectedProduct.longDescription}
                         </p>
                       </div>
+
+                      {/* Key Bio-Active Ingredients preview chips */}
+                      {selectedProduct.keyIngredients && selectedProduct.keyIngredients.length > 0 && (
+                        <div className="space-y-1.5">
+                          <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-[#5C1D13]">Key Bio-Active Ingredients</h4>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedProduct.keyIngredients.slice(0, 4).map((ing: any, idx: number) => {
+                              const ingName = typeof ing === 'string' ? ing : ing.name;
+                              return (
+                                <span key={idx} className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-800 border border-neutral-200">
+                                  🌿 {ingName}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
 
                       {/* Dosage Guidelines */}
                       <div className="p-4 rounded-2xl space-y-2 border border-neutral-100 bg-[#FAF8F6]">
@@ -3077,16 +3113,45 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </div>
                       </div>
 
+                      {/* Quantity Selector Bar */}
+                      <div className="flex items-center gap-4 py-2 border-y border-neutral-100 flex-wrap">
+                        <span className="text-xs font-black uppercase tracking-wider text-[#5C1D13]">Quantity:</span>
+                        <div className="flex items-center border border-neutral-300 rounded-xl bg-white overflow-hidden shadow-2xs">
+                          <button
+                            type="button"
+                            onClick={() => setDetailQuantity(prev => Math.max(1, prev - 1))}
+                            className="px-3.5 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors font-bold text-sm cursor-pointer"
+                            aria-label="Decrease quantity"
+                          >
+                            -
+                          </button>
+                          <span className="px-4 py-2 font-black text-sm text-neutral-900 min-w-[2.5rem] text-center select-none">
+                            {detailQuantity}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setDetailQuantity(prev => Math.min(10, prev + 1))}
+                            className="px-3.5 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors font-bold text-sm cursor-pointer"
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-xs text-neutral-500 font-medium ml-auto">
+                          Item Total: <strong className="text-neutral-950 font-black text-sm">₹{(selectedProduct.price * detailQuantity).toLocaleString('en-IN')}</strong>
+                        </span>
+                      </div>
+
                       {/* Action Buttons Design & Alignment */}
                       {(() => {
                         const stockInfo = getProductStockStatus(selectedProduct.id);
                         if (stockInfo.status === 'out_of_stock') {
                           return (
-                            <div className="space-y-3 pt-3 border-t border-neutral-100">
+                            <div className="space-y-3 pt-2">
                               {/* Row 1: side-by-side Outline Back vs. Add to Cart (Disabled) */}
                               <div className="grid grid-cols-2 gap-3">
                                 <button 
-                                  onClick={() => setCurrentView('home')}
+                                  onClick={() => { setCurrentView('home'); navigate('/'); }}
                                   className="text-xs font-bold py-3.5 px-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
                                 >
                                   Back to Products
@@ -3120,20 +3185,20 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         }
 
                         return (
-                          <div className="space-y-3 pt-3 border-t border-neutral-100">
+                          <div className="space-y-3 pt-2">
                             {/* Row 1: side-by-side Outline Back vs. Add to Cart */}
                             <div className="grid grid-cols-2 gap-3">
                               <button 
-                                onClick={() => setCurrentView('home')}
+                                onClick={() => { setCurrentView('home'); navigate('/'); }}
                                 className="text-xs font-bold py-3.5 px-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
                               >
                                 Back to Products
                               </button>
                               <button 
-                                onClick={() => addToCart(selectedProduct, 1)}
+                                onClick={() => addToCart(selectedProduct, detailQuantity)}
                                 className="text-xs font-black py-3.5 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/10"
                               >
-                                Add to Cart
+                                Add to Cart ({detailQuantity})
                               </button>
                             </div>
                             
@@ -3153,6 +3218,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               </span>
                               <span>•</span>
                               <span>Shipped in 24 Hrs</span>
+                              <span>•</span>
+                              <span>Discreet Packaging</span>
                             </div>
 
                             {/* FREE Personalized Diet Plan Banner */}
@@ -3268,6 +3335,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           } 
                           alt="8 Feminine Health Solutions" 
                           loading="lazy"
+                          decoding="async"
+                          width="450"
+                          height="350"
                           className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -3291,6 +3361,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
                           alt="33-Herb Pure Formulation" 
                           loading="lazy"
+                          decoding="async"
+                          width="450"
+                          height="350"
                           className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -3391,6 +3464,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               } 
                               alt="Dosage Info" 
                               loading="lazy"
+                              decoding="async"
+                              width="220"
+                              height="220"
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -3409,6 +3485,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               src="https://i.postimg.cc/dtsJKSzc/IMG-2931.png" 
                               alt="Certification badge" 
                               loading="lazy"
+                              decoding="async"
+                              width="220"
+                              height="220"
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -3460,6 +3539,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       } 
                       alt="Powerful Ingredients" 
                       loading="lazy"
+                      decoding="async"
+                      width="450"
+                      height="350"
                       className="w-full h-auto max-w-full object-contain block mx-auto animate-pulse-slow"
                     />
                   </div>
@@ -3601,8 +3683,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                       <img 
                                         src={imgUrl} 
                                         alt={`Review image ${imgI + 1}`} 
-                                        className="w-full h-full object-cover rounded-lg"
                                         loading="lazy"
+                                        decoding="async"
+                                        width="96"
+                                        height="96"
+                                        className="w-full h-full object-cover rounded-lg"
                                         onError={(e) => {
                                           (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
                                         }}
@@ -3675,6 +3760,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <img 
                           src={rel.images && rel.images.length > 0 ? rel.images[0] : ''} 
                           alt={rel.name} 
+                          loading="lazy"
+                          decoding="async"
+                          width="200"
+                          height="200"
                           className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
@@ -4194,6 +4283,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                   `upi://pay?pa=9350302092m@pnb&pn=MEONMODE ENTERPRISES&am=${paymentMethod === 'cod' ? '150' : getCartTotal()}&cu=INR`
                                 )}`} 
                                 alt="meONmode UPI QR Code" 
+                                loading="lazy"
+                                decoding="async"
+                                width="192"
+                                height="192"
                                 className="w-48 h-48 block object-contain"
                               />
                               <div className="absolute inset-0 border border-black/5 rounded-2xl pointer-events-none"></div>
@@ -4355,6 +4448,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       `upi://pay?pa=9350302092m@pnb&pn=MEONMODE ENTERPRISES&am=${pendingPaymentOrder.amount}&cu=INR`
                     )}`}
                     alt="meONmode UPI Payment QR Code"
+                    loading="lazy"
+                    decoding="async"
+                    width="160"
+                    height="160"
                     className="w-40 h-40 block object-contain"
                   />
                 </div>
@@ -5306,19 +5403,20 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 7: BLOG LISTING VIEW ----------------- */}
         {currentView === 'blog' && (
-          <BlogListing
-            onSelectArticle={(slug) => navigateToView('blog-article', undefined, slug)}
-            onGoHome={() => navigateToView('home')}
-            onSelectProduct={(product) => navigateToView('detail', product)}
-          />
+          <React.Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+            <BlogListing
+              onSelectArticle={(slug) => navigateToView('blog-article', undefined, slug)}
+              onGoHome={() => navigateToView('home')}
+              onSelectProduct={(product) => navigateToView('detail', product)}
+            />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 8: BLOG ARTICLE DETAIL VIEW ----------------- */}
-        {currentView === 'blog-article' && (() => {
-          const matchedPost = BLOG_POSTS.find(p => p.slug === selectedBlogSlug) || BLOG_POSTS[0];
-          return (
-            <BlogArticle
-              post={matchedPost}
+        {currentView === 'blog-article' && (
+          <React.Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+            <BlogArticleView
+              slug={selectedBlogSlug}
               onGoBackToBlog={() => navigateToView('blog')}
               onSelectArticle={(slug) => navigateToView('blog-article', undefined, slug)}
               onSelectProduct={(product) => navigateToView('detail', product)}
@@ -5327,8 +5425,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 showToastNotification(`Added ${product.name} to Cart`);
               }}
             />
-          );
-        })()}
+          </React.Suspense>
+        )}
 
       </main>
 
@@ -5789,6 +5887,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <img 
                       src={activeReviewProduct.images && activeReviewProduct.images[0]} 
                       alt={activeReviewProduct.name} 
+                      loading="lazy"
+                      decoding="async"
+                      width="48"
+                      height="48"
                       className="w-full h-full object-contain"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
@@ -5896,8 +5998,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                   <img 
                                     src={url} 
                                     alt="Review Asset" 
-                                    className="w-full h-full object-contain cursor-zoom-in"
                                     loading="lazy"
+                                    decoding="async"
+                                    width="80"
+                                    height="80"
+                                    className="w-full h-full object-contain cursor-zoom-in"
                                     onClick={() => {
                                       setLightboxImage(url);
                                       setLightboxZoom(false);
@@ -6197,7 +6302,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <div className="flex flex-wrap gap-2 mt-2">
                         {newReviewImages.map((imgSrc, i) => (
                           <div key={i} className="relative w-16 h-16 rounded-xl border border-neutral-200 overflow-hidden group">
-                            <img src={imgSrc} alt="Preview" className="w-full h-full object-cover" />
+                            <img src={imgSrc} alt="Preview" width="64" height="64" decoding="async" className="w-full h-full object-cover" />
                             <button
                               type="button"
                               onClick={() => setNewReviewImages(prev => prev.filter((_, idx) => idx !== i))}
@@ -6265,6 +6370,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
               src={lightboxImage}
               alt="Customer Review Expanded"
               referrerPolicy="no-referrer"
+              decoding="async"
               className={`max-w-full max-h-full object-contain rounded-2xl transition-all duration-300 ease-out select-none shadow-2xl border border-white/10 ${
                 lightboxZoom ? "scale-150 cursor-zoom-out" : "scale-100"
               }`}

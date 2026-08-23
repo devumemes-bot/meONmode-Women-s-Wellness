@@ -166,6 +166,9 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                         src={post.featuredImage}
                         alt={post.title}
                         loading="lazy"
+                        decoding="async"
+                        width="400"
+                        height="192"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute top-3 left-3 flex gap-2">
