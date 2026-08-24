@@ -267,7 +267,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                     height="64"
                     className="w-full h-full object-contain block mx-auto transition-transform duration-200"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                      (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                     }}
                   />
                   {isActive && (

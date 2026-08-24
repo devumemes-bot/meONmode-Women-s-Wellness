@@ -119,7 +119,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode OVAIRA Veg Capsules for PCOS care, hormonal balance, ovarian wellness, and clear skin. Ayurvedic formula with Shatavari & Kanchnar.",
         h1: "meONmode® OVAIRA Capsules – Ayurvedic PCOS & Hormonal Wellness",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/FFGxTYvK/IMG-2904.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png"
       };
     case 'flowelle':
       return {
@@ -127,7 +127,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode FLOWELLE Ayurvedic syrup for painful period cramp relief, cycle regularity, and uterine wellness. Made with Ashok Chal & Shatavari.",
         h1: "meONmode® FLOWELLE Drink – Ayurvedic Period Cramp & Flow Care",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/Gp7ykyY6/IMG-2916.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_00_PM.png"
       };
     case 'alphamax':
       return {
@@ -135,7 +135,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode AlphaMax Veg Capsules with Shudh Shilajit & Gokshura. Boost natural physical energy, stamina, and cellular recovery.",
         h1: "meONmode® AlphaMax FOR MEN – Ayurvedic Power & Energy Capsules",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/GtknmHyY/879404D5-1DBE-4DAD-A868-ACDDEF70C56F.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581390/ChatGPT_Image_Aug_24_2026_07_29_31_PM.png"
       };
     case 'wantmore':
       return {
@@ -143,7 +143,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode WANTMORE FOR MEN Prash for maximum physical strength, stamina, and workout recovery. Powered by Safed Musli & Ashwagandha.",
         h1: "meONmode® WANTMORE FOR MEN – Maximum Strength Performance Prash",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581394/ChatGPT_Image_Aug_24_2026_07_28_33_PM.png"
       };
     case 'vayucore':
       return {
@@ -151,7 +151,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode VAYUCORE Ayurvedic liquid to relieve gas, bloating, and acidity while supporting healthy digestion and gut health.",
         h1: "meONmode® VAYUCORE – Ayurvedic Digestive & Gut Wellness",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/Z5RH4n2D/E3FB9FE6-C1DB-48D1-905E-941055523296.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581399/ChatGPT_Image_Aug_24_2026_07_30_05_PM.png"
       };
     case 'combo-kit':
       return {
@@ -159,7 +159,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode Combo Kit featuring OVAIRA Capsules and FLOWELLE Syrup for complete Ayurvedic cycle care, hormonal balance, and period support.",
         h1: "meONmode® Combo Kit – Complete Ayurvedic Reset Protocol",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/MKTmNzZd/IMG-2915.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png"
       };
     case 'mens-combo':
       return {
@@ -167,7 +167,7 @@ export function getProductSeoData(product: Product) {
         description: "Shop meONmode Men's Ultimate Performance Combo pairing WANTMORE Prash & AlphaMax Capsules for complete daily stamina and physical vitality.",
         h1: "meONmode® Men's Ultimate Performance Combo – Stamina & Power Stack",
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/T1XN3QGv/86164C6E-8C99-4C84-87C7-477EB98232DF.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png"
       };
     default:
       return {
@@ -175,7 +175,7 @@ export function getProductSeoData(product: Product) {
         description: product.shortDescription || product.longDescription,
         h1: product.name,
         canonicalUrl,
-        ogImage: product.images?.[0] || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+        ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png"
       };
   }
 }
@@ -772,7 +772,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
       title: "meONmode | Ayurvedic Wellness Products",
       description: "Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, OVAIRA and VAYUCORE with Cash on Delivery, Free Shipping and GST Included.",
       canonicalUrl: "https://meonmode.com/",
-      ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+      ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png"
     };
 
     if (currentView === 'detail' && selectedProduct) {
@@ -1334,7 +1334,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               height="28"
                               className="w-full h-full object-contain"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                               }}
                             />
                           </div>
@@ -1797,7 +1797,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src="https://i.postimg.cc/BQm4ZB0G/IMG-2935.png" 
+                          src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png" 
                           alt="meONmode Women's Combo Kit" 
                           loading="eager"
                           fetchPriority="high"
@@ -1945,7 +1945,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/BQm4ZB0G/IMG-2935.png'} 
+                          src={activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png'} 
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
                           loading="eager"
                           fetchPriority="high"
@@ -2442,7 +2442,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                       <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">100% Raw Roots & Bark</span>
                       <img 
-                        src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
+                        src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png" 
                         alt="Ayurvedic Ingredients / Roots & Bark" 
                         loading="lazy"
                         decoding="async"
@@ -2454,7 +2454,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                       <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">Ayurveda vs Synthetic Pills</span>
                       <img 
-                        src="https://i.postimg.cc/qMRxSpMV/IMG-2912.png" 
+                        src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png" 
                         alt="Why Ayurvedic capsules are better Comparison" 
                         loading="lazy"
                         decoding="async"
@@ -2510,7 +2510,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                 <img 
-                  src={activeCategory === 'men' ? 'https://i.postimg.cc/Jh4rYcBN/IMG-3616.png' : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'} 
+                  src={activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png'} 
                   alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
                   loading="lazy"
                   decoding="async"
@@ -2653,7 +2653,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                       setLightboxZoom(false);
                                     }}
                                     onError={(e) => {
-                                      (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                      (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                                     }}
                                   />
                                   {revImages.length > 1 && (
@@ -3328,10 +3328,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <img 
                           src={
                             selectedProduct?.id === 'ovaira'
-                              ? 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'
+                              ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
                               : selectedProduct?.id === 'flowelle'
-                                ? 'https://i.postimg.cc/FRYJGHVz/IMG-2917.png'
-                                : 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'
+                                ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_01_PM.png'
+                                : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png'
                           } 
                           alt="8 Feminine Health Solutions" 
                           loading="lazy"
@@ -3341,7 +3341,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                            target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                           }}
                         />
                       </div>
@@ -3358,7 +3358,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="md:col-span-5 order-2 md:order-1">
                       <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/30 relative group">
                         <img 
-                          src="https://i.postimg.cc/qRNCQvxh/IMG-2918.png" 
+                          src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png" 
                           alt="33-Herb Pure Formulation" 
                           loading="lazy"
                           decoding="async"
@@ -3367,7 +3367,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                            target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
@@ -3459,8 +3459,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             <img 
                               src={
                                 selectedProduct?.id === 'ovaira'
-                                  ? 'https://i.postimg.cc/Y2ftZwDN/IMG-2926.png'
-                                  : 'https://i.postimg.cc/PxC8K5QK/IMG-2921.png'
+                                  ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
+                                  : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png'
                               } 
                               alt="Dosage Info" 
                               loading="lazy"
@@ -3470,7 +3470,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                               }}
                             />
                           </div>
@@ -3482,7 +3482,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           </div>
                           <div className="flex-grow flex items-center justify-center p-2">
                             <img 
-                              src="https://i.postimg.cc/dtsJKSzc/IMG-2931.png" 
+                              src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png" 
                               alt="Certification badge" 
                               loading="lazy"
                               decoding="async"
@@ -3491,7 +3491,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                               }}
                             />
                           </div>
@@ -3532,10 +3532,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <img 
                       src={
                         selectedProduct?.id === 'ovaira'
-                          ? 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png'
+                          ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png'
                           : selectedProduct?.id === 'flowelle'
-                            ? 'https://i.postimg.cc/qRNCQvxh/IMG-2918.png'
-                            : 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png'
+                            ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png'
+                            : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png'
                       } 
                       alt="Powerful Ingredients" 
                       loading="lazy"
@@ -3689,7 +3689,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                         height="96"
                                         className="w-full h-full object-cover rounded-lg"
                                         onError={(e) => {
-                                          (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                          (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                                         }}
                                       />
                                     </div>
@@ -5893,7 +5893,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       height="48"
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                        (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                       }}
                     />
                   </div>
@@ -6008,7 +6008,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                       setLightboxZoom(false);
                                     }}
                                     onError={(e) => {
-                                      (e.target as HTMLImageElement).src = 'https://i.postimg.cc/dtsJKSzc/IMG-2931.png';
+                                      (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
                                     }}
                                   />
                                 </div>
