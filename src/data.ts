@@ -1,5 +1,22 @@
 import { Product } from './types';
 
+/**
+ * Optimizes Cloudinary URLs by inserting modern format (AVIF/WebP) and quality auto-negotiation
+ * Zero visual alteration, massive reduction in network payload and main-thread decode work.
+ */
+export function optimizeCloudinaryUrl(url: string, width?: number): string {
+  if (!url || typeof url !== 'string') return url;
+  if (!url.includes('res.cloudinary.com')) return url;
+  if (url.includes('/upload/f_auto,q_auto')) {
+    if (width && !url.includes(`w_${width}`)) {
+      return url.replace('/upload/f_auto,q_auto/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
+    }
+    return url;
+  }
+  const transform = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
+  return url.replace('/image/upload/', `/image/upload/${transform}/`);
+}
+
 export const PRODUCTS: Product[] = [
   {
     id: 'combo-kit',
@@ -8,15 +25,15 @@ export const PRODUCTS: Product[] = [
     price: 1999,
     mrp: 3798,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_26_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_29_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_37_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_20_2026_10_28_42_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_47_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_40_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_26_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_29_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_37_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512641/ChatGPT_Image_Jun_20_2026_10_28_42_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_47_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_40_PM.png'
     ],
     tag: "BEST SELLER - SAVE 47%",
     shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
@@ -47,16 +64,16 @@ export const PRODUCTS: Product[] = [
     price: 1199,
     mrp: 1999,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_28_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_32_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512636/ChatGPT_Image_Jun_20_2026_10_27_39_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_40_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_45_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_48_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_46_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_28_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_32_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512636/ChatGPT_Image_Jun_20_2026_10_27_39_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_40_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_45_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_48_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_46_PM.png'
     ],
     tag: "PCOS SPECIALLY FORMULATED",
     shortDescription: "60 Veg Capsules to manage insulin resistance, reduce ovarian cysts, and clear hormonal acne.",
@@ -85,13 +102,13 @@ export const PRODUCTS: Product[] = [
     price: 999,
     mrp: 1799,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_00_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_01_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_20_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_11_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_08_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_00_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_01_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_20_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_11_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_08_PM.png'
     ],
     tag: "100% PAIN-FREE PERIODS",
     shortDescription: "500ml Syrup to relieve painful period cramps and restore perfect cycle volume.",
@@ -124,13 +141,13 @@ export const MENS_PRODUCTS: Product[] = [
     id: 'wantmore-men',
     name: "meONmode® WANTMORE FOR MEN (Prash)",
     subtitle: "Maximum Strength Performance Prash",
-    price: 4499,
+    price: 4999,
     mrp: 8999,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581394/ChatGPT_Image_Aug_24_2026_07_28_33_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581396/ChatGPT_Image_Aug_24_2026_07_29_06_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581383/ChatGPT_Image_Aug_24_2026_07_28_45_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581405/ChatGPT_Image_Aug_24_2026_07_28_58_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581394/ChatGPT_Image_Aug_24_2026_07_28_33_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581396/ChatGPT_Image_Aug_24_2026_07_29_06_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581383/ChatGPT_Image_Aug_24_2026_07_28_45_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581405/ChatGPT_Image_Aug_24_2026_07_28_58_PM.png'
     ],
     tag: "STAMINA BOOSTER",
     shortDescription: "Clinically balanced Prash formulation designed to optimize strength, stamina, and physical endurance.",
@@ -157,11 +174,11 @@ export const MENS_PRODUCTS: Product[] = [
     price: 2499,
     mrp: 4999,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581390/ChatGPT_Image_Aug_24_2026_07_29_31_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581393/ChatGPT_Image_Aug_24_2026_07_29_42_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581394/ChatGPT_Image_Aug_24_2026_07_29_54_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581396/ChatGPT_Image_Aug_24_2026_07_29_48_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581398/ChatGPT_Image_Aug_24_2026_07_29_59_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581390/ChatGPT_Image_Aug_24_2026_07_29_31_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581393/ChatGPT_Image_Aug_24_2026_07_29_42_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581394/ChatGPT_Image_Aug_24_2026_07_29_54_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581396/ChatGPT_Image_Aug_24_2026_07_29_48_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581398/ChatGPT_Image_Aug_24_2026_07_29_59_PM.png'
     ],
     tag: "ENERGY & VITALITY",
     shortDescription: "60 veg capsules packed with organic extracts to optimize cellular energy, vitality, and health.",
@@ -188,9 +205,9 @@ export const MENS_PRODUCTS: Product[] = [
     price: 6999,
     mrp: 15997,
     images: [
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581391/ChatGPT_Image_Aug_24_2026_at_07_45_41_PM.png',
-      'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581401/ChatGPT_Image_Aug_24_2026_07_43_06_PM.png'
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581391/ChatGPT_Image_Aug_24_2026_at_07_45_41_PM.png',
+      'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581401/ChatGPT_Image_Aug_24_2026_07_43_06_PM.png'
     ],
     tag: "BEST SELLER - SAVE 56% + FREE VAYUCORE",
     shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health, now bundled with a FREE full-size bottle of VAYUCORE Ayurvedic Digestive Liquid (450 ML).",
@@ -221,9 +238,9 @@ export const VAYUCORE_PRODUCT: Product = {
   price: 999,
   mrp: 1999,
   images: [
-    'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581399/ChatGPT_Image_Aug_24_2026_07_30_05_PM.png',
-    'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581398/ChatGPT_Image_Aug_24_2026_07_30_12_PM.png',
-    'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581401/ChatGPT_Image_Aug_24_2026_07_30_21_PM.png'
+    'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581399/ChatGPT_Image_Aug_24_2026_07_30_05_PM.png',
+    'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581398/ChatGPT_Image_Aug_24_2026_07_30_12_PM.png',
+    'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787581401/ChatGPT_Image_Aug_24_2026_07_30_21_PM.png'
   ],
   tag: "BESTSELLER - GUT HEALTH",
   shortDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid formulated with carefully selected herbs to support healthy digestion, reduce gas and bloating, relieve acidity, and maintain overall gut health. Suitable for daily use by adults.",

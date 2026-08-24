@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
@@ -44,7 +44,7 @@ import {
   Flower2,
   Phone
 } from 'lucide-react';
-import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages } from './data';
+import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl } from './data';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
@@ -245,32 +245,41 @@ export default function App() {
     setTimeout(() => setShowToast(null), 3000);
   };
 
-  // Translate products dynamically based on lang
-  const translatedData = getTranslatedProducts(lang, PRODUCTS, MENS_PRODUCTS);
+  // Translate products dynamically based on lang (memoized for high responsiveness)
+  const translatedData = useMemo(() => getTranslatedProducts(lang, PRODUCTS, MENS_PRODUCTS), [lang]);
   const womenProducts = translatedData.women;
   const menProducts = translatedData.men;
 
-  const displayFAQs = activeCategory === 'all' 
-    ? [...getTranslatedFAQs(lang, false), ...getTranslatedFAQs(lang, true)]
-    : getTranslatedFAQs(lang, activeCategory === 'men');
-  const displayTestimonials = activeCategory === 'all'
-    ? [...getTranslatedTestimonials(lang, false), ...getTranslatedTestimonials(lang, true)]
-    : getTranslatedTestimonials(lang, activeCategory === 'men');
-  const displayReviews = getTranslatedReviews(lang);
-  const currentReviews = allReviews.map(rev => {
-    const matched = displayReviews.find(tr => tr.productId === rev.productId && (tr.name === rev.name || rev.name === "Priya Sharma" || rev.name === "Anjali Verma" || rev.name === "Karuna" || rev.name === "प्रिया शर्मा" || rev.name === "अंजलि वर्मा" || rev.name === "करुणा"));
-    if (matched) {
-      return {
-        ...rev,
-        name: matched.name,
-        review: matched.review,
-        title: matched.title
-      };
-    }
-    return rev;
-  });
+  const displayFAQs = useMemo(() => {
+    return activeCategory === 'all' 
+      ? [...getTranslatedFAQs(lang, false), ...getTranslatedFAQs(lang, true)]
+      : getTranslatedFAQs(lang, activeCategory === 'men');
+  }, [lang, activeCategory]);
 
-  const t = (key: keyof typeof UI_TRANSLATIONS['en'], variables?: Record<string, string | number>) => {
+  const displayTestimonials = useMemo(() => {
+    return activeCategory === 'all'
+      ? [...getTranslatedTestimonials(lang, false), ...getTranslatedTestimonials(lang, true)]
+      : getTranslatedTestimonials(lang, activeCategory === 'men');
+  }, [lang, activeCategory]);
+
+  const displayReviews = useMemo(() => getTranslatedReviews(lang), [lang]);
+
+  const currentReviews = useMemo(() => {
+    return allReviews.map(rev => {
+      const matched = displayReviews.find(tr => tr.productId === rev.productId && (tr.name === rev.name || rev.name === "Priya Sharma" || rev.name === "Anjali Verma" || rev.name === "Karuna" || rev.name === "प्रिया शर्मा" || rev.name === "अंजलि वर्मा" || rev.name === "करुणा"));
+      if (matched) {
+        return {
+          ...rev,
+          name: matched.name,
+          review: matched.review,
+          title: matched.title
+        };
+      }
+      return rev;
+    });
+  }, [allReviews, displayReviews]);
+
+  const t = useCallback((key: keyof typeof UI_TRANSLATIONS['en'], variables?: Record<string, string | number>) => {
     let str = UI_TRANSLATIONS[lang][key] || UI_TRANSLATIONS['en'][key] || '';
     if (variables) {
       Object.entries(variables).forEach(([k, v]) => {
@@ -278,20 +287,24 @@ export default function App() {
       });
     }
     return str;
-  };
+  }, [lang]);
 
   // Translate products dynamically inside the cart
-  const translatedCart = cart.map(item => {
-    const translatedProd = womenProducts.find(p => p.id === item.product.id) || menProducts.find(p => p.id === item.product.id) || item.product;
-    return {
-      ...item,
-      product: translatedProd
-    };
-  });
+  const translatedCart = useMemo(() => {
+    return cart.map(item => {
+      const translatedProd = womenProducts.find(p => p.id === item.product.id) || menProducts.find(p => p.id === item.product.id) || item.product;
+      return {
+        ...item,
+        product: translatedProd
+      };
+    });
+  }, [cart, womenProducts, menProducts]);
 
-  const currentProduct = selectedProduct 
-    ? (womenProducts.find(p => p.id === selectedProduct.id) || menProducts.find(p => p.id === selectedProduct.id) || selectedProduct) 
-    : null;
+  const currentProduct = useMemo(() => {
+    return selectedProduct 
+      ? (womenProducts.find(p => p.id === selectedProduct.id) || menProducts.find(p => p.id === selectedProduct.id) || selectedProduct) 
+      : null;
+  }, [selectedProduct, womenProducts, menProducts]);
 
   // Convert uploaded review images into Base64 URLs for localized persistence
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -865,8 +878,13 @@ Payment has been cryptographically verified on the backend server. Please dispat
     }
   }, [searchQuery]);
 
-  // Auto scroll to top on view changes
+  // Auto scroll to top on view changes (skipped on first mount)
+  const isFirstMountRef = useRef<boolean>(true);
   useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentView, selectedProduct]);
 

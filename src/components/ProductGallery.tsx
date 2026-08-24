@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Share2, Copy, MessageSquare, Facebook } from 'lucide-react';
 import { Product } from '../types';
+import { optimizeCloudinaryUrl } from '../data';
 
 interface ProductGalleryProps {
   product: Product;
@@ -161,7 +162,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={images[currentIndex]} 
+                src={optimizeCloudinaryUrl(images[currentIndex], 800)} 
                 alt={`${product.name} - View ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
                 decoding="async"
@@ -259,7 +260,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                   title={`View image ${idx + 1}`}
                 >
                   <img
-                    src={imgSrc}
+                    src={optimizeCloudinaryUrl(imgSrc, 160)}
                     alt={`${product.name} thumbnail ${idx + 1}`}
                     loading="lazy"
                     decoding="async"
@@ -267,7 +268,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                     height="64"
                     className="w-full h-full object-contain block mx-auto transition-transform duration-200"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                      (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 160);
                     }}
                   />
                   {isActive && (
