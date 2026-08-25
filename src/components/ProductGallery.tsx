@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Share2, Copy, MessageSquare, Facebook } from 'lucide-react';
 import { Product } from '../types';
-import { optimizeCloudinaryUrl } from '../data';
+import { optimizeCloudinaryUrl, getCloudinarySrcSet } from '../data';
 
 interface ProductGalleryProps {
   product: Product;
@@ -162,9 +162,12 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={optimizeCloudinaryUrl(images[currentIndex], 640)} 
-                alt={`${product.name} - View ${currentIndex + 1} of ${totalImages}`}
+                src={optimizeCloudinaryUrl(images[currentIndex], 480)} 
+                srcSet={getCloudinarySrcSet(images[currentIndex], [320, 480, 640])}
+                sizes="(max-width: 640px) 300px, 380px"
+                alt={`${product.name} - Ayurvedic packaging & product view ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
+                fetchPriority={currentIndex === 0 ? "high" : "auto"}
                 decoding="async"
                 width="380"
                 height="380"

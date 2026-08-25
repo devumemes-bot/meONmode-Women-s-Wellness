@@ -14,6 +14,7 @@ export default defineConfig(() => {
     build: {
       cssCodeSplit: true,
       minify: 'esbuild',
+      target: 'es2020',
       chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
@@ -25,6 +26,9 @@ export default defineConfig(() => {
               if (id.includes('motion')) {
                 return 'vendor-motion';
               }
+              if (id.includes('react-router-dom') || id.includes('@remix-run')) {
+                return 'vendor-router';
+              }
               if (id.includes('react') || id.includes('react-dom') || id.includes('scheduler')) {
                 return 'vendor-react';
               }
@@ -32,6 +36,9 @@ export default defineConfig(() => {
           },
         },
       },
+    },
+    esbuild: {
+      legalComments: 'none',
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

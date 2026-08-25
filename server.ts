@@ -5,12 +5,24 @@ import crypto from "crypto";
 import Razorpay from "razorpay";
 import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
+import compression from "compression";
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+// Enable HTTP Compression for all responses (Gzip/Deflate)
+app.use(compression({
+  filter: (req, res) => {
+    if (req.headers["x-no-compression"]) {
+      return false;
+    }
+    return compression.filter(req, res);
+  },
+  threshold: 1024, // only compress responses > 1KB
+}));
 
 // Middleware
 app.use(express.json());
@@ -544,8 +556,19 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+    // Long-term immutable caching for hashed production assets
+    app.use(express.static(distPath, {
+      maxAge: '1y',
+      immutable: true,
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+          // HTML files must never be cached indefinitely to allow instantaneous updates
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        }
+      }
+    }));
     app.get("*", (req, res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
       res.sendFile(path.join(distPath, "index.html"));
     });
   }

@@ -54,21 +54,44 @@ export const BlogListing: React.FC<BlogListingProps> = ({
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] text-[#1A1A1A] font-sans">
-      {/* Schema Markup for Blog Listing */}
+      {/* Schema Markup for Blog Listing & Breadcrumbs */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "Blog",
-            "name": "meONmode Ayurvedic Wellness Blog",
-            "description": "Expert Ayurvedic health tips in Hindi on PCOD, PMOS, white discharge, men's health, and hormonal balance.",
-            "url": "https://meonmode.com/blog",
-            "publisher": {
-              "@type": "Organization",
-              "name": "meONmode",
-              "logo": "https://meonmode.com/logo.png"
-            }
+            "@graph": [
+              {
+                "@type": "Blog",
+                "@id": "https://meonmode.com/blog#blog",
+                "name": "meONmode Ayurvedic Wellness Blog",
+                "description": "Expert Ayurvedic health tips in Hindi on PCOD, PMOS, white discharge, men's health, and hormonal balance.",
+                "url": "https://meonmode.com/blog",
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "meONmode",
+                  "url": "https://meonmode.com/",
+                  "logo": "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+                }
+              },
+              {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://meonmode.com/"
+                  },
+                  {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Ayurvedic Health Blog",
+                    "item": "https://meonmode.com/blog"
+                  }
+                ]
+              }
+            ]
           })
         }}
       />

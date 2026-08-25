@@ -103,25 +103,53 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
   // Article Schema JSON-LD
   const articleSchema = {
     "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": post.title,
-    "description": post.metaDescription,
-    "image": post.featuredImage,
-    "datePublished": post.datePublished,
-    "author": {
-      "@type": "Organization",
-      "name": post.author
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "meONmode",
-      "url": "https://meonmode.com",
-      "logo": "https://meonmode.com/logo.png"
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://meonmode.com/blog/${post.slug}`
-    }
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": `https://meonmode.com/blog/${post.slug}#article`,
+        "headline": post.title,
+        "description": post.metaDescription,
+        "image": post.featuredImage,
+        "datePublished": post.datePublished,
+        "author": {
+          "@type": "Organization",
+          "name": post.author || "meONmode"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "meONmode",
+          "url": "https://meonmode.com/",
+          "logo": "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": `https://meonmode.com/blog/${post.slug}`
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://meonmode.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Ayurvedic Health Blog",
+            "item": "https://meonmode.com/blog"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": post.title,
+            "item": `https://meonmode.com/blog/${post.slug}`
+          }
+        ]
+      }
+    ]
   };
 
   // FAQ Schema JSON-LD

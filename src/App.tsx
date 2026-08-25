@@ -45,6 +45,7 @@ import {
   Phone
 } from 'lucide-react';
 import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
+import { BLOG_POSTS } from './blogData';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
@@ -86,8 +87,10 @@ export function getProductCleanSlug(id: string): string {
     case 'alphamax-men':
     case 'alphamax': return 'alphamax';
     case 'vayucore': return 'vayucore';
-    case 'combo-kit': return 'female-combo-kit';
-    case 'mens-combo': return 'mens-ultimate-performance-combo';
+    case 'combo-kit':
+    case 'female-combo-kit': return 'combo-kit';
+    case 'mens-combo':
+    case 'mens-ultimate-performance-combo': return 'mens-combo';
     default: return id;
   }
 }
@@ -117,56 +120,58 @@ export function getProductSeoData(product: Product) {
       return {
         title: "meONmode® OVAIRA Capsules | Ayurvedic PCOS & Hormonal Wellness",
         description: "Shop meONmode OVAIRA Veg Capsules for PCOS care, hormonal balance, ovarian wellness, and clear skin. Ayurvedic formula with Shatavari & Kanchnar.",
-        h1: "meONmode® OVAIRA Capsules – Ayurvedic PCOS & Hormonal Wellness",
+        h1: "meONmode® OVAIRA Capsules",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png"
       };
     case 'flowelle':
       return {
-        title: "meONmode® FLOWELLE Drink | Ayurvedic Period Cramp & Flow Care",
-        description: "Shop meONmode FLOWELLE Ayurvedic syrup for painful period cramp relief, cycle regularity, and uterine wellness. Made with Ashok Chal & Shatavari.",
-        h1: "meONmode® FLOWELLE Drink – Ayurvedic Period Cramp & Flow Care",
+        title: "meONmode® FLOWELLE Drink | Ayurvedic Period & Flow Care",
+        description: "Shop meONmode FLOWELLE Ayurvedic syrup for period cramp relief, cycle regularity, and uterine wellness. Made with Ashok Chal, Shatavari, and Gokhru.",
+        h1: "meONmode® FLOWELLE Drink",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_00_PM.png"
       };
     case 'alphamax':
       return {
-        title: "meONmode® AlphaMax Capsules | Ayurvedic Men's Energy & Vitality",
-        description: "Shop meONmode AlphaMax Veg Capsules with Shudh Shilajit & Gokshura. Boost natural physical energy, stamina, and cellular recovery.",
-        h1: "meONmode® AlphaMax FOR MEN – Ayurvedic Power & Energy Capsules",
+        title: "meONmode® AlphaMax FOR MEN | Ayurvedic Shudh Shilajit & Vitality Capsules",
+        description: "Shop meONmode AlphaMax Veg Capsules with Shudh Shilajit, Safed Musli, and Gokshura to support physical stamina, cellular energy, and daily recovery.",
+        h1: "meONmode® AlphaMax FOR MEN (Capsules)",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581390/ChatGPT_Image_Aug_24_2026_07_29_31_PM.png"
       };
     case 'wantmore':
       return {
-        title: "meONmode® WANTMORE Prash | Ayurvedic Men's Stamina & Vigor",
-        description: "Shop meONmode WANTMORE FOR MEN Prash for maximum physical strength, stamina, and workout recovery. Powered by Safed Musli & Ashwagandha.",
-        h1: "meONmode® WANTMORE FOR MEN – Maximum Strength Performance Prash",
+        title: "meONmode® WANTMORE FOR MEN (Prash) | Ayurvedic Stamina & Vigor",
+        description: "Shop meONmode WANTMORE FOR MEN Prash for maximum strength, endurance, and stamina. Ayurvedic formula with Safed Musli and Ashwagandha.",
+        h1: "meONmode® WANTMORE FOR MEN (Prash)",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581394/ChatGPT_Image_Aug_24_2026_07_28_33_PM.png"
       };
     case 'vayucore':
       return {
         title: "meONmode® VAYUCORE | Ayurvedic Digestive & Gut Health Liquid",
-        description: "Shop meONmode VAYUCORE Ayurvedic liquid to relieve gas, bloating, and acidity while supporting healthy digestion and gut health.",
-        h1: "meONmode® VAYUCORE – Ayurvedic Digestive & Gut Wellness",
+        description: "Shop meONmode VAYUCORE 450ml Ayurvedic liquid for fast relief from gas, acidity, and bloating while supporting healthy gut digestion.",
+        h1: "meONmode® VAYUCORE",
         canonicalUrl,
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581399/ChatGPT_Image_Aug_24_2026_07_30_05_PM.png"
       };
     case 'combo-kit':
+    case 'female-combo-kit':
       return {
-        title: "meONmode® Combo Kit | OVAIRA Capsules + FLOWELLE Syrup",
-        description: "Shop meONmode Combo Kit featuring OVAIRA Capsules and FLOWELLE Syrup for complete Ayurvedic cycle care, hormonal balance, and period support.",
-        h1: "meONmode® Combo Kit – Complete Ayurvedic Reset Protocol",
-        canonicalUrl,
+        title: "meONmode® Female Combo Kit | OVAIRA Capsules + FLOWELLE Syrup",
+        description: "Shop meONmode Female Combo Kit with OVAIRA Capsules and FLOWELLE Syrup for complete Ayurvedic cycle care, hormonal balance, and period support.",
+        h1: "meONmode® Combo Kit (Female Wellness Combo)",
+        canonicalUrl: "https://meonmode.com/products/combo-kit",
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png"
       };
     case 'mens-combo':
+    case 'mens-ultimate-performance-combo':
       return {
-        title: "meONmode® Men's Ultimate Performance Combo | WANTMORE + AlphaMax",
-        description: "Shop meONmode Men's Ultimate Performance Combo pairing WANTMORE Prash & AlphaMax Capsules for complete daily stamina and physical vitality.",
-        h1: "meONmode® Men's Ultimate Performance Combo – Stamina & Power Stack",
-        canonicalUrl,
+        title: "meONmode® Men's Ultimate Performance Combo | WANTMORE + AlphaMax + VAYUCORE",
+        description: "Shop meONmode Men's Ultimate Performance Combo with WANTMORE Prash, AlphaMax Capsules, and FREE VAYUCORE for complete male stamina, power, and digestion.",
+        h1: "Men's Ultimate Performance Combo Kit",
+        canonicalUrl: "https://meonmode.com/products/mens-combo",
         ogImage: product.images?.[0] || "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png"
       };
     default:
@@ -783,13 +788,54 @@ Payment has been cryptographically verified on the backend server. Please dispat
   useEffect(() => {
     let seo = {
       title: "meONmode | Ayurvedic Wellness Products",
-      description: "Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, OVAIRA and VAYUCORE with Cash on Delivery, Free Shipping and GST Included.",
+      description: "Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India.",
       canonicalUrl: "https://meonmode.com/",
-      ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png"
+      ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+      robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     };
 
     if (currentView === 'detail' && selectedProduct) {
-      seo = getProductSeoData(selectedProduct);
+      const prodSeo = getProductSeoData(selectedProduct);
+      seo = {
+        title: prodSeo.title,
+        description: prodSeo.description,
+        canonicalUrl: prodSeo.canonicalUrl,
+        ogImage: prodSeo.ogImage,
+        robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      };
+    } else if (currentView === 'blog') {
+      seo = {
+        title: "meONmode Ayurvedic Blog | Health & Wellness Tips in Hindi",
+        description: "Read expert Ayurvedic health and wellness guides in Hindi on PCOD, PMOS, white discharge, men's stamina, gut health, and hormonal harmony.",
+        canonicalUrl: "https://meonmode.com/blog",
+        ogImage: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80",
+        robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      };
+    } else if (currentView === 'blog-article') {
+      const post = BLOG_POSTS.find(p => p.slug === selectedBlogSlug);
+      seo = {
+        title: post ? `${post.title} | meONmode` : "Ayurvedic Health Article | meONmode",
+        description: post?.metaDescription || "Expert Ayurvedic health tips and wellness advice in Hindi from meONmode.",
+        canonicalUrl: `https://meonmode.com/blog/${selectedBlogSlug || ''}`,
+        ogImage: post?.featuredImage || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      };
+    } else if (currentView === 'refund-policy') {
+      seo = {
+        title: "Refund & Return Policy | meONmode Ayurvedic Wellness",
+        description: "Read meONmode's transparent return, replacement, and refund policies for authentic Ayurvedic wellness orders with unboxing video guidelines.",
+        canonicalUrl: "https://meonmode.com/refund-policy",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
+    } else if (currentView === 'order-history') {
+      seo = {
+        title: "Track Your Order | meONmode Ayurvedic Wellness",
+        description: "Track your meONmode Ayurvedic order status, delivery timeline, and shipment details.",
+        canonicalUrl: "https://meonmode.com/",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "noindex, follow"
+      };
     }
 
     document.title = seo.title;
@@ -816,6 +862,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
     setMeta('name', 'description', seo.description);
     setMeta('name', 'title', seo.title);
+    setMeta('name', 'robots', seo.robots);
     setLink('canonical', seo.canonicalUrl);
 
     // Open Graph
@@ -823,14 +870,15 @@ Payment has been cryptographically verified on the backend server. Please dispat
     setMeta('property', 'og:description', seo.description);
     setMeta('property', 'og:url', seo.canonicalUrl);
     setMeta('property', 'og:image', seo.ogImage);
-    setMeta('property', 'og:site_name', 'meONmode®');
-    setMeta('property', 'og:type', 'website');
+    setMeta('property', 'og:site_name', 'meONmode');
+    setMeta('property', 'og:type', currentView === 'blog-article' ? 'article' : 'website');
 
     // Twitter
+    setMeta('name', 'twitter:card', 'summary_large_image');
     setMeta('name', 'twitter:title', seo.title);
     setMeta('name', 'twitter:description', seo.description);
     setMeta('name', 'twitter:image', seo.ogImage);
-  }, [currentView, selectedProduct]);
+  }, [currentView, selectedProduct, selectedBlogSlug]);
 
   const handleSendAiMessage = async (customText?: string) => {
     const textToSend = customText || aiInput;
@@ -1565,6 +1613,25 @@ Payment has been cryptographically verified on the backend server. Please dispat
         {/* ----------------- VIEW 1: HOME VIEW ----------------- */}
         {currentView === 'home' && (
           <div className="space-y-8">
+            {/* JSON-LD Schema for Home View FAQs */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "FAQPage",
+                  "mainEntity": displayFAQs.map(faq => ({
+                    "@type": "Question",
+                    "name": faq.q,
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": faq.a
+                    }
+                  }))
+                })
+              }}
+            />
+
             {/* Category Toggle Switch */}
             <div className="flex flex-col items-center justify-center space-y-2 mb-2">
               <span className="text-xs uppercase tracking-widest font-bold font-sans text-[#E5A93C]">
@@ -1630,11 +1697,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                     {/* Main Heading & Sub Heading with Luxury Serif typography */}
                     <div className="space-y-4">
-                      <h1 id="women-hero-heading" className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-[#FAF6F0] leading-[1.05]">
+                      <h2 id="women-hero-heading" className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-[#FAF6F0] leading-[1.05]">
                         <span className="sr-only">meONmode – Ayurvedic Wellness Products - </span>
                         Your Body. <br />
                         <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent animate-pulse">ON Mode.</span>
-                      </h1>
+                      </h2>
                       <p id="women-hero-subheading" className="text-[#FAF6F0]/90 font-sans text-sm sm:text-base md:text-lg max-w-xl leading-relaxed font-medium">
                         Support your everyday women’s wellness with Ayurvedic nutrition crafted for modern lifestyles.
                       </p>
@@ -1815,7 +1882,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 640)} 
+                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 
+                          srcSet={`${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 380)} 380w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 480w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 640)} 640w`}
+                          sizes="(max-width: 640px) 280px, 320px"
                           alt="meONmode Women's Combo Kit" 
                           loading="eager"
                           fetchPriority="high"
@@ -1858,7 +1927,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       {activeCategory === 'all' ? t('heroTaglineAll') : t('heroTaglineMen')}
                     </div>
                     
-                    <h1 className="font-serif text-3.5xl sm:text-5xl md:text-5.5xl lg:text-6.5xl font-extrabold tracking-tight text-white leading-[1.08]">
+                    <h2 className="font-serif text-3.5xl sm:text-5xl md:text-5.5xl lg:text-6.5xl font-extrabold tracking-tight text-white leading-[1.08]">
                       {activeCategory === 'all' ? (
                         <>
                           {t('heroTitleAll1')} <br />
@@ -1870,7 +1939,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           <span className="text-[#E5A93C] font-black">{t('heroTitleMen2')}</span>
                         </>
                       )}
-                    </h1>
+                    </h2>
 
                     <p className="text-[#F7E7D9] text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-medium">
                       {activeCategory === 'all'
@@ -1963,7 +2032,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 640)} 
+                          src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 480)} 
+                          srcSet={`${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 380)} 380w, ${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 480)} 480w, ${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 640)} 640w`}
+                          sizes="(max-width: 640px) 320px, 384px"
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
                           loading="eager"
                           fetchPriority="high"
@@ -2231,7 +2302,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             title="Click to view pricing & details"
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 
+                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 240)} 240w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 360w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w`}
+                              sizes="(max-width: 640px) 240px, 300px"
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
@@ -2869,55 +2942,84 @@ Payment has been cryptographically verified on the backend server. Please dispat
           const prodReviews = currentReviews.filter(r => r.productId === selectedProduct.id);
           return (
           <div className="space-y-12">
-            {/* JSON-LD Structured Data for Google Search Stars */}
+            {/* JSON-LD Structured Data for Google Search Stars & Breadcrumbs */}
             <script 
               type="application/ld+json"
               dangerouslySetInnerHTML={{
                 __html: JSON.stringify({
                   "@context": "https://schema.org",
-                  "@type": "Product",
-                  "name": selectedProduct.name,
-                  "image": selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.image],
-                  "description": selectedProduct.shortDescription || selectedProduct.longDescription,
-                  "sku": selectedProduct.id,
-                  "mpn": selectedProduct.id,
-                  "brand": {
-                    "@type": "Brand",
-                    "name": "meONmode"
-                  },
-                  "review": prodReviews.slice(0, 5).map(rev => ({
-                    "@type": "Review",
-                    "reviewRating": {
-                      "@type": "Rating",
-                      "ratingValue": rev.rating || 5,
-                      "bestRating": 5
+                  "@graph": [
+                    {
+                      "@type": "Product",
+                      "@id": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}#product`,
+                      "name": selectedProduct.name,
+                      "image": selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.image],
+                      "description": selectedProduct.shortDescription || selectedProduct.longDescription,
+                      "sku": selectedProduct.id,
+                      "mpn": selectedProduct.id,
+                      "brand": {
+                        "@type": "Brand",
+                        "name": "meONmode"
+                      },
+                      "review": prodReviews.slice(0, 5).map(rev => ({
+                        "@type": "Review",
+                        "reviewRating": {
+                          "@type": "Rating",
+                          "ratingValue": rev.rating || 5,
+                          "bestRating": 5
+                        },
+                        "author": {
+                          "@type": "Person",
+                          "name": rev.name
+                        },
+                        "reviewBody": rev.review
+                      })),
+                      "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": Number(rating.toFixed(1)),
+                        "reviewCount": reviewsCount,
+                        "bestRating": 5,
+                        "worstRating": 1
+                      },
+                      "offers": {
+                        "@type": "Offer",
+                        "url": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`,
+                        "priceCurrency": "INR",
+                        "price": selectedProduct.price,
+                        "priceValidUntil": "2027-12-31",
+                        "itemCondition": "https://schema.org/NewCondition",
+                        "availability": "https://schema.org/InStock",
+                        "seller": {
+                          "@type": "Organization",
+                          "name": "meONmode",
+                          "url": "https://meonmode.com/"
+                        }
+                      }
                     },
-                    "author": {
-                      "@type": "Person",
-                      "name": rev.name
-                    },
-                    "reviewBody": rev.review
-                  })),
-                  "aggregateRating": {
-                    "@type": "AggregateRating",
-                    "ratingValue": Number(rating.toFixed(1)),
-                    "reviewCount": reviewsCount,
-                    "bestRating": 5,
-                    "worstRating": 1
-                  },
-                  "offers": {
-                    "@type": "Offer",
-                    "url": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`,
-                    "priceCurrency": "INR",
-                    "price": selectedProduct.price,
-                    "priceValidUntil": "2027-12-31",
-                    "itemCondition": "https://schema.org/NewCondition",
-                    "availability": "https://schema.org/InStock",
-                    "seller": {
-                      "@type": "Organization",
-                      "name": "meONmode"
+                    {
+                      "@type": "BreadcrumbList",
+                      "itemListElement": [
+                        {
+                          "@type": "ListItem",
+                          "position": 1,
+                          "name": "Home",
+                          "item": "https://meonmode.com/"
+                        },
+                        {
+                          "@type": "ListItem",
+                          "position": 2,
+                          "name": "Products",
+                          "item": "https://meonmode.com/"
+                        },
+                        {
+                          "@type": "ListItem",
+                          "position": 3,
+                          "name": selectedProduct.name,
+                          "item": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`
+                        }
+                      ]
                     }
-                  }
+                  ]
                 })
               }}
             />

@@ -47,7 +47,7 @@ export const PRODUCTS: Product[] = [
     tag: "BEST SELLER - SAVE 47%",
     shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
     longDescription: "The ultimate dual-action therapeutic kit designed by Ayurvedic gynecologists to target the root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort. While OVAIRA capsules regulate LH/FSH balance and resolve ovarian cysts, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a perfect, natural, gentle Ayurvedic solution to help you support your daily wellness.",
-    volumeOrQty: "60 Capsules + 500ml Syrup",
+    volumeOrQty: "60 Capsules + 450 ML Syrup",
     dosage: "• OVAIRA Capsule: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).\n• FLOWELLE Syrup: Take 5ml in the Morning and 5ml in the Evening (After Meals).",
     benefits: [
       "Normalizes irregular cycles and balances LH/FSH levels naturally",
@@ -120,9 +120,9 @@ export const PRODUCTS: Product[] = [
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_08_PM.png'
     ],
     tag: "100% PAIN-FREE PERIODS",
-    shortDescription: "500ml Syrup to relieve painful period cramps and restore perfect cycle volume.",
+    shortDescription: "450 ML Syrup to relieve painful period cramps and restore perfect cycle volume.",
     longDescription: "Formulated specifically to regulate flow, alleviate severe period pains, and purify blood. Sourced as per Bharat Pharmacopoeia standards, FLOWELLE contains highly potent standardised extracts of Ashok Chal, Shatavari, Gokhru, and Ashwagandha. It works as a direct uterine tonic to strengthen reproductive muscles, ease pelvic contractions, and solve multiple hormonal health issues naturally without side effects.",
-    volumeOrQty: "500 ml",
+    volumeOrQty: "450 ML",
     dosage: "Step 1: Pour 5-10ml of FLOWELLE Syrup using the measuring cap.\nStep 2: Mix it well in a glass of water until evenly blended.\nStep 3: Drink it daily after your meals (Morning and Evening) as a part of your wellness routine.",
     benefits: [
       "White Discharge (Leucorrhoea) - Stops abnormal discharge and intimate discomfort",

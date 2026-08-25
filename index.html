@@ -13,33 +13,40 @@
     <link rel="dns-prefetch" href="https://i.postimg.cc" />
     <link rel="dns-prefetch" href="https://api.qrserver.com" />
 
-    <!-- LCP Hero Image Preload -->
-    <link rel="preload" as="image" href="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_640,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png" fetchpriority="high" />
+    <!-- LCP Hero Image Preload with Responsive srcSet for Mobile & Desktop -->
+    <link 
+      rel="preload" 
+      as="image" 
+      href="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_480,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png" 
+      imagesrcset="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_380,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 380w, https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_480,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 480w, https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_640,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 640w" 
+      imagesizes="(max-width: 640px) 280px, 320px" 
+      fetchpriority="high" 
+    />
 
-    <!-- Asynchronous Non-blocking Google Fonts -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600..900;1,600..900&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600..900;1,600..900&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" media="print" onload="this.media='all'" />
+    <!-- Lean Asynchronous Non-blocking Google Fonts (Critical Weights Only) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600..900;1,600..900&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
     </noscript>
 
     <!-- Site & SEO Title -->
-    <title>meONmode® | Ayurvedic Wellness</title>
-    <meta name="title" content="meONmode® | Ayurvedic Wellness" />
-    <meta name="description" content="Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, and OVAIRA with Cash on Delivery and Free Shipping." />
-    <meta name="keywords" content="meONmode, meONmode Ayurvedic, ALPHAMAX, WANTMORE, OVAIRA, VAYUCORE, Ayurvedic Wellness, Men Wellness, Women Wellness, Health Products" />
-    <meta name="author" content="meONmode®" />
-    <meta name="robots" content="index, follow" />
+    <title>meONmode | Ayurvedic Wellness Products</title>
+    <meta name="title" content="meONmode | Ayurvedic Wellness Products" />
+    <meta name="description" content="Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India." />
+    <meta name="keywords" content="meONmode, Ayurvedic Wellness Products, FLOWELLE, OVAIRA, ALPHAMAX, WANTMORE, VAYUCORE, Ayurvedic Medicine India" />
+    <meta name="author" content="meONmode" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <!-- Brand Name & PWA Web App Name -->
-    <meta name="application-name" content="meONmode®" />
-    <meta name="apple-mobile-web-app-title" content="meONmode®" />
+    <meta name="application-name" content="meONmode" />
+    <meta name="apple-mobile-web-app-title" content="meONmode" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#1C110D" />
 
     <!-- Favicon, Apple Touch Icon & PWA Manifest -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" title="meONmode®" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" title="meONmode" />
     <link rel="apple-touch-icon" href="https://i.postimg.cc/Jh4rYcBN/IMG-3616.png" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="canonical" href="https://meonmode.com/" />
@@ -47,17 +54,18 @@
 
     <!-- Open Graph / Facebook / WhatsApp Meta Tags -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="meONmode®" />
-    <meta property="og:title" content="meONmode® | Ayurvedic Wellness" />
-    <meta property="og:description" content="Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, and OVAIRA with Cash on Delivery and Free Shipping." />
+    <meta property="og:site_name" content="meONmode" />
+    <meta property="og:title" content="meONmode | Ayurvedic Wellness Products" />
+    <meta property="og:description" content="Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India." />
     <meta property="og:url" content="https://meonmode.com/" />
     <meta property="og:image" content="https://i.postimg.cc/Jh4rYcBN/IMG-3616.png" />
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@meONmode" />
-    <meta name="twitter:title" content="meONmode® | Ayurvedic Wellness" />
-    <meta name="twitter:description" content="Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, and OVAIRA with Cash on Delivery and Free Shipping." />
+    <meta name="twitter:site" content="@meonmode_" />
+    <meta name="twitter:creator" content="@meonmode_" />
+    <meta name="twitter:title" content="meONmode | Ayurvedic Wellness Products" />
+    <meta name="twitter:description" content="Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India." />
     <meta name="twitter:image" content="https://i.postimg.cc/Jh4rYcBN/IMG-3616.png" />
 
     <!-- JSON-LD Structured Data for Organization & WebSite -->
@@ -68,17 +76,26 @@
           {
             "@type": "Organization",
             "@id": "https://meonmode.com/#organization",
-            "name": "meONmode®",
-            "url": "https://meonmode.com",
+            "name": "meONmode",
+            "url": "https://meonmode.com/",
             "logo": "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
-            "description": "Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, and OVAIRA with Cash on Delivery and Free Shipping."
+            "description": "Authentic Ayurvedic wellness formulations for women and men crafted with pure, standardized botanical extracts.",
+            "sameAs": [
+              "https://www.instagram.com/meonmode_/"
+            ],
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "+91 7290810336",
+              "contactType": "customer service",
+              "availableLanguage": ["English", "Hindi"]
+            }
           },
           {
             "@type": "WebSite",
             "@id": "https://meonmode.com/#website",
-            "url": "https://meonmode.com",
-            "name": "meONmode®",
-            "description": "Discover Ayurvedic wellness products from meONmode. Shop ALPHAMAX, WANTMORE, and OVAIRA with Cash on Delivery and Free Shipping.",
+            "url": "https://meonmode.com/",
+            "name": "meONmode",
+            "description": "Authentic Ayurvedic wellness products for women and men.",
             "publisher": {
               "@id": "https://meonmode.com/#organization"
             }
