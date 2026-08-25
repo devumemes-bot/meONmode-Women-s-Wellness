@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BlogPost, Product } from '../types';
-import { PRODUCTS, MENS_PRODUCTS } from '../data';
+import { PRODUCTS, MENS_PRODUCTS, optimizeCloudinaryUrl } from '../data';
 import { BLOG_POSTS } from '../blogData';
 import { 
   ArrowLeft, 
@@ -262,7 +262,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
           <div className="pt-4">
             <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E0D8D0] max-h-[420px]">
               <img
-                src={post.featuredImage}
+                src={post.featuredImage.includes('unsplash.com') ? post.featuredImage.replace('w=1200', 'w=900') : post.featuredImage}
                 alt={post.title}
                 loading="lazy"
                 decoding="async"
@@ -387,7 +387,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
 
                     <div className="flex flex-col items-center gap-2 shrink-0 w-full sm:w-auto">
                       <img
-                        src={relatedProduct.images[0]}
+                        src={optimizeCloudinaryUrl(relatedProduct.images[0], 160)}
                         alt={relatedProduct.name}
                         loading="lazy"
                         decoding="async"
@@ -584,7 +584,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
               <div className="space-y-3 text-center">
                 <div className="w-28 h-28 mx-auto p-2 bg-[#FAF7F2] rounded-xl border border-neutral-100">
                   <img
-                    src={relatedProduct.images[0]}
+                    src={optimizeCloudinaryUrl(relatedProduct.images[0], 240)}
                     alt={relatedProduct.name}
                     loading="lazy"
                     decoding="async"

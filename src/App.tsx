@@ -44,7 +44,7 @@ import {
   Flower2,
   Phone
 } from 'lucide-react';
-import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl } from './data';
+import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
@@ -1815,7 +1815,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png" 
+                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 640)} 
                           alt="meONmode Women's Combo Kit" 
                           loading="eager"
                           fetchPriority="high"
@@ -1963,7 +1963,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         title="Click to view details"
                       >
                         <img 
-                          src={activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png'} 
+                          src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 640)} 
                           alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
                           loading="eager"
                           fetchPriority="high"
@@ -2231,7 +2231,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             title="Click to view pricing & details"
                           >
                             <img 
-                              src={prod.images && prod.images[0]} 
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
@@ -2460,7 +2460,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                       <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">100% Raw Roots & Bark</span>
                       <img 
-                        src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png" 
+                        src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png", 480)} 
                         alt="Ayurvedic Ingredients / Roots & Bark" 
                         loading="lazy"
                         decoding="async"
@@ -2472,7 +2472,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                       <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">Ayurveda vs Synthetic Pills</span>
                       <img 
-                        src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png" 
+                        src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png", 480)} 
                         alt="Why Ayurvedic capsules are better Comparison" 
                         loading="lazy"
                         decoding="async"
@@ -2528,7 +2528,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                 <img 
-                  src={activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png'} 
+                  src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png', 480)} 
                   alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
                   loading="lazy"
                   decoding="async"
@@ -3344,13 +3344,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="md:col-span-5">
                       <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/30 relative group">
                         <img 
-                          src={
+                          src={optimizeCloudinaryUrl(
                             selectedProduct?.id === 'ovaira'
                               ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
                               : selectedProduct?.id === 'flowelle'
                                 ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_01_PM.png'
-                                : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png'
-                          } 
+                                : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png',
+                            480
+                          )} 
                           alt="8 Feminine Health Solutions" 
                           loading="lazy"
                           decoding="async"
@@ -3376,7 +3377,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="md:col-span-5 order-2 md:order-1">
                       <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/30 relative group">
                         <img 
-                          src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png" 
+                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png", 480)} 
                           alt="33-Herb Pure Formulation" 
                           loading="lazy"
                           decoding="async"
@@ -3475,11 +3476,12 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           </div>
                           <div className="flex-grow flex items-center justify-center p-2">
                             <img 
-                              src={
+                              src={optimizeCloudinaryUrl(
                                 selectedProduct?.id === 'ovaira'
                                   ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
-                                  : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png'
-                              } 
+                                  : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png',
+                                300
+                              )} 
                               alt="Dosage Info" 
                               loading="lazy"
                               decoding="async"
@@ -3488,7 +3490,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                                target.src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 300);
                               }}
                             />
                           </div>
@@ -3500,7 +3502,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           </div>
                           <div className="flex-grow flex items-center justify-center p-2">
                             <img 
-                              src="https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png" 
+                              src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png", 300)} 
                               alt="Certification badge" 
                               loading="lazy"
                               decoding="async"
@@ -3509,7 +3511,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
-                                target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                                target.src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 300);
                               }}
                             />
                           </div>
@@ -3548,13 +3550,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                   
                   <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                     <img 
-                      src={
+                      src={optimizeCloudinaryUrl(
                         selectedProduct?.id === 'ovaira'
                           ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png'
                           : selectedProduct?.id === 'flowelle'
                             ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png'
-                            : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png'
-                      } 
+                            : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png',
+                        480
+                      )} 
                       alt="Powerful Ingredients" 
                       loading="lazy"
                       decoding="async"
@@ -3776,7 +3779,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     >
                       <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
                         <img 
-                          src={rel.images && rel.images.length > 0 ? rel.images[0] : ''} 
+                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 300) : ''} 
                           alt={rel.name} 
                           loading="lazy"
                           decoding="async"

@@ -163,7 +163,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                     {/* Header Image & Badge */}
                     <div className="relative h-48 -mx-6 -mt-6 mb-4 overflow-hidden bg-neutral-100">
                       <img
-                        src={post.featuredImage}
+                        src={post.featuredImage.includes('unsplash.com') ? post.featuredImage.replace('w=1200', 'w=600') : post.featuredImage}
                         alt={post.title}
                         loading="lazy"
                         decoding="async"

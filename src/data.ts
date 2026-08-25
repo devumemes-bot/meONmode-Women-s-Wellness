@@ -7,14 +7,23 @@ import { Product } from './types';
 export function optimizeCloudinaryUrl(url: string, width?: number): string {
   if (!url || typeof url !== 'string') return url;
   if (!url.includes('res.cloudinary.com')) return url;
-  if (url.includes('/upload/f_auto,q_auto')) {
-    if (width && !url.includes(`w_${width}`)) {
-      return url.replace('/upload/f_auto,q_auto/', `/upload/f_auto,q_auto,w_${width},c_limit/`);
-    }
-    return url;
-  }
+  
+  const uploadIndex = url.indexOf('/image/upload/');
+  if (uploadIndex === -1) return url;
+  
+  const prefix = url.substring(0, uploadIndex + '/image/upload/'.length);
+  let rest = url.substring(uploadIndex + '/image/upload/'.length);
+  
+  // Strip existing transformations if present
+  rest = rest.replace(/^([a-z0-9_,]+)\/(v\d+\/.*)$/i, '$2');
+  
   const transform = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
-  return url.replace('/image/upload/', `/image/upload/${transform}/`);
+  return `${prefix}${transform}/${rest}`;
+}
+
+export function getCloudinarySrcSet(url: string, widths: number[] = [320, 480, 640, 800]): string {
+  if (!url || !url.includes('res.cloudinary.com')) return '';
+  return widths.map(w => `${optimizeCloudinaryUrl(url, w)} ${w}w`).join(', ');
 }
 
 export const PRODUCTS: Product[] = [

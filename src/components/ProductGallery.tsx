@@ -162,7 +162,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={optimizeCloudinaryUrl(images[currentIndex], 800)} 
+                src={optimizeCloudinaryUrl(images[currentIndex], 640)} 
                 alt={`${product.name} - View ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
                 decoding="async"
