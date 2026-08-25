@@ -50,22 +50,26 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
   const allProducts = [...PRODUCTS, ...MENS_PRODUCTS];
   const relatedProduct = allProducts.find(p => p.id === post.relatedProductId) || PRODUCTS[0];
 
-  // Scroll listener for reading progress bar & Back to Top
+  // Scroll listener for reading progress bar & Back to Top (batched with rAF and passive listener)
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalHeight > 0) {
-        const currentProgress = (window.scrollY / totalHeight) * 100;
-        setScrollProgress(currentProgress);
-      }
-      if (window.scrollY > 500) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+          if (totalHeight > 0) {
+            const currentProgress = (scrollY / totalHeight) * 100;
+            setScrollProgress(currentProgress);
+          }
+          setShowBackToTop(scrollY > 500);
+          ticking = false;
+        });
+        ticking = true;
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

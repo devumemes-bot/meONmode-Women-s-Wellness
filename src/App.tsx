@@ -1994,9 +1994,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                   <span className="inline-flex items-center gap-1.5 bg-[#FAF6F0]/10 text-[#E5A93C] uppercase text-[10px] tracking-widest font-extrabold font-mono px-4 py-1.5 rounded-full border border-[#E5A93C]/20 shadow-sm">
                     ✨ The 90-Day Protocol
                   </span>
-                  <h3 className="font-serif text-3xl md:text-5xl font-black text-[#FAF6F0] tracking-tight">
+                  <h2 className="font-serif text-3xl md:text-5xl font-black text-[#FAF6F0] tracking-tight">
                     90-Day Wellness Ritual
-                  </h3>
+                  </h2>
                   <p className="text-[#FAF6F0]/80 text-xs sm:text-sm font-medium leading-relaxed font-sans">
                     A simple daily Ayurvedic ritual to support hormonal balance, menstrual wellness, vaginal wellness, a healthy body, and overall female well-being.
                   </p>
@@ -2033,9 +2033,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </div>
                         <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 01 / Morning</span>
                       </div>
-                      <h4 className="font-serif font-black text-xl text-[#4A1D05]">
+                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
                         OVAIRA Capsule
-                      </h4>
+                      </h3>
                       <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
                         Take 1 capsule in the morning and 1 capsule in the evening after meals.
                       </p>
@@ -2061,9 +2061,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </div>
                         <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 02 / Evening</span>
                       </div>
-                      <h4 className="font-serif font-black text-xl text-[#4A1D05]">
+                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
                         FLOWELLE Syrup
-                      </h4>
+                      </h3>
                       <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
                         Take 5 ml in the morning and 5 ml in the evening after meals.
                       </p>
@@ -2089,9 +2089,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         </div>
                         <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 03 / Lifestyle</span>
                       </div>
-                      <h4 className="font-serif font-black text-xl text-[#4A1D05]">
+                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
                         90-Day Wellness Ritual
-                      </h4>
+                      </h3>
                       <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
                         A simple daily Ayurvedic ritual to support hormonal balance, menstrual wellness, vaginal wellness, a healthy body, and overall female well-being.
                       </p>
@@ -2501,7 +2501,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <Leaf className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-serif font-bold text-white text-xs sm:text-sm">Ayush Ministry Formulated</h4>
+                    <h3 className="font-serif font-bold text-white text-xs sm:text-sm">Ayush Ministry Formulated</h3>
                     <p className="text-[11px] text-[#F7E7D9]/80 mt-0.5">Tested thoroughly under strict Indian traditional guidelines.</p>
                   </div>
                 </div>
@@ -2510,7 +2510,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="font-serif font-bold text-white text-xs sm:text-sm">Discreet & Sealed</h4>
+                    <h3 className="font-serif font-bold text-white text-xs sm:text-sm">Discreet & Sealed</h3>
                     <p className="text-[11px] text-[#F7E7D9]/80 mt-0.5">Double-sealed under vacuum so no outside contaminants spoil the herbs.</p>
                   </div>
                 </div>
@@ -2520,9 +2520,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
             {/* Bento Block 6: Support Score Graphic (Col Span 5) */}
             <section className="lg:col-span-5 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6">
               <div className="space-y-1">
-                <h4 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">
+                <h2 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">
                   {activeCategory === 'all' ? "Clinical Restorative Success Score" : activeCategory === 'men' ? "Clinical Men's Performance Score" : "Clinical Period Support Score"}
-                </h4>
+                </h2>
                 <p className="text-[11px] text-[#F7E7D9]/80 text-center">Observed improvements over 90 days</p>
               </div>
 
@@ -2703,9 +2703,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                             {/* Review Title & Body */}
                             <div className="space-y-1">
-                              <h4 className="font-serif text-sm font-extrabold text-[#4A1D05] leading-tight">
+                              <h3 className="font-serif text-sm font-extrabold text-[#4A1D05] leading-tight">
                                 {rev.title || "Miraculous Healing Journey"}
-                              </h4>
+                              </h3>
                               <p className="text-[11px] text-neutral-600 leading-relaxed font-sans line-clamp-4 group-hover:line-clamp-none transition-all duration-300">
                                 {rev.review}
                               </p>
@@ -2715,7 +2715,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                         {/* Card Footer: Product name, customer name, date */}
                         <div className="p-5 pt-0 mt-auto border-t border-[#4A1D05]/10 space-y-1.5 bg-neutral-150/50">
-                          <div className="flex items-center justify-between text-[10px] text-neutral-400 font-semibold font-mono uppercase tracking-wider">
+                          <div className="flex items-center justify-between text-[10px] text-neutral-500 font-semibold font-mono uppercase tracking-wider">
                             <span>{rev.name} {rev.location ? `(${rev.location})` : ''}</span>
                             <span>{rev.date || "Verified"}</span>
                           </div>
@@ -2736,7 +2736,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="space-y-3 md:w-1/2">
                   <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Community Support</span>
-                  <h3 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Join the meONmode® Wellness Club Group</h3>
+                  <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Join the meONmode® Wellness Club Group</h2>
                   <p className="text-[#F7E7D9]/80 text-xs sm:text-sm leading-relaxed">
                     {activeCategory === 'all'
                       ? "You are not alone in this journey. Connect with 15,000+ members, get daily Ayurvedic lifestyle tips, diet plans, strength guides, and direct expert consultations inside our exclusive Wellness Club."
@@ -2795,9 +2795,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
             {/* Bento Block 8: FAQ Accordion (Col Span 12) */}
             <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl">
               <div className="text-center space-y-1">
-                <h3 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
+                <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
                   {activeCategory === 'all' ? "Unified Ayurvedic Queries Answered" : activeCategory === 'men' ? "Wellness & Performance Queries Answered" : "Period Health Queries Answered"}
-                </h3>
+                </h2>
                 <p className="text-[#F7E7D9]/80 text-xs sm:text-sm">Empowering you with complete, transparent Ayurvedic clinical facts.</p>
               </div>
 
@@ -3097,7 +3097,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                       {/* Long Description */}
                       <div className="space-y-2">
-                        <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-[#5C1D13]">Product Therapy Summary</h4>
+                        <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-[#5C1D13]">Product Therapy Summary</h2>
                         <p className="text-xs leading-relaxed md:text-sm text-neutral-700">
                           {selectedProduct.longDescription}
                         </p>
@@ -3106,7 +3106,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       {/* Key Bio-Active Ingredients preview chips */}
                       {selectedProduct.keyIngredients && selectedProduct.keyIngredients.length > 0 && (
                         <div className="space-y-1.5">
-                          <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-[#5C1D13]">Key Bio-Active Ingredients</h4>
+                          <h2 className="font-serif text-xs font-bold uppercase tracking-wider text-[#5C1D13]">Key Bio-Active Ingredients</h2>
                           <div className="flex flex-wrap gap-1.5">
                             {selectedProduct.keyIngredients.slice(0, 4).map((ing: any, idx: number) => {
                               const ingName = typeof ing === 'string' ? ing : ing.name;
@@ -3122,10 +3122,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                       {/* Dosage Guidelines */}
                       <div className="p-4 rounded-2xl space-y-2 border border-neutral-100 bg-[#FAF8F6]">
-                        <h4 className="font-serif text-sm font-bold flex items-center gap-1.5 text-[#5C1D13]">
+                        <h2 className="font-serif text-sm font-bold flex items-center gap-1.5 text-[#5C1D13]">
                           <Clock className="w-4 h-4 text-[#C86428]" />
                           <span>Compliant Dosage Guidelines</span>
-                        </h4>
+                        </h2>
                         <div className="text-xs leading-relaxed font-medium whitespace-pre-line pl-1.5 text-neutral-700">
                           {selectedProduct.dosage}
                         </div>
@@ -3310,9 +3310,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
                           Therapeutic Solution
                         </span>
-                        <h3 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
+                        <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
                           8 Feminine Health Problems Addition
-                        </h3>
+                        </h2>
                         <p className="text-sm text-neutral-300 mt-2">
                           FLOWELLE is a deep-acting formulation engineered to address the 8 most critical aspects of women's physiological and hormonal health.
                         </p>
@@ -3332,7 +3332,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                           <div key={idx} className="p-4 bg-[#4A1D05]/30 border border-white/5 rounded-2xl space-y-1 hover:border-[#E5A93C]/30 transition-all group">
                             <div className="flex items-center gap-2">
                               <span className="w-2.5 h-2.5 rounded-full bg-[#E5A93C] group-hover:scale-125 transition-transform" />
-                              <h4 className="font-serif font-bold text-white text-sm">{item.title}</h4>
+                              <h3 className="font-serif font-bold text-white text-sm">{item.title}</h3>
                             </div>
                             <p className="text-xs text-neutral-300 leading-normal pl-4">{item.desc}</p>
                           </div>
@@ -3400,9 +3400,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
                           Sourced Scientifically
                         </span>
-                        <h3 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
+                        <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
                           Powerful 33-Herb Formula Section
-                        </h3>
+                        </h2>
                         <p className="text-sm text-neutral-300 mt-2">
                           Crafted under strict pharmaceutical guidelines as per the official <span className="text-[#E5A93C] font-semibold">Bharat Pharmacopoeia standards</span>, this multi-herb synergy incorporates thirty-three active botanical extracts for multi-system wellness.
                         </p>
@@ -3417,7 +3417,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         ].map((herb, hIdx) => (
                           <div key={hIdx} className="p-4 bg-[#4A1D05]/50 border border-white/5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                             <div className="space-y-1">
-                              <h4 className="font-serif font-bold text-white text-base">{herb.name}</h4>
+                              <h3 className="font-serif font-bold text-white text-base">{herb.name}</h3>
                               <p className="text-xs text-neutral-300">{herb.desc}</p>
                             </div>
                             <span className="text-[11px] font-extrabold px-3 py-1.5 rounded-full bg-[#C86428]/20 text-[#E5A93C] border border-[#C86428]/30 shrink-0 self-start sm:self-auto">
@@ -3438,9 +3438,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
                         Easy 30-Second Habit
                       </span>
-                      <h3 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide">
+                      <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide">
                         Exact Consumption Ritual (How to Consume)
-                      </h3>
+                      </h2>
                       <p className="text-xs md:text-sm text-neutral-300">
                         Consistency is the secret to deep tissue rejuvenation. Follow this precise ritual twice daily.
                       </p>
@@ -3460,7 +3460,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {stepObj.step}
                             </span>
                             <div className="space-y-1">
-                              <h4 className="font-serif font-bold text-white text-base">{stepObj.title}</h4>
+                              <h3 className="font-serif font-bold text-white text-base">{stepObj.title}</h3>
                               <p className="text-xs text-neutral-300 leading-relaxed">{stepObj.desc}</p>
                             </div>
                           </div>
@@ -3525,9 +3525,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 
                 {/* Left Column: Approved Benefits */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 space-y-5">
-                  <h3 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
+                  <h2 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
                     Approved Therapeutic Benefits
-                  </h3>
+                  </h2>
                   <div className="space-y-3.5">
                     {selectedProduct.benefits.map((benefit, bIdx) => (
                       <div key={bIdx} className="flex gap-2.5 items-start">
@@ -3542,9 +3542,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                 {/* Right Column: Ayurvedic Ingredients spotlight */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 space-y-5">
-                  <h3 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
+                  <h2 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
                     Key Bio-Active Ingredients
-                  </h3>
+                  </h2>
                   
                   <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
                     <img 
@@ -3600,9 +3600,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
             <section className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl mt-12">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div className="text-left">
-                  <h3 className="font-serif text-2xl font-bold text-white flex items-center gap-2">
+                  <h2 className="font-serif text-2xl font-bold text-white flex items-center gap-2">
                     Verified Customer Reviews
-                  </h3>
+                  </h2>
                   <p className="text-xs text-neutral-300 font-medium">Authentic feedback from real meONmode® users</p>
                 </div>
                 
@@ -3719,9 +3719,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             {/* Review text */}
                             <div className="space-y-1">
                               {rev.title && (
-                                <h4 className="font-serif text-sm font-extrabold text-[#4A1D05] leading-snug">
+                                <h3 className="font-serif text-sm font-extrabold text-[#4A1D05] leading-snug">
                                   {rev.title}
-                                </h4>
+                                </h3>
                               )}
                               <p className="text-xs text-neutral-700 leading-relaxed font-sans">{rev.review}</p>
                             </div>
@@ -3744,9 +3744,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
             <section className="bg-gradient-to-br from-[#230d07] via-[#3a1508] to-[#1a0803] border border-[#E5A93C]/20 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
                 <div>
-                  <h3 className="font-serif text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                  <h2 className="font-serif text-xl md:text-2xl font-bold text-white flex items-center gap-2">
                     <span>🌿</span> Related Ayurvedic Remedies & Protocols
-                  </h3>
+                  </h2>
                   <p className="text-xs text-neutral-300">Complementary formulas for complete holistic health</p>
                 </div>
                 <button
@@ -3789,9 +3789,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#E5A93C]/10 text-[#E5A93C] border border-[#E5A93C]/20">
                           {rel.tag}
                         </span>
-                        <h4 className="font-serif font-bold text-white text-sm group-hover:text-[#E5A93C] transition-colors line-clamp-1">
+                        <h3 className="font-serif font-bold text-white text-sm group-hover:text-[#E5A93C] transition-colors line-clamp-1">
                           {rel.name}
-                        </h4>
+                        </h3>
                         <p className="text-[10px] text-neutral-300 line-clamp-2 leading-tight">
                           {rel.shortDescription}
                         </p>

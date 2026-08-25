@@ -184,7 +184,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                           </svg>
                         </span>
-                        <h4 class="font-serif font-extrabold text-lg text-[#5C1D13]">${product.name}</h4>
+                        <span class="font-serif font-extrabold text-lg text-[#5C1D13] block">${product.name}</span>
                         <p class="text-[10px] text-neutral-500 mt-0.5 uppercase tracking-widest font-bold">${product.volumeOrQty}</p>
                       `;
                       parent.appendChild(fallback);
