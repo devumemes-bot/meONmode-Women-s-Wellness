@@ -161,7 +161,7 @@ export const MENS_PRODUCTS: Product[] = [
     ],
     tag: "STAMINA BOOSTER",
     shortDescription: "Clinically balanced Prash formulation designed to optimize strength, stamina, and physical endurance.",
-    longDescription: "meONmode® WANTMORE FOR MEN is a strength and endurance Prash designed for peak physical performance. Formulated by expert Ayurvedic doctors, it incorporates standard extracts of pure herbs that naturally elevate vigor, enhance muscular endurance, and combat chronic fatigue.",
+    longDescription: "meONmode® WANTMORE FOR MEN is an Ayurvedic Prash formulated to support daily vitality, physical performance, mental clarity, reproductive wellness, and sustained endurance. It is enriched with Swaran Bhasma, Chandi Bhasma, Moti Pishti, Salam Panja, Siddh Makardhwaj, and Jayfal, with a traditional Prash formulation designed for convenient absorption.",
     volumeOrQty: "200g Prash",
     dosage: "Take 1-2 teaspoons (5g-10g) daily with lukewarm milk or water after meals.",
     benefits: [
@@ -171,8 +171,12 @@ export const MENS_PRODUCTS: Product[] = [
       "Ayurvedic, safe & effective gentle formulation"
     ],
     keyIngredients: [
-      { name: "Safed Musli", benefit: "Vigor Booster", description: "Renowned herb for boosting natural vigor and muscle development." },
-      { name: "Ashwagandha", benefit: "Stamina Support", description: "Prominent adaptogen that lowers cortisol levels and builds stamina." }
+      { name: "Swaran Bhasma", benefit: "Vitality & Strength", description: "Purified gold ash traditionally valued in Rasashastra for enhancing vitality, cellular vigor, and overall resilience." },
+      { name: "Chandi Bhasma", benefit: "Cooling & Stamina", description: "Purified silver ash known for its rejuvenating properties that support nervous system balance and physical endurance." },
+      { name: "Moti Pishti", benefit: "Mental Clarity", description: "Traditional pearl preparation that helps pacify Pitta, promoting mental clarity and natural physical balance." },
+      { name: "Salam Panja", benefit: "Endurance & Vigor", description: "Revered Ayurvedic root traditionally used to support male stamina, physical endurance, and reproductive wellness." },
+      { name: "Siddh Makardhwaj", benefit: "Rejuvenating Rasayana", description: "Classical Ayurvedic formulation revered as a potent Rasayana for sustaining peak physical performance and energy." },
+      { name: "Jayfal", benefit: "Circulation & Warmth", description: "Nutmeg extract providing aromatic and therapeutic qualities that support digestive fire and physical vitality." }
     ],
     rating: 4.9,
     reviewsCount: 819
@@ -192,7 +196,7 @@ export const MENS_PRODUCTS: Product[] = [
     ],
     tag: "ENERGY & VITALITY",
     shortDescription: "60 veg capsules packed with organic extracts to optimize cellular energy, vitality, and health.",
-    longDescription: "meONmode® AlphaMax is an advanced vitality supplement combining the power of Shudh Shilajit, Safed Musli, and Gokshura. It is designed to maximize daily physical energy, boost circulation, and regulate vitality markers naturally without any synthetic additions or chemicals.",
+    longDescription: "meONmode® ALPHAMAX is an Ayurvedic vitality formula for men designed to support daily energy, peak performance, confidence and focus, extended stamina, and reproductive wellness. It is enriched with Shilajit Extract, Safed Musli, Ashwagandha, Kaunch Beej, Swaran Bhasma, and Kesar, formulated in capsule form for convenient daily use.",
     volumeOrQty: "60 Veg Capsules",
     dosage: "Take 1 capsule in the morning and 1 capsule in the evening (after meals).",
     benefits: [
@@ -202,8 +206,12 @@ export const MENS_PRODUCTS: Product[] = [
       "Non-habit forming, safe for daily continuous use"
     ],
     keyIngredients: [
-      { name: "Shudh Shilajit", benefit: "Energy Support", description: "Purified Himalayan asphaltum rich in fulvic acid to revitalize cells." },
-      { name: "Gokshura", benefit: "Vascular Health", description: "Improves nitric oxide levels to support vascular flow and stamina." }
+      { name: "Shilajit Extract", benefit: "Cellular Energy", description: "Standardized Himalayan mineral resin rich in fulvic acid, supporting natural cellular ATP energy and stamina." },
+      { name: "Safed Musli", benefit: "Physical Vigor", description: "Classic Rasayana herb traditionally celebrated for boosting physical strength, stamina, and reproductive wellness." },
+      { name: "Ashwagandha", benefit: "Stress & Stamina", description: "Renowned adaptogen that helps the body adapt to daily stress, supporting calm focus and sustained physical endurance." },
+      { name: "Kaunch Beej", benefit: "Vitality & Mood", description: "Traditional botanical source of L-DOPA that supports nervous system health, vitality, and male reproductive wellness." },
+      { name: "Swaran Bhasma", benefit: "Precious Rasayana", description: "Traditional gold ash preparation known for its rejuvenating qualities that support overall vitality and vigor." },
+      { name: "Kesar", benefit: "Antioxidant & Mood", description: "Pure saffron threads known to support antioxidant defense, mood balance, and healthy microcirculation." }
     ],
     rating: 4.8,
     reviewsCount: 736
@@ -221,7 +229,7 @@ export const MENS_PRODUCTS: Product[] = [
     ],
     tag: "BEST SELLER - SAVE 56% + FREE VAYUCORE",
     shortDescription: "The ultimate power and performance duo for comprehensive daily stamina, vitality, and physical health, now bundled with a FREE full-size bottle of VAYUCORE Ayurvedic Digestive Liquid (450 ML).",
-    longDescription: "The absolute performance stack combining WANTMORE Prash, ALPHAMAX Capsules, and a complimentary full-size bottle of VAYUCORE Ayurvedic Digestive Liquid (450 ML). This complete synergy offers multi-target vitality: ALPHAMAX provides cell-level vitality and cellular recovery throughout the day, WANTMORE Prash powers peak athletic endurance and vascular output, while VAYUCORE ensures optimal gut absorption, zero bloating, and deep metabolic harmony.",
+    longDescription: "meONmode® Men's Performance Combo combines ALPHAMAX Capsules + WANTMORE Prash to provide complementary Ayurvedic support for men's daily vitality and performance. ALPHAMAX is enriched with Shilajit Extract, Safed Musli, Ashwagandha, Kaunch Beej, Swaran Bhasma, and Kesar, while WANTMORE is enriched with Swaran Bhasma, Chandi Bhasma, Moti Pishti, Salam Panja, Siddh Makardhwaj, and Jayfal. Together, the two formulations are positioned to support daily energy, peak performance, focus, sustained stamina, endurance, and reproductive wellness.",
     volumeOrQty: "200g Prash + 60 Capsules + 450ml VAYUCORE (Free)",
     dosage: "• WANTMORE Prash: Take 1 teaspoon daily with milk after dinner.\n• ALPHAMAX Capsules: Take 1 capsule with breakfast and 1 capsule with dinner.\n• VAYUCORE Liquid: Take 7–10 ml daily after meals.",
     benefits: [
@@ -232,9 +240,18 @@ export const MENS_PRODUCTS: Product[] = [
       "Save 56% compared to individual retail purchases"
     ],
     keyIngredients: [
-      { name: "Shudh Shilajit", benefit: "Cellular Energy", description: "Enriches cells with minerals and fulvic acid for rapid ATP production." },
-      { name: "Safed Musli", benefit: "Physical Vigor", description: "Restores deep tissue strength and boosts physical performance." },
-      { name: "Kutki & Kalmegh (Vayucore)", benefit: "Digestive Fire & Detox", description: "Enhances nutrient bioavailability and soothes acidity and bloating." }
+      { name: "Shilajit Extract (ALPHAMAX)", benefit: "Cellular Energy", description: "Standardized mineral resin rich in fulvic acid to support natural energy and stamina in ALPHAMAX Capsules." },
+      { name: "Safed Musli (ALPHAMAX)", benefit: "Physical Vigor", description: "Traditional Rasayana herb for strength, endurance, and reproductive wellness in ALPHAMAX Capsules." },
+      { name: "Ashwagandha (ALPHAMAX)", benefit: "Stress & Focus", description: "Adaptogenic herb to manage daily stress and support sustained physical endurance in ALPHAMAX Capsules." },
+      { name: "Kaunch Beej (ALPHAMAX)", benefit: "Vitality & Mood", description: "Ayurvedic botanical supporting vitality, nervous system health, and vigor in ALPHAMAX Capsules." },
+      { name: "Swaran Bhasma (ALPHAMAX)", benefit: "Precious Rasayana", description: "Gold ash preparation for cellular vitality and rejuvenation in ALPHAMAX Capsules." },
+      { name: "Kesar (ALPHAMAX)", benefit: "Antioxidant & Mood", description: "Saffron threads supporting antioxidant balance, mood, and microcirculation in ALPHAMAX Capsules." },
+      { name: "Swaran Bhasma (WANTMORE)", benefit: "Vitality & Strength", description: "Purified gold ash in WANTMORE Prash for deep cellular vitality and overall stamina." },
+      { name: "Chandi Bhasma (WANTMORE)", benefit: "Cooling & Stamina", description: "Purified silver ash in WANTMORE Prash supporting nervous balance and physical endurance." },
+      { name: "Moti Pishti (WANTMORE)", benefit: "Mental Clarity", description: "Pearl preparation in WANTMORE Prash to pacify Pitta and promote mind-body equilibrium." },
+      { name: "Salam Panja (WANTMORE)", benefit: "Endurance & Vigor", description: "Ayurvedic root in WANTMORE Prash supporting stamina, physical endurance, and male wellness." },
+      { name: "Siddh Makardhwaj (WANTMORE)", benefit: "Rejuvenating Rasayana", description: "Classical Ayurvedic Rasayana in WANTMORE Prash for peak physical performance and endurance." },
+      { name: "Jayfal (WANTMORE)", benefit: "Circulation & Warmth", description: "Nutmeg extract in WANTMORE Prash supporting vitality, digestive harmony, and warmth." }
     ],
     rating: 5.0,
     reviewsCount: 915

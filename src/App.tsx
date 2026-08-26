@@ -3249,7 +3249,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         <div className="space-y-1.5">
                           <h2 className="font-serif text-xs font-bold uppercase tracking-wider text-[#5C1D13]">Key Bio-Active Ingredients</h2>
                           <div className="flex flex-wrap gap-1.5">
-                            {selectedProduct.keyIngredients.slice(0, 4).map((ing: any, idx: number) => {
+                            {selectedProduct.keyIngredients.map((ing: any, idx: number) => {
                               const ingName = typeof ing === 'string' ? ing : ing.name;
                               return (
                                 <span key={idx} className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-800 border border-neutral-200">
