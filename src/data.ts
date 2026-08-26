@@ -14,8 +14,8 @@ export function optimizeCloudinaryUrl(url: string, width?: number): string {
   const prefix = url.substring(0, uploadIndex + '/image/upload/'.length);
   let rest = url.substring(uploadIndex + '/image/upload/'.length);
   
-  // Strip existing transformations if present
-  rest = rest.replace(/^([a-z0-9_,]+)\/(v\d+\/.*)$/i, '$2');
+  // Strip existing transformations if present (including colons, equals, commas)
+  rest = rest.replace(/^([a-z0-9_:,=-]+)\/(v\d+\/.*)$/i, '$2');
   
   // Use q_auto:best for crystal-sharp text and packaging labels, c_limit to never distort aspect ratio or upscale
   const transform = width ? `f_auto,q_auto:best,w_${width},c_limit` : 'f_auto,q_auto:best';

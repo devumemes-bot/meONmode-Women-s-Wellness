@@ -2893,37 +2893,12 @@ Payment has been cryptographically verified on the backend server. Please dispat
                   </div>
                 </div>
                 <div className="md:w-1/2 w-full">
-                  <div className="overflow-hidden rounded-2xl border border-white/10 shadow-lg bg-black/40 relative">
-                    <img 
-                      src="1000166074.jpg" 
-                      alt="meONmode Wellness Club Group" 
-                      loading="lazy"
-                      decoding="async"
-                      width="500"
-                      height="320"
-                      className="w-full h-auto max-w-full object-contain block mx-auto" 
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          const existingFallback = parent.querySelector('.club-fallback-overlay');
-                          if (existingFallback) {
-                            existingFallback.remove();
-                          }
-                          const fb = document.createElement('div');
-                          fb.className = "club-fallback-overlay p-8 text-center text-white/80 font-medium text-xs flex flex-col items-center justify-center min-h-[180px]";
-                          fb.innerHTML = `
-                            <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-full mb-2">
-                              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                            </div>
-                            <span class="font-bold text-sm text-white">meONmode® Wellness Club Group Support</span>
-                            <span class="text-[10px] text-emerald-400 mt-1 font-bold">10,000+ Active Members Active</span>
-                          `;
-                          parent.appendChild(fb);
-                        }
-                      }}
-                    />
+                  <div className="overflow-hidden rounded-2xl border border-emerald-500/20 shadow-lg bg-gradient-to-br from-emerald-950/40 via-[#1C110D] to-[#2B170E] p-8 text-center text-white/80 font-medium text-xs flex flex-col items-center justify-center min-h-[200px]">
+                    <div className="p-3.5 bg-emerald-500/10 text-emerald-400 rounded-full mb-3 border border-emerald-500/20 shadow-inner">
+                      <MessageCircle className="w-8 h-8" />
+                    </div>
+                    <span className="font-serif font-bold text-base sm:text-lg text-white">meONmode® Wellness Club Group Support</span>
+                    <span className="text-[11px] text-emerald-400 mt-1 font-bold">10,000+ Active Community Members</span>
                   </div>
                 </div>
               </div>
