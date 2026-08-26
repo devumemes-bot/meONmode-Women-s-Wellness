@@ -290,12 +290,13 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
           <div className="pt-4">
             <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E0D8D0] max-h-[420px]">
               <img
-                src={post.featuredImage.includes('unsplash.com') ? post.featuredImage.replace('w=1200', 'w=900') : post.featuredImage}
+                src={post.featuredImage}
                 alt={post.title}
-                loading="lazy"
+                loading="eager"
+                fetchPriority="high"
                 decoding="async"
-                width="800"
-                height="420"
+                width="1200"
+                height="630"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>

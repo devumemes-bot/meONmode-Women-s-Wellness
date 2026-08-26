@@ -44,7 +44,7 @@ import {
   Flower2,
   Phone
 } from 'lucide-react';
-import { PRODUCTS, MENS_PRODUCTS, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
+import { PRODUCTS, MENS_PRODUCTS, VAYUCORE_PRODUCT, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
 import { BLOG_POSTS } from './blogData';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { motion } from 'motion/react';
@@ -96,17 +96,27 @@ export function getProductCleanSlug(id: string): string {
 }
 
 export function getProductFromSlug(slug: string): Product | undefined {
-  const clean = slug.toLowerCase().replace('/products/', '').replace('/product/', '').replace('/', '').trim();
-  const allProds = [...PRODUCTS, ...MENS_PRODUCTS];
+  if (!slug) return undefined;
+  const clean = slug
+    .toLowerCase()
+    .replace('/products/', '')
+    .replace('/product/', '')
+    .replace('/combos/', '')
+    .replace('/combo/', '')
+    .replace(/^\/+|\/+$/g, '')
+    .split('?')[0]
+    .split('#')[0]
+    .trim();
+  const allProds = [...PRODUCTS, ...MENS_PRODUCTS, VAYUCORE_PRODUCT];
   return allProds.find(p => {
-    if (p.id === clean) return true;
-    if (clean === 'female-combo-kit' || clean === 'combo-kit' || clean === 'womens-combo' || clean === 'women-combo') return p.id === 'combo-kit';
-    if (clean === 'mens-ultimate-performance-combo' || clean === 'mens-combo' || clean === 'men-combo') return p.id === 'mens-combo';
-    if (clean === 'wantmore' || clean === 'wantmore-men') return p.id === 'wantmore-men';
-    if (clean === 'alphamax' || clean === 'alphamax-men') return p.id === 'alphamax-men';
-    if (clean === 'flowelle') return p.id === 'flowelle';
-    if (clean === 'ovaira') return p.id === 'ovaira';
-    if (clean === 'vayucore') return p.id === 'vayucore';
+    if (p.id.toLowerCase() === clean) return true;
+    if (clean === 'female-combo-kit' || clean === 'combo-kit' || clean === 'womens-combo' || clean === 'women-combo' || clean === 'women-combo-kit') return p.id === 'combo-kit';
+    if (clean === 'mens-ultimate-performance-combo' || clean === 'mens-combo' || clean === 'men-combo' || clean === 'men-combo-kit') return p.id === 'mens-combo';
+    if (clean === 'wantmore' || clean === 'wantmore-men' || clean === 'wantmore-prash') return p.id === 'wantmore-men';
+    if (clean === 'alphamax' || clean === 'alphamax-men' || clean === 'alphamax-capsules') return p.id === 'alphamax-men';
+    if (clean === 'flowelle' || clean === 'flowelle-syrup' || clean === 'flowelle-drink') return p.id === 'flowelle';
+    if (clean === 'ovaira' || clean === 'ovaira-capsules') return p.id === 'ovaira';
+    if (clean === 'vayucore' || clean === 'vayucore-liquid') return p.id === 'vayucore';
     return false;
   });
 }
@@ -435,48 +445,81 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Synchronize HashRouter location <-> currentView
+  // Synchronize BrowserRouter location & search <-> currentView & sub-states
   useEffect(() => {
-    const path = location.pathname.toLowerCase();
+    const path = location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+    const searchParams = new URLSearchParams(location.search);
+    const prodParam = searchParams.get('product') || searchParams.get('p');
+
     if (path === '/cart') {
       if (currentView !== 'cart') setCurrentView('cart');
-    } else if (path === '/orders' || path === '/order-history' || path === '/track-order') {
+    } else if (path === '/orders' || path === '/order-history' || path === '/track-order' || path === '/track-orders') {
       if (currentView !== 'order-history') setCurrentView('order-history');
-    } else if (path === '/refund-policy') {
+    } else if (path === '/refund-policy' || path === '/return-policy') {
       if (currentView !== 'refund-policy') setCurrentView('refund-policy');
+    } else if (path === '/shipping-policy') {
+      if (currentView !== 'shipping-policy') setCurrentView('shipping-policy');
+    } else if (path === '/privacy-policy') {
+      if (currentView !== 'privacy-policy') setCurrentView('privacy-policy');
+    } else if (path === '/terms-and-conditions' || path === '/terms' || path === '/terms-of-service') {
+      if (currentView !== 'terms-and-conditions') setCurrentView('terms-and-conditions');
+    } else if (path === '/about' || path === '/about-us') {
+      if (currentView !== 'about') setCurrentView('about');
+    } else if (path === '/contact' || path === '/contact-us') {
+      if (currentView !== 'contact') setCurrentView('contact');
     } else if (path === '/success') {
       if (lastVerifiedOrder) {
         if (currentView !== 'success') setCurrentView('success');
       } else {
         navigate('/cart', { replace: true });
       }
-    } else if (path === '/blog' || path === '/blog/') {
+    } else if (path === '/blog') {
       if (currentView !== 'blog') setCurrentView('blog');
     } else if (path.startsWith('/blog/')) {
-      const slug = path.split('/blog/')[1]?.split('/')[0];
-      if (slug) {
-        setSelectedBlogSlug(slug);
+      const slug = path.split('/blog/')[1]?.split('/')[0]?.split('?')[0];
+      const foundBlog = BLOG_POSTS.find(b => b.slug.toLowerCase() === (slug || '').toLowerCase());
+      if (foundBlog) {
+        setSelectedBlogSlug(foundBlog.slug);
         if (currentView !== 'blog-article') setCurrentView('blog-article');
       } else {
-        if (currentView !== 'blog') setCurrentView('blog');
+        if (currentView !== 'not-found') setCurrentView('not-found');
       }
-    } else if (path.startsWith('/products/') || path.startsWith('/product/')) {
-      const slug = path.startsWith('/products/')
-        ? path.replace('/products/', '').split('/')[0]?.split('?')[0]
-        : path.replace('/product/', '').split('/')[0]?.split('?')[0];
+    } else if (path.startsWith('/products/') || path.startsWith('/product/') || path.startsWith('/combo/') || path.startsWith('/combos/')) {
+      const slug = path
+        .replace(/^\/(products|product|combos|combo)\//, '')
+        .split('/')[0]
+        ?.split('?')[0];
       const match = getProductFromSlug(slug || '');
       if (match) {
         setSelectedProduct(match);
         setActiveImageIndex(0);
         setDetailQuantity(1);
         if (currentView !== 'detail') setCurrentView('detail');
-        const isMen = MENS_PRODUCTS.some(m => m.id === match.id);
+        const isMen = isMenProduct(match);
         setActiveCategory(isMen ? 'men' : 'women');
+      } else {
+        if (currentView !== 'not-found') setCurrentView('not-found');
       }
-    } else if (path === '/' || path === '') {
+    } else if (prodParam) {
+      const match = getProductFromSlug(prodParam);
+      if (match) {
+        setSelectedProduct(match);
+        setActiveImageIndex(0);
+        setDetailQuantity(1);
+        if (currentView !== 'detail') setCurrentView('detail');
+        const isMen = isMenProduct(match);
+        setActiveCategory(isMen ? 'men' : 'women');
+      } else {
+        if (currentView !== 'not-found') setCurrentView('not-found');
+      }
+    } else if (path === '/products' || path === '/combos') {
       if (currentView !== 'home') setCurrentView('home');
+    } else if (path === '/') {
+      if (currentView !== 'home') setCurrentView('home');
+    } else {
+      if (currentView !== 'not-found') setCurrentView('not-found');
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   // Always reset activeImageIndex and detailQuantity when selected product changes
   useEffect(() => {
@@ -484,13 +527,18 @@ export default function App() {
     setDetailQuantity(1);
   }, [selectedProduct?.id]);
 
-  // View navigation helper that updates hash route
+  // View navigation helper that updates route URL
   const navigateToView = (view: ViewType, product?: Product, blogSlug?: string) => {
     setCurrentView(view);
     if (view === 'home') navigate('/');
     else if (view === 'cart') navigate('/cart');
     else if (view === 'order-history' || view === 'track-order') navigate('/orders');
     else if (view === 'refund-policy') navigate('/refund-policy');
+    else if (view === 'shipping-policy') navigate('/shipping-policy');
+    else if (view === 'privacy-policy') navigate('/privacy-policy');
+    else if (view === 'terms-and-conditions') navigate('/terms-and-conditions');
+    else if (view === 'about') navigate('/about');
+    else if (view === 'contact') navigate('/contact');
     else if (view === 'success') navigate('/success');
     else if (view === 'blog') navigate('/blog');
     else if (view === 'blog-article') {
@@ -828,6 +876,46 @@ Payment has been cryptographically verified on the backend server. Please dispat
         ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
         robots: "index, follow"
       };
+    } else if (currentView === 'shipping-policy') {
+      seo = {
+        title: "Shipping & Delivery Policy | meONmode Ayurvedic Wellness",
+        description: "Learn about meONmode's 100% free pan-India shipping, discreet unbranded packaging, and fast 3-5 business day delivery.",
+        canonicalUrl: "https://meonmode.com/shipping-policy",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
+    } else if (currentView === 'privacy-policy') {
+      seo = {
+        title: "Privacy Policy & Data Security | meONmode Ayurvedic Wellness",
+        description: "meONmode's strict privacy policy guarantees 100% confidential health consultations, 256-bit SSL encrypted checkout, and zero data sharing.",
+        canonicalUrl: "https://meonmode.com/privacy-policy",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
+    } else if (currentView === 'terms-and-conditions') {
+      seo = {
+        title: "Terms & Conditions | meONmode Ayurvedic Wellness",
+        description: "Review the official terms, conditions, AYUSH-compliant Ayurvedic wellness product guidelines, and order policies for meONmode.",
+        canonicalUrl: "https://meonmode.com/terms-and-conditions",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
+    } else if (currentView === 'about') {
+      seo = {
+        title: "About Us | meONmode Ayurvedic Wellness",
+        description: "Discover meONmode's mission to bring authentic, AYUSH-compliant Ayurvedic wellness, herbal purity, and hormonal balance to everyday lives.",
+        canonicalUrl: "https://meonmode.com/about",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
+    } else if (currentView === 'contact') {
+      seo = {
+        title: "Contact & Doctor Support | meONmode Ayurvedic Wellness",
+        description: "Get in touch with meONmode Ayurvedic doctors and customer support desk via WhatsApp (+91 72908 10336) and email.",
+        canonicalUrl: "https://meonmode.com/contact",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "index, follow"
+      };
     } else if (currentView === 'order-history') {
       seo = {
         title: "Track Your Order | meONmode Ayurvedic Wellness",
@@ -835,6 +923,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
         canonicalUrl: "https://meonmode.com/",
         ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
         robots: "noindex, follow"
+      };
+    } else if (currentView === 'not-found') {
+      seo = {
+        title: "404 - Page Not Found | meONmode Ayurvedic Wellness",
+        description: "The requested page could not be found. Explore meONmode AYUSH-compliant Ayurvedic formulations.",
+        canonicalUrl: "https://meonmode.com/",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        robots: "noindex, nofollow"
       };
     }
 
@@ -940,38 +1036,6 @@ Payment has been cryptographically verified on the backend server. Please dispat
   useEffect(() => {
     setActiveImageIndex(0);
   }, [selectedProduct?.id]);
-
-  // Deep-linking & Route Initialization: handle /products/:slug and ?product=:id on page load & popstate
-  useEffect(() => {
-    const handleRoute = () => {
-      const path = window.location.pathname;
-      const urlParams = new URLSearchParams(window.location.search);
-      const productParam = urlParams.get('product');
-
-      let foundProduct: Product | undefined;
-
-      if (path.startsWith('/products/')) {
-        const slug = path.replace('/products/', '').replace('/', '');
-        foundProduct = getProductFromSlug(slug);
-      } else if (productParam) {
-        foundProduct = getProductFromSlug(productParam);
-      }
-
-      if (foundProduct) {
-        setSelectedProduct(foundProduct);
-        setCurrentView('detail');
-        const isMen = MENS_PRODUCTS.some(m => m.id === foundProduct!.id);
-        setActiveCategory(isMen ? 'men' : 'women');
-      } else if (path === '/' || path === '') {
-        setCurrentView('home');
-      }
-    };
-
-    handleRoute();
-
-    window.addEventListener('popstate', handleRoute);
-    return () => window.removeEventListener('popstate', handleRoute);
-  }, []);
 
   // Handle Share copy link
   const handleShareProduct = (product: Product, e?: React.MouseEvent) => {
@@ -2302,14 +2366,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             title="Click to view pricing & details"
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 
-                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 240)} 240w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 360w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w`}
-                              sizes="(max-width: 640px) 240px, 300px"
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 800)} 
+                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 720)} 720w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 960)} 960w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 1200)} 1200w`}
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
-                              width="240"
-                              height="224"
+                              width="400"
+                              height="380"
                               className="w-full h-auto max-w-full object-contain block mx-auto h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -3881,12 +3945,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     >
                       <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
                         <img 
-                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 300) : ''} 
+                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 600) : ''} 
+                          srcSet={rel.images && rel.images.length > 0 ? getCloudinarySrcSet(rel.images[0], [300, 450, 600]) : ''}
+                          sizes="(max-width: 640px) 50vw, 250px"
                           alt={rel.name} 
                           loading="lazy"
                           decoding="async"
-                          width="200"
-                          height="200"
+                          width="250"
+                          height="250"
                           className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
@@ -5075,10 +5141,345 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
             <div className="text-center pt-2">
               <button
-                onClick={() => setCurrentView('home')}
+                onClick={() => navigateToView('home')}
                 className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
               >
                 Return to Shop
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5B: SHIPPING POLICY VIEW ----------------- */}
+        {currentView === 'shipping-policy' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">Shipping & Delivery Policy</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Fast & Discreet Pan-India Delivery</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
+                  Free Shipping All Across India
+                </h3>
+                <p className="text-white/80 pl-10">
+                  We offer 100% Free Express Shipping on all prepaid and Cash on Delivery (COD) orders across India with zero hidden delivery charges or surge fees.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
+                  Discreet & Confidential Packaging
+                </h3>
+                <p className="text-white/80 pl-10">
+                  Your privacy is our utmost priority. All meONmode orders are shipped in unmarked, plain brown corrugated boxes with no product names, medical descriptions, or logos printed on the outer exterior packaging.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
+                  Dispatch & Delivery Timelines
+                </h3>
+                <div className="text-white/80 pl-10 space-y-1.5">
+                  <p>• <strong>Order Processing:</strong> Dispatched within 24 to 48 business hours from our certified Ayurvedic pharmacy hubs.</p>
+                  <p>• <strong>Metro Cities:</strong> Delivered within 2 to 4 business days.</p>
+                  <p>• <strong>Rest of India:</strong> Delivered within 3 to 6 business days depending on pin code accessibility.</p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
+                  Order Tracking
+                </h3>
+                <p className="text-white/80 pl-10">
+                  Once your parcel is dispatched, you will receive real-time SMS & WhatsApp notifications containing your AWB tracking link from our courier partners (Bluedart, Delhivery, ExpressBees, Xpressbees, Shadowfax).
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5C: PRIVACY POLICY VIEW ----------------- */}
+        {currentView === 'privacy-policy' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">Privacy Policy</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Data Protection & Security</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
+                  Commitment to Privacy
+                </h3>
+                <p className="text-white/80 pl-10">
+                  meONmode is committed to safeguarding the privacy and confidentiality of our customers. Any personal details, contact numbers, or health consultation inquiries shared with us are treated with strict confidentiality.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
+                  Data We Collect
+                </h3>
+                <p className="text-white/80 pl-10">
+                  We collect basic order fulfillment information including your name, delivery address, phone number, and email. We do not store financial payment credentials or card details on our servers — all transactions are processed via bank-grade 256-bit SSL encrypted payment gateways.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
+                  Zero Third-Party Sharing
+                </h3>
+                <p className="text-white/80 pl-10">
+                  We strictly never sell, rent, lease, or trade your personal or medical inquiry data with unauthorized third parties or marketing brokers. Information is shared strictly with verified courier delivery partners solely for doorstep order delivery.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5D: TERMS AND CONDITIONS VIEW ----------------- */}
+        {currentView === 'terms-and-conditions' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">Terms & Conditions</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Official Terms of Service</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
+                  Ayurvedic Product Information
+                </h3>
+                <p className="text-white/80 pl-10">
+                  meONmode products (OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, VAYUCORE) are authentic proprietary Ayurvedic wellness formulations manufactured in GMP-certified facilities compliant with AYUSH guidelines. They are formulated to support natural bodily balance and hormonal harmony.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
+                  Dosage & Holistic Health
+                </h3>
+                <p className="text-white/80 pl-10">
+                  Please follow the recommended dosages as printed on the product pack or guided by Ayurvedic physicians. Individual results may vary depending on diet, sleep, and lifestyle habits.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
+                  Order Confirmation & Verification
+                </h3>
+                <p className="text-white/80 pl-10">
+                  Orders placed on meONmode are verified via automated SMS/WhatsApp and customer care verification. For Cash on Delivery orders, an advance payment of ₹150 is collected to confirm intentional delivery booking and prevent transit wastage.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5E: ABOUT US VIEW ----------------- */}
+        {currentView === 'about' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">About meONmode®</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">Authentic Ayurvedic Wellness & Science</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C]">Our Mission</h3>
+                <p className="text-white/80">
+                  At meONmode®, our mission is to empower individuals with authentic, pure, and clinically respected Ayurvedic formulations. We bridge the ancient wisdom of classical Ayurveda with modern clinical standards, delivering holistic care for women's reproductive health, cycle regularity, and men's vitality.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="font-serif text-lg font-bold text-[#E5A93C]">Pure Botanicals & GMP Standards</h3>
+                <p className="text-white/80">
+                  Every batch of meONmode formulations is crafted in state-of-the-art GMP-certified facilities adhering to the highest quality control and AYUSH guidelines. We use 100% natural, ethically sourced herbs with zero artificial hormones, steroids, or harmful additives.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Explore Products
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5F: CONTACT US VIEW ----------------- */}
+        {currentView === 'contact' && (
+          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+              <button
+                onClick={() => navigateToView('home')}
+                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
+                aria-label="Back to home"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h1 className="font-serif text-3xl font-extrabold text-white">Contact & Support</h1>
+                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Dedicated Doctor & Customer Care Desk</p>
+              </div>
+            </div>
+
+            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
+              <p className="text-white/80">
+                Have questions about your order, dosages, or want a confidential Ayurvedic health consultation with Dr. Ananya Iyer? Our support team is here to assist you.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <a 
+                  href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20have%20a%20query%20about%20my%20wellness%20order." 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/30 p-4 rounded-2xl flex items-center gap-3 text-white font-semibold text-xs transition-colors"
+                >
+                  <span className="text-2xl">💬</span>
+                  <div>
+                    <div className="text-emerald-400 font-bold text-sm">WhatsApp Support</div>
+                    <div>+91 72908 10336</div>
+                  </div>
+                </a>
+
+                <a 
+                  href="mailto:meonmodewellness@gmail.com" 
+                  className="bg-blue-600/25 hover:bg-blue-600/35 border border-blue-500/30 p-4 rounded-2xl flex items-center gap-3 text-white font-semibold text-xs transition-colors"
+                >
+                  <span className="text-2xl">✉️</span>
+                  <div>
+                    <div className="text-blue-400 font-bold text-sm">Email Care Desk</div>
+                    <div>meonmodewellness@gmail.com</div>
+                  </div>
+                </a>
+              </div>
+
+              <div className="pt-2 text-xs text-white/60">
+                <strong>Support Hours:</strong> Monday – Saturday, 9:30 AM – 7:30 PM IST.
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <button
+                onClick={() => navigateToView('home')}
+                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Return to Shop
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ----------------- VIEW 5G: NOT FOUND (404) VIEW ----------------- */}
+        {currentView === 'not-found' && (
+          <div className="max-w-xl mx-auto space-y-6 py-12 px-4 animate-fade-in text-center">
+            <div className="w-20 h-20 mx-auto rounded-3xl bg-[#E5A93C]/10 border border-[#E5A93C]/30 flex items-center justify-center text-4xl shadow-inner">
+              🌿
+            </div>
+            <div className="space-y-2">
+              <span className="text-xs font-mono font-bold tracking-widest text-[#E5A93C] uppercase bg-[#E5A93C]/10 px-3 py-1 rounded-full border border-[#E5A93C]/20">
+                404 • Page Not Found
+              </span>
+              <h1 className="font-serif text-3xl md:text-4xl font-extrabold text-white">
+                Looking for Holistic Healing?
+              </h1>
+              <p className="text-sm text-white/70 max-w-md mx-auto leading-relaxed">
+                The page or product you requested cannot be found or may have been updated. Explore our authentic AYUSH-compliant Ayurvedic formulations below.
+              </p>
+            </div>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => navigateToView('home')}
+                className="w-full sm:w-auto bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                Back to Home / Shop
+              </button>
+              <button
+                onClick={() => navigateToView('blog')}
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/15 text-white font-bold text-sm py-3.5 px-6 rounded-xl border border-white/10 transition-all duration-200 cursor-pointer"
+              >
+                Read Wellness Blog
               </button>
             </div>
           </div>
@@ -5657,12 +6058,47 @@ Payment has been cryptographically verified on the backend server. Please dispat
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-[#E5A93C] font-semibold mb-2">
+          <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-xs text-[#E5A93C] font-semibold mb-2">
             <button 
               onClick={() => navigateToView('refund-policy')} 
               className="hover:underline cursor-pointer"
             >
               Refund & Return Policy
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('shipping-policy')} 
+              className="hover:underline cursor-pointer"
+            >
+              Shipping Policy
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('privacy-policy')} 
+              className="hover:underline cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('terms-and-conditions')} 
+              className="hover:underline cursor-pointer"
+            >
+              Terms & Conditions
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('about')} 
+              className="hover:underline cursor-pointer"
+            >
+              About Us
+            </button>
+            <span className="text-white/20">•</span>
+            <button 
+              onClick={() => navigateToView('contact')} 
+              className="hover:underline cursor-pointer"
+            >
+              Contact Support
             </button>
             <span className="text-white/20">•</span>
             <button 

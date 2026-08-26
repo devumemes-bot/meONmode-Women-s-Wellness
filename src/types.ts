@@ -21,7 +21,22 @@ export interface CartItem {
   quantity: number;
 }
 
-export type ViewType = 'home' | 'detail' | 'cart' | 'success' | 'refund-policy' | 'track-order' | 'order-history' | 'blog' | 'blog-article';
+export type ViewType = 
+  | 'home' 
+  | 'detail' 
+  | 'cart' 
+  | 'success' 
+  | 'refund-policy' 
+  | 'shipping-policy' 
+  | 'privacy-policy' 
+  | 'terms-and-conditions' 
+  | 'about' 
+  | 'contact' 
+  | 'track-order' 
+  | 'order-history' 
+  | 'blog' 
+  | 'blog-article'
+  | 'not-found';
 
 export interface BlogPost {
   slug: string;

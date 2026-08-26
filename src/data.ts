@@ -1,8 +1,8 @@
 import { Product } from './types';
 
 /**
- * Optimizes Cloudinary URLs by inserting modern format (AVIF/WebP) and quality auto-negotiation
- * Zero visual alteration, massive reduction in network payload and main-thread decode work.
+ * Optimizes Cloudinary URLs preserving maximum visual fidelity, sharp label text, and high DPI support.
+ * Uses visually lossless quality (q_auto:best) and avoids downscaling text or fine packaging details.
  */
 export function optimizeCloudinaryUrl(url: string, width?: number): string {
   if (!url || typeof url !== 'string') return url;
@@ -17,11 +17,12 @@ export function optimizeCloudinaryUrl(url: string, width?: number): string {
   // Strip existing transformations if present
   rest = rest.replace(/^([a-z0-9_,]+)\/(v\d+\/.*)$/i, '$2');
   
-  const transform = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
+  // Use q_auto:best for crystal-sharp text and packaging labels, c_limit to never distort aspect ratio or upscale
+  const transform = width ? `f_auto,q_auto:best,w_${width},c_limit` : 'f_auto,q_auto:best';
   return `${prefix}${transform}/${rest}`;
 }
 
-export function getCloudinarySrcSet(url: string, widths: number[] = [320, 480, 640, 800]): string {
+export function getCloudinarySrcSet(url: string, widths: number[] = [480, 720, 960, 1200, 1600]): string {
   if (!url || !url.includes('res.cloudinary.com')) return '';
   return widths.map(w => `${optimizeCloudinaryUrl(url, w)} ${w}w`).join(', ');
 }
