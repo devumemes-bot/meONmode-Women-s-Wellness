@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BlogPost, Product } from '../types';
 import { PRODUCTS, MENS_PRODUCTS, optimizeCloudinaryUrl } from '../data';
 import { BLOG_POSTS } from '../blogData';
+import { getOptimizedImageUrl } from '../blogImages';
 import { 
   ArrowLeft, 
   Clock, 
@@ -226,11 +227,21 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
       {/* Article Header Container */}
       <header className="bg-white border-b border-[#E0D8D0] py-8 md:py-12 px-4">
         <div className="max-w-4xl mx-auto space-y-4 text-left">
-          {/* Category Badge */}
-          <div className="flex items-center gap-2">
+          {/* Category & Badges */}
+          <div className="flex flex-wrap items-center gap-2">
             <span className="bg-[#8B4A5A] text-white text-[11px] font-black uppercase px-3.5 py-1 rounded-full tracking-wider font-mono">
               {post.category}
             </span>
+            {post.difficulty && (
+              <span className="bg-amber-100 text-amber-900 border border-amber-300/60 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full font-mono">
+                {post.difficulty} Level
+              </span>
+            )}
+            {post.featured && (
+              <span className="bg-emerald-100 text-emerald-800 border border-emerald-300/60 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full font-mono">
+                ⭐ Featured Guide
+              </span>
+            )}
             <span className="text-xs text-[#E8621A] font-extrabold bg-[#E8621A]/10 px-2.5 py-0.5 rounded">
               Verified Ayurvedic Guide
             </span>
@@ -290,7 +301,9 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
           <div className="pt-4">
             <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E0D8D0] max-h-[420px]">
               <img
-                src={post.featuredImage}
+                src={getOptimizedImageUrl(post.featuredImage, { width: 900 })}
+                srcSet={`${getOptimizedImageUrl(post.featuredImage, { width: 480 })} 480w, ${getOptimizedImageUrl(post.featuredImage, { width: 800 })} 800w, ${getOptimizedImageUrl(post.featuredImage, { width: 1200 })} 1200w`}
+                sizes="(max-width: 768px) 100vw, 800px"
                 alt={post.title}
                 loading="eager"
                 fetchPriority="high"
@@ -312,6 +325,24 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
           {/* ARTICLE BODY (70% on desktop) */}
           <article className="lg:col-span-8 max-w-[680px] mx-auto lg:mx-0 space-y-10 text-[#444] text-base leading-relaxed">
             
+            {/* Quick Facts Card (if provided at post level) */}
+            {post.quickFacts && post.quickFacts.length > 0 && (
+              <div className="bg-[#FAF7F2] border border-[#8B4A5A]/25 rounded-2xl p-5 shadow-sm space-y-3">
+                <h3 className="font-serif text-sm font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#E8621A]" />
+                  <span>Mukhya Tathya (Quick Facts)</span>
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {post.quickFacts.map((fact, fidx) => (
+                    <div key={fidx} className="bg-white p-3 rounded-xl border border-[#E0D8D0]/60 text-xs">
+                      <span className="font-bold text-neutral-500 block text-[11px] uppercase tracking-wider">{fact.label}</span>
+                      <span className="font-semibold text-neutral-800 leading-snug">{fact.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Sections Loop */}
             {post.contentSections.map((section) => (
               <section key={section.id} id={section.id} className="space-y-5 scroll-mt-24">
@@ -319,6 +350,46 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                 <h2 className="font-serif text-xl md:text-2xl font-bold text-[#6B2A3A] border-b-2 border-[#8B4A5A]/20 pb-2">
                   {section.title}
                 </h2>
+
+                {/* Section Image (if provided) */}
+                {section.image && (
+                  <div className="my-5 rounded-2xl overflow-hidden border border-[#E0D8D0] shadow-sm bg-neutral-50">
+                    <img
+                      src={getOptimizedImageUrl(section.image.url, { width: 720 })}
+                      srcSet={`${getOptimizedImageUrl(section.image.url, { width: 400 })} 400w, ${getOptimizedImageUrl(section.image.url, { width: 720 })} 720w`}
+                      sizes="(max-width: 768px) 100vw, 680px"
+                      alt={section.image.alt || section.title}
+                      loading="lazy"
+                      decoding="async"
+                      width="680"
+                      height="380"
+                      className="w-full h-auto max-h-[380px] object-cover"
+                    />
+                    {section.image.caption && (
+                      <p className="p-2.5 text-xs text-neutral-600 text-center italic bg-white border-t border-[#E0D8D0]/60">
+                        {section.image.caption}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Section Quick Facts */}
+                {section.quickFacts && section.quickFacts.length > 0 && (
+                  <div className="bg-[#FAF7F2] border border-[#8B4A5A]/20 rounded-xl p-4 my-4 space-y-2.5">
+                    <h4 className="font-serif text-xs font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#E8621A]" />
+                      <span>Key Takeaways</span>
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {section.quickFacts.map((fact, fidx) => (
+                        <div key={fidx} className="bg-white p-2.5 rounded-lg border border-[#E0D8D0]/60 text-xs">
+                          <span className="font-bold text-neutral-500 block text-[10px] uppercase">{fact.label}</span>
+                          <span className="font-medium text-neutral-800">{fact.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Paragraphs */}
                 {section.paragraphs?.map((p, idx) => (
@@ -687,7 +758,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                   FREE Wellness Guide Chahiye?
                 </h4>
                 <p className="text-white/70 text-xs">
-                  {post.category.includes("Women") ? "OVAIRA/FLOWELLE" : "WANTMORE/ALPHAMAX"} ke saath 30-Day complete plan aapke WhatsApp par paayein.
+                  {post.category.includes("Women") ? "OVAIRA/FLOWELLE" : post.category.includes("Digestive") ? "VAYUCORE" : "WANTMORE/ALPHAMAX"} ke saath 30-Day complete plan aapke WhatsApp par paayein.
                 </p>
               </div>
 

@@ -47,7 +47,6 @@ import {
 import { PRODUCTS, MENS_PRODUCTS, VAYUCORE_PRODUCT, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
 import { BLOG_POSTS } from './blogData';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
-import { motion } from 'motion/react';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
 import { ProductGallery } from './components/ProductGallery';
 
@@ -230,8 +229,16 @@ export default function App() {
   // Centralized Reviews Database State (Persisted in LocalStorage)
   const [allReviews, setAllReviews] = useState<CustomerReview[]>(() => {
     try {
-      const saved = localStorage.getItem('meonmode_reviews_v5');
-      return saved ? JSON.parse(saved) : reviews;
+      const saved = localStorage.getItem('meonmode_reviews_v7');
+      if (saved) {
+        const parsed: CustomerReview[] = JSON.parse(saved);
+        // Combine parsed user reviews with pristine base reviews, eliminating duplicate objects
+        const userAddedReviews = parsed.filter(
+          p => !reviews.some(base => base.name.toLowerCase() === p.name.toLowerCase() && base.productId === p.productId)
+        );
+        return [...reviews, ...userAddedReviews];
+      }
+      return reviews;
     } catch (e) {
       return reviews;
     }
@@ -239,7 +246,7 @@ export default function App() {
 
   // Auto-save reviews
   useEffect(() => {
-    localStorage.setItem('meonmode_reviews_v5', JSON.stringify(allReviews));
+    localStorage.setItem('meonmode_reviews_v7', JSON.stringify(allReviews));
   }, [allReviews]);
 
   // Review System Modal / Sheet States
@@ -341,11 +348,13 @@ export default function App() {
     });
   };
 
-  // Safe Multi-Image parsing helper
+  // Safe Multi-Image parsing helper with strict deduplication
   const getReviewImages = (imageField: string | string[] | undefined): string[] => {
     if (!imageField) return [];
-    if (Array.isArray(imageField)) return imageField;
-    return imageField.split(/[\s\n,]+/).filter(url => url.trim().startsWith('http'));
+    const list = Array.isArray(imageField) 
+      ? imageField 
+      : imageField.split(/[\s\n,]+/).filter(url => url.trim().startsWith('http'));
+    return Array.from(new Set(list.map(u => u.trim()).filter(u => u.startsWith('http'))));
   };
 
   // Compute dynamic average ratings and review counts merging custom reviews into status counts
@@ -440,7 +449,7 @@ export default function App() {
     }
   });
 
-  const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>('pmos-kya-hai-pcod-se-alag');
+  const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>('pcos-kya-hai-pcod-se-alag');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -477,7 +486,11 @@ export default function App() {
       if (currentView !== 'blog') setCurrentView('blog');
     } else if (path.startsWith('/blog/')) {
       const slug = path.split('/blog/')[1]?.split('/')[0]?.split('?')[0];
-      const foundBlog = BLOG_POSTS.find(b => b.slug.toLowerCase() === (slug || '').toLowerCase());
+      const cleanSlug = (slug || '').toLowerCase();
+      const foundBlog = BLOG_POSTS.find(b => 
+        b.slug.toLowerCase() === cleanSlug || 
+        b.legacySlugs?.some(ls => ls.toLowerCase() === cleanSlug)
+      );
       if (foundBlog) {
         setSelectedBlogSlug(foundBlog.slug);
         if (currentView !== 'blog-article') setCurrentView('blog-article');
@@ -777,14 +790,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
     requestAnimationFrame(() => {
       const el = document.getElementById('pricing-details-section') || document.getElementById('product-purchase-section');
       if (el) {
-        const headerEl = document.querySelector('header');
-        const headerOffset = headerEl ? headerEl.getBoundingClientRect().height + 20 : 80;
-        const elementPosition = el.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({
-          top: Math.max(0, offsetPosition),
-          behavior: 'smooth'
-        });
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   };
@@ -854,7 +860,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
     } else if (currentView === 'blog') {
       seo = {
         title: "meONmode Ayurvedic Blog | Health & Wellness Tips in Hindi",
-        description: "Read expert Ayurvedic health and wellness guides in Hindi on PCOD, PMOS, white discharge, men's stamina, gut health, and hormonal harmony.",
+        description: "Read expert Ayurvedic health and wellness guides in Hindi on PCOD, PCOS, white discharge, men's stamina, gut health, and hormonal harmony.",
         canonicalUrl: "https://meonmode.com/blog",
         ogImage: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80",
         robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
@@ -1764,7 +1770,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <h2 id="women-hero-heading" className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-[#FAF6F0] leading-[1.05]">
                         <span className="sr-only">meONmode – Ayurvedic Wellness Products - </span>
                         Your Body. <br />
-                        <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent animate-pulse">ON Mode.</span>
+                        <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent">ON Mode.</span>
                       </h2>
                       <p id="women-hero-subheading" className="text-[#FAF6F0]/90 font-sans text-sm sm:text-base md:text-lg max-w-xl leading-relaxed font-medium">
                         Support your everyday women’s wellness with Ayurvedic nutrition crafted for modern lifestyles.
@@ -2137,28 +2143,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                   </p>
                 </div>
 
-                <motion.div 
-                  className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10"
-                  variants={{
-                    hidden: { opacity: 0 },
-                    visible: {
-                      opacity: 1,
-                      transition: {
-                        staggerChildren: 0.15
-                      }
-                    }
-                  }}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-100px" }}
-                >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                   {/* Step 1 */}
-                  <motion.div 
+                  <div 
                     id="ritual-step-1" 
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15, duration: 0.6 } }
-                    }}
                     className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
                   >
                     <div className="space-y-4">
@@ -2178,15 +2166,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
                       ✓ Supports cycle regularity
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Step 2 */}
-                  <motion.div 
+                  <div 
                     id="ritual-step-2" 
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15, duration: 0.6 } }
-                    }}
                     className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
                   >
                     <div className="space-y-4">
@@ -2206,15 +2190,11 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
                       ✓ Tones & strengthens uterine system
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Step 3 */}
-                  <motion.div 
+                  <div 
                     id="ritual-step-3" 
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15, duration: 0.6 } }
-                    }}
                     className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
                   >
                     <div className="space-y-4">
@@ -2234,8 +2214,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
                       ✓ Holistic mind-body equilibrium
                     </div>
-                  </motion.div>
-                </motion.div>
+                  </div>
+                </div>
 
                 {/* Safe elegant disclaimer that avoids guarantees or clinical medical claims */}
                 <div className="pt-4 text-center text-[10px] text-white/60 max-w-2xl mx-auto leading-relaxed font-sans border-t border-white/10 relative z-10">
@@ -2366,14 +2346,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             title="Click to view pricing & details"
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 800)} 
-                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 720)} 720w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 960)} 960w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 1200)} 1200w`}
-                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 
+                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 320)} 320w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 640w`}
+                              sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 320px"
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
-                              width="400"
-                              height="380"
+                              width="320"
+                              height="224"
                               className="w-full h-auto max-w-full object-contain block mx-auto h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
@@ -2796,7 +2776,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {revImages.map((imgUrl, imgIndex) => (
                                 <div key={imgIndex} className="w-full h-full snap-center shrink-0 relative flex items-center justify-center p-2">
                                   <img 
-                                    src={imgUrl} 
+                                    src={optimizeCloudinaryUrl(imgUrl, 480)} 
+                                    srcSet={`${optimizeCloudinaryUrl(imgUrl, 320)} 320w, ${optimizeCloudinaryUrl(imgUrl, 480)} 480w, ${optimizeCloudinaryUrl(imgUrl, 640)} 640w`}
+                                    sizes="(max-width: 640px) 280px, 320px"
                                     alt={`${rev.name}'s Review Asset ${imgIndex + 1}`} 
                                     loading="lazy"
                                     decoding="async"
@@ -2905,7 +2887,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
             </section>
 
             {/* Bento Block 8: FAQ Accordion (Col Span 12) */}
-            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl">
+            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl content-auto">
               <div className="text-center space-y-1">
                 <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">
                   {activeCategory === 'all' ? "Unified Ayurvedic Queries Answered" : activeCategory === 'men' ? "Wellness & Performance Queries Answered" : "Period Health Queries Answered"}
@@ -3843,7 +3825,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                       }}
                                     >
                                       <img 
-                                        src={imgUrl} 
+                                        src={optimizeCloudinaryUrl(imgUrl, 200)} 
+                                        srcSet={`${optimizeCloudinaryUrl(imgUrl, 120)} 120w, ${optimizeCloudinaryUrl(imgUrl, 200)} 200w`}
+                                        sizes="96px"
                                         alt={`Review image ${imgI + 1}`} 
                                         loading="lazy"
                                         decoding="async"
@@ -3920,9 +3904,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                     >
                       <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
                         <img 
-                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 600) : ''} 
-                          srcSet={rel.images && rel.images.length > 0 ? getCloudinarySrcSet(rel.images[0], [300, 450, 600]) : ''}
-                          sizes="(max-width: 640px) 50vw, 250px"
+                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 300) : ''} 
+                          srcSet={rel.images && rel.images.length > 0 ? `${optimizeCloudinaryUrl(rel.images[0], 200)} 200w, ${optimizeCloudinaryUrl(rel.images[0], 300)} 300w, ${optimizeCloudinaryUrl(rel.images[0], 450)} 450w` : ''}
+                          sizes="(max-width: 640px) 140px, 250px"
                           alt={rel.name} 
                           loading="lazy"
                           decoding="async"
@@ -4003,7 +3987,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       <div className="bg-gradient-to-br from-[#4A1D05]/80 to-[#5C1D13]/60 border border-[#E5A93C]/20 rounded-2xl p-4 shadow-xl space-y-3 sticky top-4 z-10 backdrop-blur-md">
                         <div className="flex items-center gap-2 text-white">
                           <Sparkles className="w-4.5 h-4.5 text-[#E5A93C] animate-pulse shrink-0" />
-                          <h4 className="font-serif text-xs font-bold uppercase tracking-wider text-[#E5A93C]">Loyalty Reward Tracker</h4>
+                          <span className="font-serif text-xs font-bold uppercase tracking-wider text-[#E5A93C]">Loyalty Reward Tracker</span>
                         </div>
                         
                         {remaining > 0 ? (
@@ -5017,10 +5001,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
               
               {/* Section 1 */}
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
                   Eligibility & Scope
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   At meONmode, we want you to be completely satisfied with your wellness purchase. We offer full refund or replacements only on damaged, incorrect, or defective products. Due to the high-purity, clinical nature of Ayurvedic medicine, personal preference or subjective changes in symptom relief timing do not qualify as defects.
                 </p>
@@ -5028,10 +5012,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               {/* Section 2 - Highlighted Callout Box */}
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
                   Mandatory Unboxing Video Requirement
-                </h3>
+                </h2>
                 <div className="pl-10">
                   <div className="bg-gradient-to-br from-[#5C1D13] to-[#4A1D05] border-2 border-[#E5A93C] rounded-2xl p-5 md:p-6 space-y-3.5 shadow-lg">
                     <div className="flex items-center gap-2.5 text-[#E5A93C] font-serif font-black text-sm uppercase tracking-wide">
@@ -5041,7 +5025,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       To qualify for a refund, return, or replacement, you MUST record a continuous unboxing video. No claims will be entertained without this proof under any circumstances.
                     </p>
                     <div className="space-y-2 border-t border-white/10 pt-3">
-                      <h4 className="text-xs font-extrabold text-[#E5A93C] uppercase tracking-wider">How to record a valid unboxing video:</h4>
+                      <h3 className="text-xs font-extrabold text-[#E5A93C] uppercase tracking-wider">How to record a valid unboxing video:</h3>
                       <ol className="list-decimal list-inside text-xs text-[#F7E7D9]/90 space-y-1.5 pl-1 leading-relaxed font-medium">
                         <li>Start recording <strong className="text-white font-extrabold underline">BEFORE</strong> opening the outer corrugated box packaging.</li>
                         <li>The shipping courier label showing your name, complete address, and barcode must be clearly visible and in focus.</li>
@@ -5055,10 +5039,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               {/* Section 3 */}
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
                   How to Submit a Claim
-                </h3>
+                </h2>
                 <div className="text-white/80 pl-10 space-y-2">
                   <p>
                     Please submit your claim within <strong className="text-white">48 hours</strong> of package delivery. Send the raw, uncut unboxing video along with your Order ID through either of the channels below:
@@ -5086,10 +5070,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               {/* Section 4 */}
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
                   Review & Processing Timeframe
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   Our quality assurance team will inspect your submitted video evidence within <strong className="text-white">2 to 3 business days</strong>. Once approved, a replacement package will be dispatched at zero additional cost, or a direct refund will be credited to your original payment method/bank account within <strong className="text-white">7 business days</strong>.
                 </p>
@@ -5097,10 +5081,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               {/* Section 5 */}
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">05</span>
                   Non-Returnable & Void Conditions
-                </h3>
+                </h2>
                 <div className="text-white/80 pl-10">
                   <p className="mb-2">A claim is strictly void and rejected if any of the following occur:</p>
                   <ul className="list-disc list-inside space-y-1.5 pl-1 text-white/70">
@@ -5144,30 +5128,30 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
             <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
                   Free Shipping All Across India
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   We offer 100% Free Express Shipping on all prepaid and Cash on Delivery (COD) orders across India with zero hidden delivery charges or surge fees.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
                   Discreet & Confidential Packaging
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   Your privacy is our utmost priority. All meONmode orders are shipped in unmarked, plain brown corrugated boxes with no product names, medical descriptions, or logos printed on the outer exterior packaging.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
                   Dispatch & Delivery Timelines
-                </h3>
+                </h2>
                 <div className="text-white/80 pl-10 space-y-1.5">
                   <p>• <strong>Order Processing:</strong> Dispatched within 24 to 48 business hours from our certified Ayurvedic pharmacy hubs.</p>
                   <p>• <strong>Metro Cities:</strong> Delivered within 2 to 4 business days.</p>
@@ -5176,10 +5160,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
                   Order Tracking
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   Once your parcel is dispatched, you will receive real-time SMS & WhatsApp notifications containing your AWB tracking link from our courier partners (Bluedart, Delhivery, ExpressBees, Xpressbees, Shadowfax).
                 </p>
@@ -5216,30 +5200,30 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
             <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
                   Commitment to Privacy
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   meONmode is committed to safeguarding the privacy and confidentiality of our customers. Any personal details, contact numbers, or health consultation inquiries shared with us are treated with strict confidentiality.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
                   Data We Collect
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   We collect basic order fulfillment information including your name, delivery address, phone number, and email. We do not store financial payment credentials or card details on our servers — all transactions are processed via bank-grade 256-bit SSL encrypted payment gateways.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
                   Zero Third-Party Sharing
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   We strictly never sell, rent, lease, or trade your personal or medical inquiry data with unauthorized third parties or marketing brokers. Information is shared strictly with verified courier delivery partners solely for doorstep order delivery.
                 </p>
@@ -5276,30 +5260,30 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
             <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
                   Ayurvedic Product Information
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   meONmode products (OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, VAYUCORE) are authentic proprietary Ayurvedic wellness formulations manufactured in GMP-certified facilities compliant with AYUSH guidelines. They are formulated to support natural bodily balance and hormonal harmony.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
                   Dosage & Holistic Health
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   Please follow the recommended dosages as printed on the product pack or guided by Ayurvedic physicians. Individual results may vary depending on diet, sleep, and lifestyle habits.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
                   <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
                   Order Confirmation & Verification
-                </h3>
+                </h2>
                 <p className="text-white/80 pl-10">
                   Orders placed on meONmode are verified via automated SMS/WhatsApp and customer care verification. For Cash on Delivery orders, an advance payment of ₹150 is collected to confirm intentional delivery booking and prevent transit wastage.
                 </p>
@@ -5336,14 +5320,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
             <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C]">Our Mission</h3>
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C]">Our Mission</h2>
                 <p className="text-white/80">
                   At meONmode®, our mission is to empower individuals with authentic, pure, and clinically respected Ayurvedic formulations. We bridge the ancient wisdom of classical Ayurveda with modern clinical standards, delivering holistic care for women's reproductive health, cycle regularity, and men's vitality.
                 </p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-serif text-lg font-bold text-[#E5A93C]">Pure Botanicals & GMP Standards</h3>
+                <h2 className="font-serif text-lg font-bold text-[#E5A93C]">Pure Botanicals & GMP Standards</h2>
                 <p className="text-white/80">
                   Every batch of meONmode formulations is crafted in state-of-the-art GMP-certified facilities adhering to the highest quality control and AYUSH guidelines. We use 100% natural, ethically sourced herbs with zero artificial hormones, steroids, or harmful additives.
                 </p>
@@ -5485,10 +5469,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
             {/* Search Box Card */}
             <div className="bg-gradient-to-br from-[#4A1D05] to-[#2D120B] border border-[#E5A93C]/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
               <div className="space-y-1">
-                <h3 className="text-base font-serif font-extrabold text-white flex items-center gap-2">
+                <h2 className="text-base font-serif font-extrabold text-white flex items-center gap-2">
                   <Phone className="w-4 h-4 text-[#E5A93C]" />
                   <span>Look Up Orders by Registered Phone Number</span>
-                </h3>
+                </h2>
                 <p className="text-xs text-white/70 leading-relaxed">
                   Enter your 10-digit mobile number used during checkout to view all server-verified orders, payment status, dispatch receipts, and tax invoices.
                 </p>
@@ -5930,7 +5914,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
       </main>
 
       {/* Global Bottom Trust Seals */}
-      <footer className="bg-black/40 border-t border-white/10 mt-16 py-12 px-4 text-center space-y-6">
+      <footer className="bg-black/40 border-t border-white/10 mt-16 py-12 px-4 text-center space-y-6 content-auto">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-[#F7E7D9]/80 text-xs">
           <div className="space-y-1 bg-[#4A1D05]/30 p-4 rounded-xl border border-white/5">
             <span className="font-serif block text-sm font-bold text-white">AYUSH Ministry</span>
@@ -5957,10 +5941,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs text-white/80">
             <button 
-              onClick={() => navigateToView('blog-article', undefined, 'pmos-kya-hai-pcod-se-alag')}
+              onClick={() => navigateToView('blog-article', undefined, 'pcos-kya-hai-pcod-se-alag')}
               className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
             >
-              • PMOS Kya Hai? PCOD Se Kaise Alag Hai
+              • PCOS Kya Hai? PCOD Se Kaise Alag Hai
             </button>
             <button 
               onClick={() => navigateToView('blog-article', undefined, 'white-discharge-shwet-pradar-ayurvedic')}
@@ -5972,25 +5956,43 @@ Payment has been cryptographically verified on the backend server. Please dispat
               onClick={() => navigateToView('blog-article', undefined, 'pcod-diet-plan-hindi')}
               className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
             >
-              • PCOD Diet Plan Hindi Complete Chart
+              • PCOD & PCOS Diet Plan Hindi
             </button>
             <button 
-              onClick={() => navigateToView('blog-article', undefined, 'kanchnar-guggul-fayde-pcod')}
+              onClick={() => navigateToView('blog-article', undefined, 'wantmore-ingredient-guide')}
               className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
             >
-              • Kanchnar Guggul Ke Fayde Cysts Me
+              • WANTMORE Prash Ingredient Guide
             </button>
             <button 
-              onClick={() => navigateToView('blog-article', undefined, 'ashwagandha-shilajit-mard-shakti')}
+              onClick={() => navigateToView('blog-article', undefined, 'alphamax-ingredient-guide')}
               className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
             >
-              • Ashwagandha & Shilajit For Men
+              • ALPHAMAX 6 Bioactive Herbs Guide
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'ashwagandha-vs-shilajit')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • Ashwagandha vs Shilajit for Men
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'vayucore-ingredient-guide')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • VAYUCORE Gut Health & Digestion
+            </button>
+            <button 
+              onClick={() => navigateToView('blog-article', undefined, 'shatavari-in-ayurveda')}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            >
+              • Shatavari in Ayurveda: Female Rasayana
             </button>
             <button 
               onClick={() => navigateToView('blog')}
               className="text-[#E8621A] font-bold hover:underline text-left cursor-pointer"
             >
-              • Saare Articles Dekhein (meonmode.com/blog) →
+              • Saare 32 Articles Dekhein (meonmode.com/blog) →
             </button>
           </div>
         </div>
@@ -6497,7 +6499,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                 {/* Individual Review Entries */}
                 <div className="space-y-4">
-                  <h5 className="text-[10px] font-extrabold text-neutral-400 font-mono tracking-wider uppercase">Showing Verified Feedback ({prodReviews.length})</h5>
+                  <p className="text-[10px] font-extrabold text-neutral-400 font-mono tracking-wider uppercase">Showing Verified Feedback ({prodReviews.length})</p>
                   
                   {prodReviews.length === 0 ? (
                     <p className="text-xs text-neutral-500 italic">No detailed reviews logged for this product yet.</p>
@@ -6530,7 +6532,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {revImages.map((url, imgIndex) => (
                                 <div key={imgIndex} className="relative rounded-xl border border-neutral-200 overflow-hidden w-20 h-20 shrink-0 bg-neutral-50 flex items-center justify-center p-1">
                                   <img 
-                                    src={url} 
+                                    src={optimizeCloudinaryUrl(url, 200)} 
+                                    srcSet={`${optimizeCloudinaryUrl(url, 120)} 120w, ${optimizeCloudinaryUrl(url, 200)} 200w`}
+                                    sizes="80px"
                                     alt="Review Asset" 
                                     loading="lazy"
                                     decoding="async"
@@ -6552,7 +6556,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
                           {/* Mid Row: Title & Body */}
                           <div className="space-y-1">
-                            <h6 className="font-serif text-sm font-bold text-neutral-950">{rev.title || "Wonderful healing experience"}</h6>
+                            <h4 className="font-serif text-sm font-bold text-neutral-950">{rev.title || "Wonderful healing experience"}</h4>
                             <p className="text-xs text-neutral-700 leading-relaxed font-sans">{rev.review}</p>
                           </div>
 

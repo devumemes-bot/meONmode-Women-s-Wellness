@@ -579,7 +579,7 @@ export const getTranslatedReviews = (lang: 'en' | 'hi') => {
       review: lang === 'hi' 
         ? "मैं नियमित रूप से ओवैरा का उपयोग कर रही हूं और यह मेरे दैनिक स्वास्थ्य दिनचर्या का एक महत्वपूर्ण हिस्सा बन गया है।" 
         : "I've been using OVAIRA consistently and it has become an important part of my daily wellness routine.",
-      image: "https://i.postimg.cc/0y5tTYHw/IMG-3015.jpg",
+      image: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787917042/photo_2026-08-28_17.06.01.jpg",
       verified: true,
       date: "12 July 2026",
       title: lang === 'hi' ? "दैनिक स्वास्थ्य के लिए आवश्यक" : "Essential Daily Wellness",
@@ -592,7 +592,7 @@ export const getTranslatedReviews = (lang: 'en' | 'hi') => {
       review: lang === 'hi' 
         ? "फ्लोवेल लेना बहुत आसान है और यह मेरी दैनिक स्वास्थ्य दिनचर्या में पूरी तरह से फिट बैठता है।" 
         : "FLOWELLE is easy to take and fits perfectly into my daily wellness routine.",
-      image: "https://i.postimg.cc/P5f6gWFD/IMG-3016.jpg",
+      image: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787917042/photo_2026-08-28_17.06.02.jpg",
       verified: true,
       date: "15 July 2026",
       title: lang === 'hi' ? "लेना बहुत आसान है" : "Very easy to take",
@@ -605,7 +605,7 @@ export const getTranslatedReviews = (lang: 'en' | 'hi') => {
       review: lang === 'hi' 
         ? "ओवैरा और फ्लोवेल का लगातार उपयोग करने के बाद, मैं अधिक ऊर्जावान महसूस करती हूं और मेरी दिनचर्या बहुत बेहतर हो गई है।" 
         : "After using OVAIRA and FLOWELLE consistently, I feel more energetic and my daily wellness routine has become much better.",
-      image: "https://i.postimg.cc/CL0J83kT/IMG-3021.jpg",
+      image: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787917041/photo_2026-08-28_17.05.54.jpg",
       verified: true,
       date: "16 June 2026",
       title: lang === 'hi' ? "हर दिन अधिक ऊर्जावान" : "More energetic every day",

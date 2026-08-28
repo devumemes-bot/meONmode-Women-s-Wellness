@@ -46,7 +46,12 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/blog/pmos-kya-hai-pcod-se-alag</loc>
+    <loc>https://meonmode.com/blog/pcos-kya-hai-pcod-se-alag</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/pcos-vs-pcod</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -66,22 +71,102 @@
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/blog/irregular-periods-ayurvedic-treatment</loc>
+    <loc>https://meonmode.com/blog/irregular-periods-causes-medical-advice</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/blog/ashwagandha-shilajit-mard-shakti</loc>
+    <loc>https://meonmode.com/blog/womens-daily-hormonal-wellness-habits</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/blog/pet-sahi-performance-sahi-men-health</loc>
+    <loc>https://meonmode.com/blog/shatavari-in-ayurveda</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/blog/hormonal-imbalance-signs-hindi</loc>
+    <loc>https://meonmode.com/blog/ashoka-lodhra-traditional-ayurveda</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/menstrual-cycle-basics</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/everyday-womens-wellness-routine</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/wantmore-ingredient-guide</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/swaran-bhasma-in-ayurveda</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/chandi-bhasma-in-ayurveda</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/moti-pishti-explained</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/alphamax-ingredient-guide</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/shilajit-explained</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/ashwagandha-explained</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/safed-musli-explained</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/ashwagandha-vs-shilajit</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/why-digestive-wellness-matters</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/understanding-bloating</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/everyday-habits-digestive-comfort</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/ayurvedic-view-of-digestion</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/vayucore-ingredient-guide</loc>
     <priority>0.7</priority>
     <changefreq>monthly</changefreq>
   </url>
@@ -116,3 +201,4 @@
     <changefreq>monthly</changefreq>
   </url>
 </urlset>
+

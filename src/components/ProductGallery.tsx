@@ -162,15 +162,15 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={optimizeCloudinaryUrl(images[currentIndex], 1200)} 
-                srcSet={getCloudinarySrcSet(images[currentIndex], [600, 800, 1000, 1200, 1600])}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                src={optimizeCloudinaryUrl(images[currentIndex], 640)} 
+                srcSet={`${optimizeCloudinaryUrl(images[currentIndex], 480)} 480w, ${optimizeCloudinaryUrl(images[currentIndex], 640)} 640w, ${optimizeCloudinaryUrl(images[currentIndex], 800)} 800w`}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
                 alt={`${product.name} - Ayurvedic packaging & product view ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
                 fetchPriority={currentIndex === 0 ? "high" : "auto"}
                 decoding="async"
-                width="600"
-                height="600"
+                width="480"
+                height="480"
                 className="w-auto h-auto max-h-[260px] sm:max-h-[330px] md:max-h-[360px] max-w-full object-contain block mx-auto transition-transform duration-500 ease-out group-hover/mainimg:scale-105"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -263,8 +263,8 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                   title={`View image ${idx + 1}`}
                 >
                   <img
-                    src={optimizeCloudinaryUrl(imgSrc, 240)}
-                    srcSet={getCloudinarySrcSet(imgSrc, [120, 180, 240])}
+                    src={optimizeCloudinaryUrl(imgSrc, 160)}
+                    srcSet={`${optimizeCloudinaryUrl(imgSrc, 120)} 120w, ${optimizeCloudinaryUrl(imgSrc, 160)} 160w`}
                     sizes="80px"
                     alt={`${product.name} thumbnail ${idx + 1}`}
                     loading="lazy"
@@ -273,7 +273,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                     height="80"
                     className="w-full h-full object-contain block mx-auto transition-transform duration-200"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 240);
+                      (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 160);
                     }}
                   />
                   {isActive && (

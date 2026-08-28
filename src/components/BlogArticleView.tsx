@@ -18,7 +18,9 @@ export const BlogArticleView: React.FC<BlogArticleViewProps> = ({
   onSelectProduct,
   onAddToCart,
 }) => {
-  const matchedPost = BLOG_POSTS.find(p => p.slug === slug) || BLOG_POSTS[0];
+  const matchedPost = BLOG_POSTS.find(p => 
+    p.slug === slug || (p.legacySlugs && slug && p.legacySlugs.includes(slug))
+  ) || BLOG_POSTS[0];
   return (
     <BlogArticle
       post={matchedPost}

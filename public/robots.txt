@@ -1,5 +1,22 @@
 User-agent: *
 Allow: /
+Allow: /llms.txt
 Disallow: /api/
+
+# AI Search and Assistant Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
 
 Sitemap: https://meonmode.com/sitemap.xml

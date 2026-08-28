@@ -38,26 +38,43 @@ export type ViewType =
   | 'blog-article'
   | 'not-found';
 
+export type BlogCategory = 
+  | "Women's Wellness"
+  | "Men's Wellness"
+  | "Digestive Wellness"
+  | "Ayurvedic Ingredients"
+  | "Product Guides"
+  | "Women's Health"
+  | "Men's Health"
+  | "Diet & Nutrition"
+  | "Ayurvedic Herbs";
+
 export interface BlogPost {
   slug: string;
+  legacySlugs?: string[];
   title: string;
   subtitle: string;
-  category: "Women's Health" | "Men's Health" | "Diet & Nutrition" | "Ayurvedic Herbs";
+  category: BlogCategory;
   author: string;
   datePublished: string;
   readTime: string;
   wordCount: number;
+  difficulty?: 'Beginner' | 'Deep Dive' | 'Doctor Protocol' | 'Intermediate' | 'Practical Routine' | 'Comprehensive Guide';
+  featured?: boolean;
   targetKeyword: string;
   relatedProductId: string;
   featuredImage: string;
   excerpt: string;
   tags: string[];
   metaDescription: string;
+  quickFacts?: { label: string; value: string }[];
   tableOfContents: { id: string; text: string }[];
   contentSections: {
     id: string;
     title: string;
     paragraphs?: string[];
+    image?: { url: string; caption?: string; alt?: string };
+    quickFacts?: { label: string; value: string }[];
     subSections?: { title: string; paragraphs: string[] }[];
     bullets?: string[];
     tipBox?: { title: string; text: string };

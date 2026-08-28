@@ -546,6 +546,11 @@ app.get("/robots.txt", (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "robots.txt"));
 });
 
+app.get("/llms.txt", (req, res) => {
+  res.header("Content-Type", "text/plain; charset=utf-8");
+  res.sendFile(path.join(process.cwd(), "public", "llms.txt"));
+});
+
 // Serve frontend assets using Vite middleware or static files
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

@@ -30,6 +30,11 @@
   image-rendering: auto !important;
 }
 
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
   50% { transform: translateY(-12px) rotate(1.5deg); }
