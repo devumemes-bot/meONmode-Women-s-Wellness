@@ -14,12 +14,12 @@ export interface AyurvedicHerb {
   botanicalName: string;
   category: 'Womens-Health' | 'Mens-Vitality' | 'Detox-Metabolism' | 'Rasayana';
   targetHealthGoals: string[];
-  ayurvedicProperties: {
-    rasa: string; // Taste
-    guna: string; // Qualities
-    virya: string; // Potency (Heating / Cooling)
-    vipaka: string; // Post-digestive effect
-    doshaKarma: string; // Effect on Vata, Pitta, Kapha
+  ayurvedicProperties?: {
+    rasa?: string; // Taste
+    guna?: string; // Qualities
+    virya?: string; // Potency (Heating / Cooling)
+    vipaka?: string; // Post-digestive effect
+    doshaKarma?: string; // Effect on Vata, Pitta, Kapha
     prabhava?: string; // Special specific action
   };
   traditionalAction: string; // e.g. Granthi-hara, Rasayana, Balya
@@ -27,11 +27,13 @@ export interface AyurvedicHerb {
   foundInProducts: {
     id: string;
     name: string;
-    role: string;
+    role?: string;
   }[];
   relatedArticleSlug?: string;
-  image: string;
-  summary: string;
+  image?: string;
+  summary?: string;
+  icon?: string;
+  productTag?: 'ALPHAMAX' | 'WANTMORE' | 'BOTH' | 'WOMEN';
 }
 
 export const AYURVEDIC_HERBS: AyurvedicHerb[] = [
@@ -322,5 +324,197 @@ export const AYURVEDIC_HERBS: AyurvedicHerb[] = [
     relatedArticleSlug: 'pet-sahi-performance-sahi-men-health',
     image: getOptimizedImageUrl(BLOG_IMAGES.herbs.haritaki, { width: 400 }),
     summary: 'The revered queen of digestion, gently eliminating trapped gas, calming abdominal colic, and restoring natural intestinal motility.'
+  }
+];
+
+/**
+ * Standardized 6 core herbs spotlighted on the Women's page
+ */
+export const WOMEN_TRANSPARENCY_HERBS: AyurvedicHerb[] = AYURVEDIC_HERBS.slice(0, 6);
+
+/**
+ * Verified Men's Ayurvedic Ingredients for ALPHAMAX & WANTMORE
+ * Strictly separated from female hormonal herbs.
+ * ALPHAMAX: Shilajit Extract, Safed Musli, Ashwagandha, Kaunch Beej, Swaran Bhasma, Kesar (6 items)
+ * WANTMORE: Swaran Bhasma, Chandi Bhasma, Moti Pishti, Salam Panja, Siddh Makardhwaj, Jayfal (6 items)
+ * Swaran Bhasma is explicitly associated with BOTH ALPHAMAX and WANTMORE.
+ */
+export const MEN_TRANSPARENCY_HERBS: AyurvedicHerb[] = [
+  {
+    id: 'shilajit-extract',
+    name: 'Shilajit Extract',
+    sanskritName: 'शुद्ध शिलाजीत (Śilājītu)',
+    hindiName: 'शुद्ध शिलाजीत',
+    botanicalName: 'Asphaltum punjabianum (Purified Mineral Pitch)',
+    category: 'Mens-Vitality',
+    productTag: 'ALPHAMAX',
+    targetHealthGoals: ['Cellular ATP Energy', 'Physical Stamina', 'Endurance', 'Vitality'],
+    traditionalAction: 'Celebrated in classical Ayurvedic treatises as a premier Rasayana and Balya. Rejuvenates deep bodily tissues (Dhatus) and functions as an amplifier (Yogavahi) for formulation synergy.',
+    modernValidation: 'Standardized Himalayan mineral pitch rich in active fulvic acid and ionic trace minerals that support natural mitochondrial cellular energy without synthetic crashes.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Vitality & Endurance Capsule' }
+    ],
+    icon: '🏔️'
+  },
+  {
+    id: 'safed-musli',
+    name: 'Safed Musli',
+    sanskritName: 'श्वेत मूसली (Śveta Mūsalī)',
+    hindiName: 'सफेद मूसली',
+    botanicalName: 'Chlorophytum borivilianum',
+    category: 'Mens-Vitality',
+    productTag: 'ALPHAMAX',
+    targetHealthGoals: ['Physical Vigor', 'Shukra Dhatu Nourishment', 'Muscle Stamina', 'Endurance'],
+    traditionalAction: 'Cornerstone of Ayurvedic Vajikarana and Rasayana therapy. Traditionally used to nourish deep reproductive and muscular tissues for lasting stamina and strength.',
+    modernValidation: 'Supplies natural spirostanol glycosides, saponins, and polysaccharides that combat daily physical fatigue and promote muscle recovery.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Vitality & Endurance Capsule' }
+    ],
+    icon: '🌱'
+  },
+  {
+    id: 'ashwagandha',
+    name: 'Ashwagandha',
+    sanskritName: 'अश्वगन्धा (Aśvagandhā)',
+    hindiName: 'अश्वगंधा (नागौरी)',
+    botanicalName: 'Withania somnifera',
+    category: 'Mens-Vitality',
+    productTag: 'ALPHAMAX',
+    targetHealthGoals: ['Stress Resilience', 'Physical Endurance', 'Calm Focus', 'Ojas Vitality'],
+    traditionalAction: 'Foremost Balya (strength-giver) and Rasayana adaptogen traditionally used to build enduring physical capacity, reduce daily fatigue, and fortify vital Ojas.',
+    modernValidation: 'Standardized withanolides help maintain physiological homeostasis during stress and support continuous daily stamina.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Vitality & Endurance Capsule' }
+    ],
+    icon: '🌿'
+  },
+  {
+    id: 'kaunch-beej',
+    name: 'Kaunch Beej',
+    sanskritName: 'कपिकच्छू (Kapikacchū / Kauñca Bīja)',
+    hindiName: 'कौंच बीज',
+    botanicalName: 'Mucuna pruriens',
+    category: 'Mens-Vitality',
+    productTag: 'ALPHAMAX',
+    targetHealthGoals: ['Vitality & Mood', 'Dhatu Nourishment', 'Nervous System Health', 'Vigor'],
+    traditionalAction: 'Celebrated Ayurvedic botanical known for deep Dhatu nourishment, supporting motor nervous system harmony and natural male vigor.',
+    modernValidation: 'Natural botanical source of L-DOPA that supports healthy neurotransmitter synthesis, mood equilibrium, and physical vitality.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Vitality & Endurance Capsule' }
+    ],
+    icon: '🌰'
+  },
+  {
+    id: 'swaran-bhasma',
+    name: 'Swaran Bhasma',
+    sanskritName: 'स्वर्ण भस्म (Svarṇa Bhasma)',
+    hindiName: 'शुद्ध स्वर्ण भस्म',
+    botanicalName: 'Purified Sub-Micron Calx of Gold (Aurum)',
+    category: 'Rasayana',
+    productTag: 'BOTH',
+    targetHealthGoals: ['Peak Cellular Rejuvenation', 'Longevity & Ojas', 'Endurance', 'Supreme Rasayana'],
+    traditionalAction: 'The ultimate jewel of Ayurvedic alchemy (Rasa Shastra). Prepared through traditional repeated Puta firings into sub-micron particles to nourish Ojas and core stamina.',
+    modernValidation: 'Traditional calcined nano-particle gold ash acting as a cellular bio-carrier that protects vital tissues and enhances formulation bioavailability.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Precious Cellular Rasayana' },
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Supreme Vitality Prash Core' }
+    ],
+    icon: '✨'
+  },
+  {
+    id: 'kesar',
+    name: 'Kesar',
+    sanskritName: 'कुङ्कुम (Kuṅkuma / Kesar)',
+    hindiName: 'केसर / जाफरान',
+    botanicalName: 'Crocus sativus (Pure Saffron Stigma)',
+    category: 'Mens-Vitality',
+    productTag: 'ALPHAMAX',
+    targetHealthGoals: ['Micro-Circulation', 'Mood Uplift', 'Varnya Harmonizer', 'Vital Energy'],
+    traditionalAction: 'Revered Tridoshic harmonizer and Varnya herb celebrated in Ayurvedic treatises for uplifting vitality, circulation, and mental poise.',
+    modernValidation: 'Rich in bioactive crocin, crocetin, and safranal that provide natural antioxidant protection and cellular support.',
+    foundInProducts: [
+      { id: 'alphamax-men', name: 'ALPHAMAX', role: 'Vitality & Endurance Capsule' }
+    ],
+    icon: '🌺'
+  },
+  {
+    id: 'chandi-bhasma',
+    name: 'Chandi Bhasma',
+    sanskritName: 'रजत भस्म (Rajata Bhasma)',
+    hindiName: 'शुद्ध चांदी भस्म',
+    botanicalName: 'Purified Sub-Micron Calx of Silver (Argentum)',
+    category: 'Rasayana',
+    productTag: 'WANTMORE',
+    targetHealthGoals: ['Cooling Endurance', 'Pitta Pacification', 'Nervous Equilibrium', 'Physical Stamina'],
+    traditionalAction: 'Classical Sheeta Virya (cooling potency) mineral preparation traditionally used to soothe Pitta, calm the nervous system, and build sustained physical endurance.',
+    modernValidation: 'Traditional silver calx incinerated into bio-compatible micro-particles, supporting physical stamina and nervous resilience.',
+    foundInProducts: [
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Cooling Stamina & Endurance Prash' }
+    ],
+    icon: '🌙'
+  },
+  {
+    id: 'moti-pishti',
+    name: 'Moti Pishti',
+    sanskritName: 'मुक्ता पिष्टी (Muktā Piṣṭī)',
+    hindiName: 'मोती पिष्टी',
+    botanicalName: 'Purified Calx of Natural Pearl (Pinctada margaritifera)',
+    category: 'Rasayana',
+    productTag: 'WANTMORE',
+    targetHealthGoals: ['Calm Vitality', 'Pitta Balance', 'Mental Clarity', 'Endurance'],
+    traditionalAction: 'Celebrated in Rasashastra as the supreme cooling, heart-soothing (Hridya) jewel preparation for pacifying Pitta and promoting steady physical composure.',
+    modernValidation: 'Bio-assimilable natural calcium and marine trace elements gently processed with rose water, promoting nervous balance and vitality.',
+    foundInProducts: [
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Calm Vitality & Balance Prash' }
+    ],
+    icon: '🦪'
+  },
+  {
+    id: 'salam-panja',
+    name: 'Salam Panja',
+    sanskritName: 'सालम पंजा (Sālama Pañjā)',
+    hindiName: 'सालम पंजा',
+    botanicalName: 'Dactylorhiza hatagirea',
+    category: 'Mens-Vitality',
+    productTag: 'WANTMORE',
+    targetHealthGoals: ['Dhatu Vardhak', 'Endurance', 'Physical Stamina', 'Strength'],
+    traditionalAction: 'Rare high-altitude Ayurvedic botanical historically prized as a premier Dhatu Vardhak for male vigor, muscle strength, and athletic endurance.',
+    modernValidation: 'Rich in natural bioactive mucilages, polysaccharides, and nutrients that support muscle energy recovery and continuous physical stamina.',
+    foundInProducts: [
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Dhatu Vardhak Strength Core' }
+    ],
+    icon: '🌿'
+  },
+  {
+    id: 'siddh-makardhwaj',
+    name: 'Siddh Makardhwaj',
+    sanskritName: 'सिद्ध मकरध्वज (Siddha Makaradhvaja)',
+    hindiName: 'सिद्ध मकरध्वज',
+    botanicalName: 'Classical Ayurvedic Kupipakwa Rasayana',
+    category: 'Rasayana',
+    productTag: 'WANTMORE',
+    targetHealthGoals: ['Peak Vigor', 'Cellular Rejuvenation', 'Yogavahi Potency', 'Performance'],
+    traditionalAction: 'Legendary Kupipakwa formulation prepared with purified minerals and gold, celebrated across classical treatises as an unparalleled Yogavahi Rasayana.',
+    modernValidation: 'Prepared through traditional controlled temperature sand-bath heating (Valuka Yantra), acting as a potent bio-enhancer for formulation synergy.',
+    foundInProducts: [
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Classical Yogavahi Rasayana' }
+    ],
+    icon: '⚡'
+  },
+  {
+    id: 'jayfal',
+    name: 'Jayfal',
+    sanskritName: 'जातीफल (Jātīphala)',
+    hindiName: 'जायफल',
+    botanicalName: 'Myristica fragrans (Nutmeg)',
+    category: 'Mens-Vitality',
+    productTag: 'WANTMORE',
+    targetHealthGoals: ['Formulation Synergy', 'Deepana & Digestion', 'Absorption', 'Evening Recovery'],
+    traditionalAction: 'Classical aromatic spice with Deepana (digestive fire) and Vrishya properties, promoting optimal assimilation of heavy Rasayanas.',
+    modernValidation: 'Supplies natural essential aromatic compounds like myristicin that support gastrointestinal absorption and soothe the nervous system.',
+    foundInProducts: [
+      { id: 'wantmore-men', name: 'WANTMORE', role: 'Deepana & Formulation Synergist' }
+    ],
+    icon: '🍂'
   }
 ];

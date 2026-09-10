@@ -46,17 +46,17 @@ export const PRODUCTS: Product[] = [
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_40_PM.png'
     ],
     tag: "BEST SELLER - SAVE 47%",
-    shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and painless periods.",
-    longDescription: "The ultimate dual-action therapeutic kit designed by Ayurvedic gynecologists to target the root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort. While OVAIRA capsules regulate LH/FSH balance and resolve ovarian cysts, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a perfect, natural, gentle Ayurvedic solution to help you support your daily wellness.",
+    shortDescription: "The complete 30-second daily Ayurvedic ritual for everyday cycle support, hormonal balance, and period comfort.",
+    longDescription: "The synergistic dual-action therapeutic kit designed by Ayurvedic specialists to support natural cycle balance, hormonal harmony, and menstrual comfort. While OVAIRA capsules support healthy LH/FSH balance and ovarian wellness, FLOWELLE syrup tones uterine muscles and regularizes flow volume. Combined, they form a gentle, time-tested Ayurvedic routine for holistic women's wellness.",
     volumeOrQty: "60 Capsules + 450 ML Syrup",
     dosage: "• OVAIRA Capsule: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).\n• FLOWELLE Syrup: Take 5ml in the Morning and 5ml in the Evening (After Meals).",
     benefits: [
-      "Normalizes irregular cycles and balances LH/FSH levels naturally",
-      "Reduces ovarian cyst size and prevents further cyst formation",
-      "Significantly relieves painful cramps, bloating, and backaches",
-      "Combats hormonal acne and controls excess facial hair (hirsutism)",
+      "Supports regular menstrual cycles and promotes hormonal balance",
+      "Nourishes ovarian tissues and assists natural reproductive wellness",
+      "Significantly eases menstrual cramps, bloating, and pelvic discomfort",
+      "Helps balance skin health and reduce hormonal breakout tendencies",
       "Detoxifies blood, purifies skin, and elevates everyday energy levels",
-      "Ayurvedic, Soy-Free, Gluten-Free, and clinically tested"
+      "Ayurvedic, Soy-Free, Gluten-Free, and safety tested"
     ],
     keyIngredients: [
       { name: "Shatavari", benefit: "Hormonal Balance", description: "The premier female reproductive tonic that naturally regularizes estrogen and progesterone cycles." },
@@ -85,17 +85,17 @@ export const PRODUCTS: Product[] = [
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_48_PM.png',
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_46_PM.png'
     ],
-    tag: "PCOS SPECIALLY FORMULATED",
-    shortDescription: "60 Veg Capsules to manage insulin resistance, reduce ovarian cysts, and clear hormonal acne.",
-    longDescription: "A specialized Ayurvedic formula crafted to restore healthy ovulation, normalize menstrual flow, and resolve PCOS/PCOD symptoms at the root level. Contains highly purified Shatavari, Kanchnar, and Guggulu to boost metabolic health, reduce insulin resistance, and bring back a natural, monthly cycle without synthetic hormones.",
+    tag: "HORMONAL & OVARIAN CARE",
+    shortDescription: "60 Veg Capsules formulated with Shatavari and Kanchnar to support hormonal harmony, ovarian wellness, and clear skin.",
+    longDescription: "A specialized Ayurvedic formula crafted to nurture ovarian vitality, support balanced menstrual flow, and promote endocrine balance at the root level. Formulated with highly purified Shatavari, Kanchnar, and Guggulu to support healthy metabolism and regular monthly rhythms without synthetic hormones.",
     volumeOrQty: "60 Veg Capsules",
     dosage: "Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).",
     benefits: [
-      "Promotes healthy eggs & timely monthly ovulation",
-      "Reduces high levels of free testosterone & clears facial hair",
-      "Eliminates deep painful cystic acne & purifies pores",
-      "Enhances metabolic rate to aid PCOS-related weight loss",
-      "100% natural, non-habit forming capsules"
+      "Promotes healthy ovarian function & timely monthly ovulation",
+      "Supports healthy androgen balance and manages facial hair growth",
+      "Calms stubborn hormonal skin flare-ups and purifies pores",
+      "Supports metabolic balance and healthy weight management",
+      "100% natural, non-habit forming plant-based capsules"
     ],
     keyIngredients: [
       { name: "Shatavari", benefit: "Egg Quality", description: "Fosters healthy egg development and stabilizes mood and energy swings." },
@@ -120,20 +120,20 @@ export const PRODUCTS: Product[] = [
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png',
       'https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_08_PM.png'
     ],
-    tag: "100% PAIN-FREE PERIODS",
-    shortDescription: "450 ML Syrup to relieve painful period cramps and restore perfect cycle volume.",
-    longDescription: "Formulated specifically to regulate flow, alleviate severe period pains, and purify blood. Sourced as per Bharat Pharmacopoeia standards, FLOWELLE contains highly potent standardised extracts of Ashok Chal, Shatavari, Gokhru, and Ashwagandha. It works as a direct uterine tonic to strengthen reproductive muscles, ease pelvic contractions, and solve multiple hormonal health issues naturally without side effects.",
+    tag: "NATURAL PERIOD COMFORT",
+    shortDescription: "450 ML Ayurvedic syrup to ease cycle cramps, tone uterine muscles, and support healthy flow.",
+    longDescription: "Formulated specifically to regulate flow volume, soothe monthly pelvic contractions, and nourish reproductive vitality. Sourced in compliance with Ayurvedic pharmacopoeia standards, FLOWELLE contains standardized extracts of Ashok Chal, Shatavari, Gokhru, and Ashwagandha. It acts as a restorative uterine tonic to strengthen pelvic tone and promote daily comfort without harsh additives.",
     volumeOrQty: "450 ML",
     dosage: "Step 1: Pour 5-10ml of FLOWELLE Syrup using the measuring cap.\nStep 2: Mix it well in a glass of water until evenly blended.\nStep 3: Drink it daily after your meals (Morning and Evening) as a part of your wellness routine.",
     benefits: [
-      "White Discharge (Leucorrhoea) - Stops abnormal discharge and intimate discomfort",
-      "Irregular Periods - Establishes healthy, timely cycle rhythms naturally",
-      "Hormonal Imbalance - Balances progesterone, estrogen, and LH/FSH ratios",
-      "Menstrual Pain - Significantly reduces pelvic pain, cramping, and severe backaches",
-      "Low Energy - Alleviates chronic period fatigue and boosts daytime stamina",
-      "Uterine Weakness - Tones uterine muscles and strengthens overall wellness",
-      "Mood Swings - Balances neurochemical fluctuations for a calm, happy mind",
-      "Excessive Bleeding - Restricts excess flow and preserves healthy hemoglobin"
+      "White Discharge Support - Promotes intimate hygiene and vaginal mucosal comfort",
+      "Irregular Cycles - Supports healthy, predictable cycle rhythms naturally",
+      "Hormonal Balance - Supports balanced estrogen and progesterone harmony",
+      "Menstrual Comfort - Helps ease pelvic spasms, cramping, and lower back tension",
+      "Vital Energy - Combats monthly fatigue and restores active daytime stamina",
+      "Uterine Tone - Tones pelvic and reproductive muscles gently",
+      "Mood & Mind - Stabilizes stress levels for calm emotional well-being",
+      "Flow Regulation - Helps normalize healthy flow volume and preserve vitality"
     ],
     keyIngredients: [
       { name: "Ashok Chal", benefit: "Uterine Health", description: "Supports uterine health, tones reproductive muscles, and balances menstrual cycle." },
@@ -354,7 +354,7 @@ export const MENS_TESTIMONIALS = [
 export const FAQS = [
   {
     question: "How long does it take to see visible results?",
-    answer: "Most women see a noticeable reduction in cramp intensity and mood swings within the first 15 days. For regular cycles and cyst reduction, we highly recommend continuing the Combo Kit consistently for 3 to 6 months."
+    answer: "Most women notice greater pelvic comfort and improved energy within the first 15 to 30 days. For sustained menstrual regularity and comprehensive hormonal balance, we recommend maintaining the routine consistently for 90 to 180 days."
   },
   {
     question: "Is meONmode safe to take alongside modern medicine?",

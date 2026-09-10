@@ -49,6 +49,16 @@ import { BLOG_POSTS } from './blogData';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
 import { ProductGallery } from './components/ProductGallery';
+import { Hero } from './components/Hero';
+import { ProductDetail } from './components/ProductDetail';
+import { ConcernSelector } from './components/ConcernSelector';
+import { WhyMeonmode } from './components/WhyMeonmode';
+import { WhyOurFormulations } from './components/WhyOurFormulations';
+import { IngredientTransparency } from './components/IngredientTransparency';
+import { WOMEN_TRANSPARENCY_HERBS, MEN_TRANSPARENCY_HERBS } from './ingredientData';
+import { AllProductsPage } from './components/AllProductsPage';
+import { HowItWorks } from './components/HowItWorks';
+import { BrandStory } from './components/BrandStory';
 
 // Code-split dynamic views
 const BlogListing = React.lazy(() => import('./components/BlogListing').then(m => ({ default: m.BlogListing })));
@@ -525,8 +535,15 @@ export default function App() {
       } else {
         if (currentView !== 'not-found') setCurrentView('not-found');
       }
-    } else if (path === '/products' || path === '/combos') {
+    } else if (path === '/products' || path === '/combos' || path === '/collections/all-products' || path === '/collections/all' || path === '/all-products' || path === '/collections') {
       if (currentView !== 'home') setCurrentView('home');
+      setActiveCategory('all');
+    } else if (path === '/collections/women' || path === '/collections/womens') {
+      if (currentView !== 'home') setCurrentView('home');
+      setActiveCategory('women');
+    } else if (path === '/collections/men' || path === '/collections/mens') {
+      if (currentView !== 'home') setCurrentView('home');
+      setActiveCategory('men');
     } else if (path === '/') {
       if (currentView !== 'home') setCurrentView('home');
     } else {
@@ -1462,7 +1479,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                         >
                           <div className="w-7 h-7 rounded bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] flex-shrink-0 flex items-center justify-center border border-white/10 overflow-hidden">
                             <img
-                              src={prod.images && prod.images[0]}
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 64)}
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
@@ -1470,7 +1487,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               height="28"
                               className="w-full h-full object-contain"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                                (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 64);
                               }}
                             />
                           </div>
@@ -1744,488 +1761,48 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-            
-            {/* Bento Block 1: Hero Banner Section (Col Span 12) */}
-            {activeCategory === 'women' ? (
-              <section id="luxury-women-hero" className="lg:col-span-12 relative overflow-hidden rounded-[2.5rem] border-2 md:border-[3px] border-[#FAF6F0] shadow-[0_24px_80px_rgba(35,18,11,0.5)] bg-gradient-to-br from-[#1b0b05] via-[#4a1d05] to-[#2a0e05] p-6 md:p-12 transition-all duration-700">
-                {/* Immersive gold glowing highlights with soft glowing effects */}
-                <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-gradient-to-tr from-[#E5A93C]/15 via-[#C86428]/5 to-transparent rounded-full blur-[140px] animate-soft-glow pointer-events-none"></div>
-                <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-gradient-to-bl from-[#C86428]/10 via-[#E5A93C]/8 to-transparent rounded-full blur-[160px] pointer-events-none"></div>
-                
-                {/* Fallback organic pattern background */}
-                <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#E5A93C_1px,transparent_1px)] [background-size:32px_32px]"></div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
-                  {/* Left Column Content */}
-                  <div className="lg:col-span-7 space-y-8 text-left">
-                    {/* Small Badge */}
-                    <div id="women-hero-badge" className="inline-flex items-center gap-2 bg-[#FAF6F0]/10 border border-[#FAF6F0]/20 text-[#FAF6F0] text-xs font-black uppercase tracking-widest py-1.5 px-4 rounded-full shadow-lg backdrop-blur-md">
-                      <Sparkles className="w-3.5 h-3.5 text-[#E5A93C] animate-pulse" />
-                      <span>✨ Ayurvedic Women’s Wellness</span>
-                    </div>
-
-                    {/* Main Heading & Sub Heading with Luxury Serif typography */}
-                    <div className="space-y-4">
-                      <h2 id="women-hero-heading" className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight text-[#FAF6F0] leading-[1.05]">
-                        <span className="sr-only">meONmode – Ayurvedic Wellness Products - </span>
-                        Your Body. <br />
-                        <span className="bg-gradient-to-r from-[#E5A93C] via-[#FAF6F0] to-[#E5A93C] bg-clip-text text-transparent">ON Mode.</span>
-                      </h2>
-                      <p id="women-hero-subheading" className="text-[#FAF6F0]/90 font-sans text-sm sm:text-base md:text-lg max-w-xl leading-relaxed font-medium">
-                        Support your everyday women’s wellness with Ayurvedic nutrition crafted for modern lifestyles.
-                      </p>
-                    </div>
-
-                    {/* Wellness Highlight Chips arranged in two responsive rows with golden ticks */}
-                    <div id="women-hero-chips-container" className="space-y-4">
-                      <div className="text-[10px] uppercase font-bold text-[#E5A93C] tracking-widest font-mono flex items-center gap-1.5">
-                        <Leaf className="w-3.5 h-3.5 text-[#E5A93C]" />
-                        <span>Formulated to Support Women's Wellness Concerns:</span>
-                      </div>
-                      
-                      <div className="flex flex-col gap-3">
-                        {/* Row 1 */}
-                        <div className="flex flex-wrap gap-2.5">
-                          {[
-                            'PCOS',
-                            'PCOD',
-                            'Hormonal Imbalance',
-                            'Irregular Periods'
-                          ].map((chipLabel, idx) => (
-                            <span 
-                              key={idx}
-                              id={`women-chip-row1-${idx}`}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg text-xs font-bold text-[#FAF6F0] hover:scale-105 hover:bg-white/10 hover:border-[#E5A93C]/40 transition-all duration-300"
-                            >
-                              <Check className="w-3.5 h-3.5 text-[#E5A93C] stroke-[3]" />
-                              <span>{chipLabel}</span>
-                            </span>
-                          ))}
-                        </div>
-                        {/* Row 2 */}
-                        <div className="flex flex-wrap gap-2.5">
-                          {[
-                            'White Discharge',
-                            'PMS Support',
-                            'Menstrual Wellness',
-                            'Ovulation Support'
-                          ].map((chipLabel, idx) => (
-                            <span 
-                              key={idx}
-                              id={`women-chip-row2-${idx}`}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md shadow-lg text-xs font-bold text-[#FAF6F0] hover:scale-105 hover:bg-white/10 hover:border-[#E5A93C]/40 transition-all duration-300"
-                            >
-                              <Check className="w-3.5 h-3.5 text-[#E5A93C] stroke-[3]" />
-                              <span>{chipLabel}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-[10px] text-white/50 italic mt-2 leading-normal font-sans">
-                        *Daily holistic lifestyle support. These wellness supplements do not claim to diagnose, treat, cure, or guarantee clinical results.
-                      </p>
-                    </div>
-
-                    {/* FREE Personalized Diet Plan Trust Banner */}
-                    <div id="women-hero-diet-plan-banner" className="bg-[#FAF6F0]/10 border border-[#E5A93C]/40 rounded-2xl p-3.5 flex items-center gap-3 backdrop-blur-md shadow-lg">
-                      <div className="w-8 h-8 rounded-xl bg-[#E5A93C]/20 border border-[#E5A93C]/30 flex items-center justify-center shrink-0 text-base">
-                        🥗
-                      </div>
-                      <div className="text-left">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] font-black uppercase tracking-wider bg-[#E5A93C] text-[#23120B] px-2 py-0.5 rounded-full font-sans">
-                            FREE BONUS
-                          </span>
-                          <span className="text-[10px] font-extrabold text-[#E5A93C]">Included with every product & combo</span>
-                        </div>
-                        <p className="text-xs sm:text-sm font-bold text-white leading-tight mt-0.5">
-                          FREE Personalized Diet Plan based on your body type and weight
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* CTA Buttons - Interactions with responsive focus on meONmode style */}
-                    <div className="pt-2 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
-                      <button 
-                        id="women-hero-cta-primary"
-                        onClick={() => {
-                          const catalogSec = document.getElementById('catalog-anchor');
-                          if (catalogSec) {
-                            catalogSec.scrollIntoView({ behavior: 'smooth' });
-                          } else {
-                            window.scrollTo({ top: window.innerHeight * 0.8, behavior: 'smooth' });
-                          }
-                        }}
-                        className="bg-gradient-to-r from-[#C86428] via-[#E5A93C] to-[#C86428] hover:brightness-110 active:bg-[#FAF6F0] active:text-[#4A1D05] active:from-none active:to-none text-[#23120B] font-extrabold text-xs sm:text-sm py-4 px-8 rounded-full shadow-xl shadow-black/30 transition-all duration-300 hover:shadow-[0_0_25px_rgba(229,169,60,0.5)] hover:scale-[1.03] active:scale-95 text-center flex items-center justify-center gap-2.5 cursor-pointer uppercase tracking-wider"
-                      >
-                        <ShoppingBag className="w-4.5 h-4.5" />
-                        <span>Shop Women’s Wellness</span>
-                      </button>
-                      <button 
-                        id="women-hero-cta-secondary"
-                        onClick={() => {
-                          const catalogSec = document.getElementById('catalog-anchor');
-                          if (catalogSec) {
-                            catalogSec.scrollIntoView({ behavior: 'smooth' });
-                          } else {
-                            window.scrollTo({ top: window.innerHeight * 0.8, behavior: 'smooth' });
-                          }
-                        }}
-                        className="bg-transparent hover:bg-white/5 active:bg-[#4A1D05] active:text-[#FAF6F0] border-2 border-[#FAF6F0]/60 hover:border-[#FAF6F0] text-[#FAF6F0] font-extrabold text-xs sm:text-sm py-3.5 px-8 rounded-full transition-all duration-300 text-center cursor-pointer hover:scale-[1.03] active:scale-95 uppercase tracking-wider"
-                      >
-                        Explore Products
-                      </button>
-                    </div>
-
-                    {/* Trust Features styled as Trust Cards */}
-                    <div id="women-hero-trust-grid" className="pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      {[
-                        'Ayurvedic',
-                        'Pure Herbal Ingredients',
-                        'No Artificial Colors',
-                        'No Heavy Metals',
-                        'Made for Women’s Wellness',
-                        'Quality Tested'
-                      ].map((trust, idx) => (
-                        <div 
-                          key={idx} 
-                          id={`women-trust-${idx}`} 
-                          className="flex items-center gap-2.5 bg-white/5 border border-white/10 rounded-2xl p-3 hover:bg-white/10 transition-colors shadow-sm"
-                        >
-                          <span className="text-[#E5A93C] font-bold text-sm">✓</span>
-                          <span className="text-xs font-bold text-white/95">{trust}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Right Column Visual Composition */}
-                  <div className="lg:col-span-5 relative flex justify-center py-6">
-                    {/* Simulated Soft Cream Fabric Backdrop & Wooden Platform */}
-                    <div id="women-hero-visual-card" className="relative w-full max-w-[340px] md:max-w-md aspect-[4/5] rounded-[2.5rem] overflow-hidden p-6 shadow-2xl border-2 border-[#E5A93C]/20 bg-gradient-to-b from-[#2a130b] to-[#120502] flex flex-col justify-end">
-                      
-                      {/* Soft cream fabric background overlay style via elegant backdrop styling */}
-                      <div className="absolute inset-0 bg-gradient-to-b from-[#FAF6F0]/20 via-[#FAF3E8]/10 to-transparent opacity-80 pointer-events-none"></div>
-                      
-                      {/* Wood-colored warm brown wooden platform at the bottom */}
-                      <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-[#3B1E08] via-[#5C2E0B] to-[#FAF6F0]/5 rounded-t-[2rem] opacity-90 border-t-2 border-[#E5A93C]/20"></div>
-
-                      {/* Golden glowing light rays and highlight spots */}
-                      <div className="absolute -top-10 left-10 w-44 h-44 bg-amber-400/25 rounded-full blur-3xl animate-soft-pulse pointer-events-none"></div>
-                      <div className="absolute top-1/2 right-0 w-32 h-32 bg-[#E5A93C]/25 rounded-full blur-2xl pointer-events-none animate-pulse"></div>
-
-                      {/* Fresh Flowers & Botanicals floating absolute props using Lucide icons */}
-                      <div className="absolute top-8 right-8 text-[#E5A93C]/40 pointer-events-none animate-float" style={{ animationDelay: '1s' }}>
-                        <Leaf className="w-10 h-10 rotate-[40deg] filter drop-shadow-[0_4px_6px_rgba(0,0,0,0.3)]" />
-                      </div>
-                      <div className="absolute top-1/3 left-6 text-[#C86428]/50 pointer-events-none animate-float" style={{ animationDelay: '2.5s' }}>
-                        <Flower2 className="w-12 h-12 rotate-[12deg] filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]" />
-                      </div>
-                      <div className="absolute bottom-20 right-8 text-[#E5A93C]/50 pointer-events-none animate-float" style={{ animationDelay: '0.5s' }}>
-                        <Leaf className="w-8 h-8 rotate-[-30deg] filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
-                      </div>
-                      
-                      {/* Luxury Gift Box styling representation border lines */}
-                      <div className="absolute inset-4 border border-[#E5A93C]/20 rounded-[1.8rem] pointer-events-none z-10"></div>
-                      <div className="absolute inset-5 border border-[#E5A93C]/10 rounded-[1.6rem] pointer-events-none z-10"></div>
-
-                      {/* Gold batch harvest badge */}
-                      <div className="absolute top-6 left-6 bg-[#4A1D05] text-[#E5A93C] px-3 py-1 rounded-md border border-[#E5A93C]/30 z-20 shadow-md">
-                        <span className="text-[9px] uppercase tracking-widest font-black font-mono flex items-center gap-1">
-                          ✨ Gold Batch Harvest
-                        </span>
-                      </div>
-
-                      {/* Product display container with floating animation */}
-                      <button
-                        id="women-hero-visual-button"
-                        type="button"
-                        onClick={() => {
-                          const foundProd = PRODUCTS.find(p => p.id === 'combo-kit');
-                          if (foundProd) {
-                            handleProductClick(foundProd);
-                            scrollToBuyingDetails();
-                          }
-                        }}
-                        className="w-full relative z-20 focus:outline-none cursor-pointer overflow-hidden block group/hero-img rounded-2xl animate-float mt-auto"
-                        title="Click to view details"
-                      >
-                        <img 
-                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 
-                          srcSet={`${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 380)} 380w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 480w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 640)} 640w`}
-                          sizes="(max-width: 640px) 280px, 320px"
-                          alt="meONmode Women's Combo Kit" 
-                          loading="eager"
-                          fetchPriority="high"
-                          decoding="async"
-                          width="320"
-                          height="320"
-                          className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
-                        />
-                      </button>
-
-                      {/* Standardized Shastras floating badge */}
-                      <span className="absolute bottom-6 left-6 bg-[#4A1D05] text-white text-[9px] font-black tracking-wider uppercase px-3 py-2 rounded-full shadow-lg border border-[#E5A93C]/30 z-20">
-                        🌿 Standardized Shastras
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </section>
+            {activeCategory === 'all' ? (
+              <AllProductsPage
+                products={Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values())}
+                onSelectProduct={handleProductClick}
+                onQuickBuy={handleQuickBuy}
+                onAddToCart={addToCart}
+                onBackToHome={() => setActiveCategory('women')}
+              />
             ) : (
-              <section id="traditional-hero" className={`lg:col-span-12 relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl flex flex-col justify-between transition-all duration-700 ${
-                activeCategory === 'all'
-                  ? 'bg-gradient-to-br from-[#2B1B15] to-[#120B09]'
-                  : 'bg-gradient-to-br from-[#1C1C1C] to-[#0A0A0A]'
-              }`}>
-                {/* Fallback pattern background */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(#C86428_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                
-                {/* Soft Warm Depth Glow Behind Text/Image */}
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            {/* Modular Brand-First Hero (Neutral Gateway for All, Dedicated for Women/Men) */}
+            <Hero
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              onQuickBuy={handleQuickBuy}
+              onProductClick={handleProductClick}
+              womenProducts={womenProducts}
+              menProducts={menProducts}
+              scrollToCatalog={() => {
+                const catalogSec = document.getElementById('catalog-anchor');
+                if (catalogSec) {
+                  catalogSec.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  window.scrollTo({ top: window.innerHeight * 0.7, behavior: 'smooth' });
+                }
+              }}
+              t={t}
+            />
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-12 items-center relative z-10 h-full">
-                  {/* Text Sales Copy */}
-                  <div className="md:col-span-7 space-y-6">
-                    <div className={`inline-flex items-center gap-2 border text-[10px] font-bold uppercase tracking-wider py-1 px-3.5 rounded-full transition-colors duration-500 ${
-                      activeCategory === 'all'
-                        ? 'bg-[#3B2314] border-[#E5A93C]/30 text-[#E5A93C]'
-                        : 'bg-[#E5A93C]/10 border-amber-500/30 text-[#E5A93C]'
-                    }`}>
-                      <Sparkles className="w-3 h-3 text-[#E5A93C]" />
-                      {activeCategory === 'all' ? t('heroTaglineAll') : t('heroTaglineMen')}
-                    </div>
-                    
-                    <h2 className="font-serif text-3.5xl sm:text-5xl md:text-5.5xl lg:text-6.5xl font-extrabold tracking-tight text-white leading-[1.08]">
-                      {activeCategory === 'all' ? (
-                        <>
-                          {t('heroTitleAll1')} <br />
-                          <span className="text-[#E5A93C] font-black">{t('heroTitleAll2')}</span>
-                        </>
-                      ) : (
-                        <>
-                          {t('heroTitleMen1')} <br />
-                          <span className="text-[#E5A93C] font-black">{t('heroTitleMen2')}</span>
-                        </>
-                      )}
-                    </h2>
-
-                    <p className="text-[#F7E7D9] text-xs sm:text-sm md:text-base leading-relaxed max-w-xl font-medium">
-                      {activeCategory === 'all'
-                        ? t('heroDescAll')
-                        : t('heroDescMen')}
-                    </p>
-
-                    {/* Highlight Specs */}
-                    <div className="grid grid-cols-2 gap-3.5 max-w-md pt-1">
-                      <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
-                        <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>{t('heroSpec1')}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
-                        <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>{t('heroSpec2')}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
-                        <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>{t('heroSpec3')}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-[#F7E7D9]/90">
-                        <Check className="w-4 h-4 text-[#E5A93C] shrink-0" />
-                        <span>{t('heroSpec4')}</span>
-                      </div>
-                    </div>
-
-                    {/* FREE Personalized Diet Plan Trust Banner */}
-                    <div id="hero-diet-plan-banner" className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex items-center gap-3 max-w-md shadow-md">
-                      <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center shrink-0 text-base">
-                        🥗
-                      </div>
-                      <div className="text-left">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[9px] font-black uppercase tracking-wider bg-[#E5A93C] text-[#23120B] px-2 py-0.5 rounded-full font-sans">
-                            FREE BONUS
-                          </span>
-                          <span className="text-[10px] font-extrabold text-[#E5A93C]">Included with every product</span>
-                        </div>
-                        <p className="text-xs sm:text-sm font-bold text-white leading-tight mt-0.5">
-                          FREE Personalized Diet Plan based on your body type and weight
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 flex flex-col sm:flex-row gap-4">
-                      <button 
-                        id="hero-buy-combo-btn"
-                        onClick={() => handleQuickBuy(activeCategory === 'men' ? menProducts[2] : womenProducts[0])}
-                        className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm py-3.5 px-6 rounded-xl shadow-lg shadow-[#4A1D05]/50 transition-all hover:shadow-[0_0_20px_rgba(200,100,40,0.6)] hover:scale-[1.01] active:scale-95 text-center flex items-center justify-center gap-2 cursor-pointer"
-                      >
-                        <ShoppingBag className="w-4.5 h-4.5" />
-                        <span>{t('shopCombo')} - <span className="text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}>{activeCategory === 'men' ? '₹6,999' : '₹1,999'}</span></span>
-                      </button>
-                      <button 
-                        id="hero-view-details-btn"
-                        onClick={() => handleProductClick(activeCategory === 'men' ? menProducts[2] : womenProducts[0])}
-                        className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs sm:text-sm py-3.5 px-6 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(255,255,255,0.15)] text-center cursor-pointer hover:scale-[1.01]"
-                      >
-                        {t('learnMore')}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Right Hero Image Column representing 1000166066_2.jpg / Product Hero */}
-                  <div className="md:col-span-5 relative flex justify-center">
-                    {/* Outer stage glow */}
-                    <div className="absolute inset-[-20px] bg-gradient-to-br from-[#E5A93C]/20 to-transparent blur-3xl rounded-full pointer-events-none"></div>
-                    
-                    <div className={`relative w-full max-w-[260px] md:max-w-sm rounded-3xl overflow-hidden p-2.5 shadow-2xl border border-white/20 transition-all duration-500 bg-gradient-to-br ${
-                      activeCategory === 'all'
-                        ? 'from-[#3B2314] to-[#1F120B]'
-                        : 'from-[#333333] to-[#121212]'
-                    }`}>
-                      {/* Glowing golden light overlay inside the container */}
-                      <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 via-transparent to-transparent pointer-events-none"></div>
-
-                      <button
-                        id="traditional-hero-visual-btn"
-                        type="button"
-                        onClick={() => {
-                          const targetId = activeCategory === 'men' ? 'mens-combo' : 'combo-kit';
-                          const foundProd = (activeCategory === 'men' ? MENS_PRODUCTS : PRODUCTS).find(p => p.id === targetId);
-                          if (foundProd) {
-                            handleProductClick(foundProd);
-                            scrollToBuyingDetails();
-                          }
-                        }}
-                        className="w-full focus:outline-none cursor-pointer overflow-hidden relative block group/hero-img rounded-2xl"
-                        title="Click to view details"
-                      >
-                        <img 
-                          src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 480)} 
-                          srcSet={`${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 380)} 380w, ${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 480)} 480w, ${optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png', 640)} 640w`}
-                          sizes="(max-width: 640px) 320px, 384px"
-                          alt={activeCategory === 'men' ? "meONmode Men's Combo" : "meONmode Combo Kit"} 
-                          loading="eager"
-                          fetchPriority="high"
-                          decoding="async"
-                          width="384"
-                          height="384"
-                          className="w-full h-auto max-w-full object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 animate-float"
-                        />
-                      </button>
-                      {/* Glassmorphic price tag pill */}
-                      <div className="absolute top-3 right-3 bg-[#5C1D13]/90 backdrop-blur-md border-2 border-amber-400 text-white font-extrabold px-3 py-1 rounded-full text-[10px] shadow-[0_0_10px_rgba(251,191,36,0.5)] drop-shadow-md">
-                        {activeCategory === 'all' ? 'Save Up to 57%' : 'Save 57%'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            )}
-
-            {/* Bento Block 3: Daily 90-Day Wellness Ritual Timeline (Col Span 12) */}
-            {activeCategory === 'women' && (
-              <section id="wellness-ritual-timeline" className="lg:col-span-12 bg-[#23120b] border-2 md:border-[3px] border-[#FAF6F0] rounded-[2.5rem] p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden text-[#FAF6F0]">
-                {/* Very soft glowing effects */}
-                <div className="absolute top-0 right-1/4 w-72 h-72 bg-[#E5A93C]/10 rounded-full blur-[80px] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-[#C86428]/10 rounded-full blur-[100px] pointer-events-none"></div>
-
-                <div className="text-center space-y-3 max-w-2xl mx-auto relative z-10">
-                  <span className="inline-flex items-center gap-1.5 bg-[#FAF6F0]/10 text-[#E5A93C] uppercase text-[10px] tracking-widest font-extrabold font-mono px-4 py-1.5 rounded-full border border-[#E5A93C]/20 shadow-sm">
-                    ✨ The 90-Day Protocol
-                  </span>
-                  <h2 className="font-serif text-3xl md:text-5xl font-black text-[#FAF6F0] tracking-tight">
-                    90-Day Wellness Ritual
-                  </h2>
-                  <p className="text-[#FAF6F0]/80 text-xs sm:text-sm font-medium leading-relaxed font-sans">
-                    A simple daily Ayurvedic ritual to support hormonal balance, menstrual wellness, vaginal wellness, a healthy body, and overall female well-being.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-                  {/* Step 1 */}
-                  <div 
-                    id="ritual-step-1" 
-                    className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-[#4A1D05] text-[#E5A93C] rounded-2xl flex items-center justify-center font-bold border border-[#E5A93C]/30 shadow-md">
-                          <Pill className="w-6 h-6 text-[#E5A93C]" />
-                        </div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 01 / Morning</span>
-                      </div>
-                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
-                        OVAIRA Capsule
-                      </h3>
-                      <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
-                        Take 1 capsule in the morning and 1 capsule in the evening after meals.
-                      </p>
-                    </div>
-                    <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
-                      ✓ Supports cycle regularity
-                    </div>
-                  </div>
-
-                  {/* Step 2 */}
-                  <div 
-                    id="ritual-step-2" 
-                    className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-[#4A1D05] text-[#E5A93C] rounded-2xl flex items-center justify-center font-bold border border-[#E5A93C]/30 shadow-md">
-                          <Droplet className="w-6 h-6 text-[#E5A93C]" />
-                        </div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 02 / Evening</span>
-                      </div>
-                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
-                        FLOWELLE Syrup
-                      </h3>
-                      <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
-                        Take 5 ml in the morning and 5 ml in the evening after meals.
-                      </p>
-                    </div>
-                    <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
-                      ✓ Tones & strengthens uterine system
-                    </div>
-                  </div>
-
-                  {/* Step 3 */}
-                  <div 
-                    id="ritual-step-3" 
-                    className="bg-[#FAF6F0] rounded-[20px] border border-[#E5A93C]/25 p-6 md:p-8 space-y-5 hover:shadow-[0_0_20px_rgba(229,169,60,0.2)] hover:border-[#E5A93C]/50 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between shadow-lg text-[#4A1D05]"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="w-12 h-12 bg-[#4A1D05] text-[#E5A93C] rounded-2xl flex items-center justify-center font-bold border border-[#E5A93C]/30 shadow-md">
-                          <Flower2 className="w-6 h-6 text-[#E5A93C]" />
-                        </div>
-                        <span className="text-[10px] font-extrabold uppercase tracking-widest font-mono text-[#C86428]">Step 03 / Lifestyle</span>
-                      </div>
-                      <h3 className="font-serif font-black text-xl text-[#4A1D05]">
-                        90-Day Wellness Ritual
-                      </h3>
-                      <p className="text-xs text-[#4A1D05]/90 font-medium leading-relaxed font-sans">
-                        A simple daily Ayurvedic ritual to support hormonal balance, menstrual wellness, vaginal wellness, a healthy body, and overall female well-being.
-                      </p>
-                    </div>
-                    <div className="pt-3 border-t border-[#4A1D05]/10 text-[10px] text-neutral-500 font-bold tracking-wider uppercase font-mono">
-                      ✓ Holistic mind-body equilibrium
-                    </div>
-                  </div>
-                </div>
-
-                {/* Safe elegant disclaimer that avoids guarantees or clinical medical claims */}
-                <div className="pt-4 text-center text-[10px] text-white/60 max-w-2xl mx-auto leading-relaxed font-sans border-t border-white/10 relative z-10">
-                  ⚠️ <strong className="font-extrabold text-[#E5A93C]">Disclaimer:</strong> Formulated for everyday health support. These products do not claim to diagnose, treat, cure, or prevent any medical conditions. Individual responses to botanical extracts may vary; please maintain a balanced lifestyle and consult your healthcare practitioner before commencing any new wellness routine.
-                </div>
-              </section>
-            )}
+            {/* "What are you looking for?" Goal / Concern Navigator */}
+            <ConcernSelector
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+              onSelectProduct={(prod) => {
+                handleProductClick(prod);
+                scrollToBuyingDetails();
+              }}
+            />
 
             {/* Bento Block 4: Product Catalog Section (Col Span 12) */}
-            <section className="lg:col-span-12 space-y-6 pt-4">
+            <section id="catalog-anchor" className="lg:col-span-12 space-y-6 pt-4">
               <div className="text-center space-y-2 animate-fade-in">
                 <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">
                   {activeCategory === 'all' ? "Unified Wellness Catalogue" : activeCategory === 'men' ? "Men's Wellness Catalogue" : "Our Treatment Catalogue"}
@@ -2558,167 +2135,23 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </section>
 
-            {/* Bento Block 5: Reassuring Medical Statement (Col Span 7) */}
-            <section className={`lg:col-span-7 backdrop-blur-md border p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6 transition-colors duration-700 ${
-              activeCategory === 'all'
-                ? 'bg-[#1C110D]/90 border-amber-500/15'
-                : activeCategory === 'men' 
-                  ? 'bg-[#181818]/90 border-amber-500/20' 
-                  : 'bg-[#5C1D13]/70 border-white/10'
-            }`}>
-              <div className="space-y-4">
-                <span className="text-[#E5A93C] text-xs font-bold tracking-widest uppercase block">Clinically Certified Wellness</span>
-                <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white leading-tight">
-                  No Synthetic Pills. Just Pure, Standardized Ayurvedic Shastras.
-                </h2>
-                
-                {activeCategory !== 'men' && (
-                  <div className={`grid gap-4 my-2 ${activeCategory === 'all' ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                    <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                      <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">100% Raw Roots & Bark</span>
-                      <img 
-                        src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png", 480)} 
-                        alt="Ayurvedic Ingredients / Roots & Bark" 
-                        loading="lazy"
-                        decoding="async"
-                        width="400"
-                        height="300"
-                        className="w-full h-auto max-w-full object-contain block mx-auto"
-                      />
-                    </div>
-                    <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                      <span className="block text-[10px] uppercase font-bold text-[#E5A93C] p-2 bg-black/30 text-center border-b border-white/5">Ayurveda vs Synthetic Pills</span>
-                      <img 
-                        src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512637/ChatGPT_Image_Jun_20_2026_10_27_42_PM.png", 480)} 
-                        alt="Why Ayurvedic capsules are better Comparison" 
-                        loading="lazy"
-                        decoding="async"
-                        width="400"
-                        height="300"
-                        className="w-full h-auto max-w-full object-contain block mx-auto"
-                      />
-                    </div>
-                  </div>
-                )}
+            {/* Why Our Formulations? (Clean 4-card responsive section with zero giant posters) */}
+            <WhyOurFormulations />
 
-                <p className="text-[#F7E7D9] text-xs sm:text-sm leading-relaxed">
-                  {activeCategory === 'all' ? (
-                    "Modern synthetic treatments are packed with temporary chemicals or high-dose artificial hormones which trigger severe weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on organic, bio-active botanical compounds and uterine toners processed inside GMP certified facilities."
-                  ) : activeCategory === 'men' ? (
-                    "Most performance pills are packed with dangerous synthetic stimulants or low-grade chemicals which trigger critical blood pressure spikes, cardiac stress, and anxiety. meONmode® relies purely on organic, bio-active botanical compounds processed inside GMP certified facilities."
-                  ) : (
-                    "Most hormonal pills are packed with heavy doses of synthetic estrogen which trigger high weight gain, blood pressure spikes, and mental anxiety. meONmode® relies purely on bio-active phytoestrogens and uterine toners processed inside GMP certified facilities."
-                  )}
-                </p>
-              </div>
+            {/* Why meONmode? Pillars of Quality, Safety, and Trust */}
+            <WhyMeonmode />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/5">
-                <div className="flex gap-3 items-start">
-                  <div className="p-1.5 bg-[#C86428]/25 rounded-lg text-[#E5A93C] shrink-0">
-                    <Leaf className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-white text-xs sm:text-sm">Ayush Ministry Formulated</h3>
-                    <p className="text-[11px] text-[#F7E7D9]/80 mt-0.5">Tested thoroughly under strict Indian traditional guidelines.</p>
-                  </div>
-                </div>
-                <div className="flex gap-3 items-start">
-                  <div className="p-1.5 bg-[#C86428]/25 rounded-lg text-[#E5A93C] shrink-0">
-                    <ShieldCheck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-white text-xs sm:text-sm">Discreet & Sealed</h3>
-                    <p className="text-[11px] text-[#F7E7D9]/80 mt-0.5">Double-sealed under vacuum so no outside contaminants spoil the herbs.</p>
-                  </div>
-                </div>
-              </div>
-            </section>
+            {/* Full Ingredient Transparency: Category-specific verified formulations (Zero Fillers) */}
+            <IngredientTransparency 
+              category={activeCategory === 'men' ? 'men' : 'women'}
+              ingredients={activeCategory === 'men' ? MEN_TRANSPARENCY_HERBS : WOMEN_TRANSPARENCY_HERBS}
+            />
 
-            {/* Bento Block 6: Support Score Graphic (Col Span 5) */}
-            <section className="lg:col-span-5 bg-white/5 backdrop-blur-md border border-white/10 p-6 md:p-8 rounded-3xl flex flex-col justify-between shadow-2xl space-y-6">
-              <div className="space-y-1">
-                <h2 className="font-serif text-lg font-bold text-white text-center border-b border-white/10 pb-3">
-                  {activeCategory === 'all' ? "Clinical Restorative Success Score" : activeCategory === 'men' ? "Clinical Men's Performance Score" : "Clinical Period Support Score"}
-                </h2>
-                <p className="text-[11px] text-[#F7E7D9]/80 text-center">Observed improvements over 90 days</p>
-              </div>
+            {/* How It Works: The 90-Day Protocol & Personalized Diet Routine */}
+            <HowItWorks />
 
-              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                <img 
-                  src={optimizeCloudinaryUrl(activeCategory === 'men' ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png' : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png', 480)} 
-                  alt={activeCategory === 'men' ? "meONmode Men's Results" : "Bye Bye Period Problems / 87% & 95% Results"} 
-                  loading="lazy"
-                  decoding="async"
-                  width="450"
-                  height="350"
-                  className="w-full h-auto max-w-full object-contain block mx-auto"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const parent = target.parentElement;
-                    if (parent) {
-                      const existingFallback = parent.querySelector('.score-fallback-overlay');
-                      if (existingFallback) {
-                        existingFallback.remove();
-                      }
-                      const fallback = document.createElement('div');
-                      fallback.className = "score-fallback-overlay p-4 text-center text-white/90 font-serif text-sm flex flex-col items-center justify-center min-h-[140px]";
-                      fallback.innerHTML = `
-                        <div class="p-2 bg-amber-500/10 rounded-full border border-amber-500/20 mb-2">
-                          <svg class="w-6 h-6 text-[#E5A93C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                        </div>
-                        <span class="font-bold">Over 90% Voted Recovery Success</span>
-                      `;
-                      parent.appendChild(fallback);
-                    }
-                  }}
-                />
-              </div>
-              
-              <div className="space-y-4 text-xs font-semibold">
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>
-                      {activeCategory === 'all' ? "Stamina & Physical Endurance Boosted" : activeCategory === 'men' ? "Physical Stamina & Power Boosted" : "Irregular Flow Regularized (Within 45 Days)"}
-                    </span>
-                    <span className="text-[#E5A93C]">94%</span>
-                  </div>
-                  <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] h-full rounded-full" style={{ width: '94%' }}></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>
-                      {activeCategory === 'all' ? "Hormonal Balance & Stress Reduced" : activeCategory === 'men' ? "Vigor Restoration & Endurance Increased" : "Agonizing Pelvic Cramps Reduced"}
-                    </span>
-                    <span className="text-[#E5A93C]">97%</span>
-                  </div>
-                  <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] h-full rounded-full" style={{ width: '97%' }}></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between mb-1">
-                    <span>
-                      {activeCategory === 'all' ? "Overall Energy & Vitality Restored" : activeCategory === 'men' ? "Baseline Cellular Energy Stabilized" : "Cyst Clearance & LH/FSH Balanced"}
-                    </span>
-                    <span className="text-[#E5A93C]">88%</span>
-                  </div>
-                  <div className="w-full bg-white/10 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] h-full rounded-full" style={{ width: '88%' }}></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-2 text-center border-t border-white/5">
-                <span className="inline-block text-[10px] tracking-wider text-neutral-300 bg-black/20 px-3 py-1.5 rounded-full">
-                  *Based on a 12-week review of 3,420 meONmode® customers in 2025
-                </span>
-              </div>
-            </section>
+            {/* Brand Story & Ayurvedic Roots */}
+            <BrandStory />
 
             {/* Bento Block 7: Dynamic Customer Reviews Section (Col Span 12) */}
             <section id="review-gallery" className="lg:col-span-12 space-y-8 relative overflow-hidden bg-[#23120b]/30 border-2 border-[#FAF6F0]/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md">
@@ -2734,8 +2167,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 </h2>
                 <p className="text-[#FAF6F0]/80 max-w-xl mx-auto text-xs sm:text-sm font-sans">
                   {activeCategory === 'men' 
-                    ? "Read authentic, raw experiences shared by brothers inside the meONmode® community. Filtered for 100% relevance."
-                    : "Discover honest reviews and photo logs shared by our meONmode® community members. Real people, real results."}
+                    ? "Read authentic, raw experiences shared by verified customers. Filtered for 100% relevance."
+                    : "Discover honest reviews and photo logs shared by verified meONmode® customers. Real people, real results."}
                 </p>
               </div>
 
@@ -2850,42 +2283,6 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </section>
 
-            {/* Bento Block 7.5: meONmode Wellness Club Group */}
-            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-8 space-y-4 shadow-xl">
-              <div className="flex flex-col md:flex-row gap-6 items-center">
-                <div className="space-y-3 md:w-1/2">
-                  <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold">Community Support</span>
-                  <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-white">Join the meONmode® Wellness Club Group</h2>
-                  <p className="text-[#F7E7D9]/80 text-xs sm:text-sm leading-relaxed">
-                    {activeCategory === 'all'
-                      ? "You are not alone in this journey. Connect with 15,000+ members, get daily Ayurvedic lifestyle tips, diet plans, strength guides, and direct expert consultations inside our exclusive Wellness Club."
-                      : activeCategory === 'men'
-                        ? "You are not alone in this journey. Connect with 10,000+ brothers, get daily Ayurvedic strength tips, clean diet plans, and direct expert consultations inside our exclusive Wellness Club."
-                        : "You are not alone in this journey. Connect with 10,000+ sisters, get daily Ayurvedic lifestyle tips, diet plans, and direct expert consultations inside our exclusive Wellness Club."}
-                  </p>
-                  <div className="pt-2">
-                    <a 
-                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20want%20to%20join%20the%20Wellness%20Club%20Group."
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-5 rounded-xl transition-all shadow-md hover:scale-[1.02]"
-                    >
-                      <span>Join Free Group on WhatsApp</span>
-                    </a>
-                  </div>
-                </div>
-                <div className="md:w-1/2 w-full">
-                  <div className="overflow-hidden rounded-2xl border border-emerald-500/20 shadow-lg bg-gradient-to-br from-emerald-950/40 via-[#1C110D] to-[#2B170E] p-8 text-center text-white/80 font-medium text-xs flex flex-col items-center justify-center min-h-[200px]">
-                    <div className="p-3.5 bg-emerald-500/10 text-emerald-400 rounded-full mb-3 border border-emerald-500/20 shadow-inner">
-                      <MessageCircle className="w-8 h-8" />
-                    </div>
-                    <span className="font-serif font-bold text-base sm:text-lg text-white">meONmode® Wellness Club Group Support</span>
-                    <span className="text-[11px] text-emerald-400 mt-1 font-bold">10,000+ Active Community Members</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
             {/* Bento Block 8: FAQ Accordion (Col Span 12) */}
             <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl content-auto">
               <div className="text-center space-y-1">
@@ -2952,998 +2349,43 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </section>
           </div>
+        )}
         </div>
       )}
 
         {/* ----------------- VIEW 2: PRODUCT DETAIL VIEW ----------------- */}
-        {(() => {
-          if (!currentProduct || currentView !== 'detail') return null;
-          const selectedProduct = currentProduct;
-          const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
-          const prodReviews = currentReviews.filter(r => r.productId === selectedProduct.id);
-          return (
-          <div className="space-y-12">
-            {/* JSON-LD Structured Data for Google Search Stars & Breadcrumbs */}
-            <script 
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{
-                __html: JSON.stringify({
-                  "@context": "https://schema.org",
-                  "@graph": [
-                    {
-                      "@type": "Product",
-                      "@id": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}#product`,
-                      "name": selectedProduct.name,
-                      "image": selectedProduct.images && selectedProduct.images.length > 0 ? selectedProduct.images : [selectedProduct.image],
-                      "description": selectedProduct.shortDescription || selectedProduct.longDescription,
-                      "sku": selectedProduct.id,
-                      "mpn": selectedProduct.id,
-                      "brand": {
-                        "@type": "Brand",
-                        "name": "meONmode"
-                      },
-                      "review": prodReviews.slice(0, 5).map(rev => ({
-                        "@type": "Review",
-                        "reviewRating": {
-                          "@type": "Rating",
-                          "ratingValue": rev.rating || 5,
-                          "bestRating": 5
-                        },
-                        "author": {
-                          "@type": "Person",
-                          "name": rev.name
-                        },
-                        "reviewBody": rev.review
-                      })),
-                      "aggregateRating": {
-                        "@type": "AggregateRating",
-                        "ratingValue": Number(rating.toFixed(1)),
-                        "reviewCount": reviewsCount,
-                        "bestRating": 5,
-                        "worstRating": 1
-                      },
-                      "offers": {
-                        "@type": "Offer",
-                        "url": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`,
-                        "priceCurrency": "INR",
-                        "price": selectedProduct.price,
-                        "priceValidUntil": "2027-12-31",
-                        "itemCondition": "https://schema.org/NewCondition",
-                        "availability": "https://schema.org/InStock",
-                        "seller": {
-                          "@type": "Organization",
-                          "name": "meONmode",
-                          "url": "https://meonmode.com/"
-                        }
-                      }
-                    },
-                    {
-                      "@type": "BreadcrumbList",
-                      "itemListElement": [
-                        {
-                          "@type": "ListItem",
-                          "position": 1,
-                          "name": "Home",
-                          "item": "https://meonmode.com/"
-                        },
-                        {
-                          "@type": "ListItem",
-                          "position": 2,
-                          "name": "Products",
-                          "item": "https://meonmode.com/"
-                        },
-                        {
-                          "@type": "ListItem",
-                          "position": 3,
-                          "name": selectedProduct.name,
-                          "item": `https://meonmode.com/products/${getProductCleanSlug(selectedProduct.id)}`
-                        }
-                      ]
-                    }
-                  ]
-                })
-              }}
-            />
-            
-            {/* Breadcrumb back navigation link */}
-            <div className="flex items-center justify-between gap-2 flex-wrap">
-              <nav className="flex items-center gap-2 text-xs text-white/70 font-medium">
-                <button 
-                  onClick={() => { setCurrentView('home'); navigate('/'); }}
-                  className="hover:text-[#E5A93C] transition-colors cursor-pointer"
-                >
-                  Home
-                </button>
-                <span className="text-white/40">/</span>
-                <button 
-                  onClick={() => { setCurrentView('home'); navigate('/'); }}
-                  className="hover:text-[#E5A93C] transition-colors cursor-pointer"
-                >
-                  Products
-                </button>
-                <span className="text-white/40">/</span>
-                <span className="text-[#E5A93C] font-bold truncate max-w-[200px] sm:max-w-none">
-                  {selectedProduct.name}
-                </span>
-              </nav>
-
-              <button 
-                onClick={() => { setCurrentView('home'); navigate('/'); }}
-                className="text-xs text-white/90 hover:text-[#E5A93C] flex items-center gap-1.5 transition-all font-semibold bg-white/10 hover:bg-white/20 py-1.5 px-4 rounded-full border border-white/15 cursor-pointer shadow-xs"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>All Products</span>
-              </button>
-            </div>
-
-            {/* Main Product Spotlight Card */}
-            {(() => {
-              const isWishlisted = wishlist.includes(selectedProduct.id);
-              const discount = Math.round(((selectedProduct.mrp - selectedProduct.price) / selectedProduct.mrp) * 100);
-
-              return (
-                <div className="bg-[#fdfbf7] text-neutral-900 border border-neutral-200/60 rounded-3xl overflow-hidden shadow-2xl">
-                  <div className="grid grid-cols-1 md:grid-cols-12">
-                    
-                    {/* Image Column */}
-                    <div className="md:col-span-5 relative flex flex-col items-center justify-start overflow-hidden bg-[#FAF8F6] p-4 sm:p-6 border-b md:border-b-0 md:border-r border-neutral-100 min-h-[350px] md:min-h-[450px]">
-                      <ProductGallery
-                        product={selectedProduct}
-                        activeImageIndex={activeImageIndex}
-                        setActiveImageIndex={setActiveImageIndex}
-                        onImageClick={() => {
-                          const imgs = selectedProduct.images || [];
-                          if (imgs[activeImageIndex]) {
-                            setLightboxImage(imgs[activeImageIndex]);
-                            setLightboxZoom(false);
-                          }
-                        }}
-                        showShareDropdown={showShareDropdown}
-                        setShowShareDropdown={setShowShareDropdown}
-                        handleShareProduct={handleShareProduct}
-                      />
-                      <p className="text-[11px] text-neutral-400 font-medium text-center mt-2 flex items-center gap-1">
-                        <span>🔍</span> Click image for high-resolution zoom view
-                      </p>
-                    </div>
-
-                    {/* Info and Purchase Column */}
-                    <div id="product-purchase-section" className="md:col-span-7 p-6 md:p-10 flex flex-col justify-between space-y-6">
-                      
-                      {/* Typography & Content Hierarchy */}
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          {/* Gold Star Rating Block */}
-                          <button
-                            type="button"
-                            onClick={() => setActiveReviewProduct(selectedProduct)}
-                            className="flex items-center gap-1 text-neutral-800 hover:text-[#C86428] text-xs font-bold focus:outline-none transition-colors group cursor-pointer"
-                            title="Click to view verified customer reviews"
-                          >
-                            <div className="flex items-center text-[#E5A93C]">
-                              {[...Array(5)].map((_, i) => (
-                                <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                              ))}
-                            </div>
-                            {(() => {
-                              const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
-                              return (
-                                <span className="underline decoration-dotted decoration-[#E5A93C]/60 hover:decoration-solid ml-1">
-                                  {rating.toFixed(1)} ({reviewsCount.toLocaleString('en-IN')} verified reviews)
-                                </span>
-                              );
-                            })()}
-                          </button>
-
-                          {/* Wishlist Button */}
-                          <button
-                            type="button"
-                            onClick={(e) => toggleWishlist(selectedProduct, e)}
-                            className={`p-2 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-bold ${
-                              isWishlisted
-                                ? 'bg-rose-50 border-rose-200 text-rose-600'
-                                : 'bg-white border-neutral-200 text-neutral-600 hover:text-rose-600 hover:border-rose-200'
-                            }`}
-                            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                          >
-                            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-rose-600 text-rose-600' : ''}`} />
-                            <span className="hidden sm:inline">{isWishlisted ? 'Wishlisted' : 'Save'}</span>
-                          </button>
-                        </div>
-
-                        {/* Main Title: Large, serif typography */}
-                        <h1 className="font-serif text-3xl md:text-4xl font-black text-neutral-950 tracking-tight leading-snug">
-                          {selectedProduct.name}
-                        </h1>
-
-                        {/* Subtitle: slightly tracked out uppercase sans-serif text */}
-                        <p className="font-sans text-[11px] font-extrabold uppercase tracking-widest text-[#5C1D13] mt-1 flex items-center gap-2 flex-wrap">
-                          <span>{selectedProduct.subtitle}</span>
-                          <span className="text-neutral-300">•</span>
-                          <span className="bg-neutral-100 text-neutral-800 px-2.5 py-0.5 rounded-md font-mono font-bold">
-                            {selectedProduct.volumeOrQty}
-                          </span>
-                        </p>
-                      </div>
-
-                      {/* Pricing & Scarcity Layout */}
-                      <div className="space-y-2">
-                        <div className="flex flex-col">
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            <span className="text-3xl sm:text-4xl font-black text-neutral-950">
-                              ₹{selectedProduct.price.toLocaleString('en-IN')}
-                            </span>
-                            <span className="text-base sm:text-lg font-bold line-through text-neutral-400">
-                              ₹{selectedProduct.mrp.toLocaleString('en-IN')}
-                            </span>
-                            <span className="text-xs font-black px-3 py-1 rounded-full border border-red-200 bg-red-50 text-red-600">
-                              {discount}% Off (Save ₹{(selectedProduct.mrp - selectedProduct.price).toLocaleString('en-IN')})
-                            </span>
-                          </div>
-                          <div className="flex flex-col gap-0.5 mt-1">
-                            <p className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5" /> {t('inclusiveGst')}
-                            </p>
-                            <p className="text-[10px] text-neutral-500 font-medium">
-                              ({t('priceInclusiveOfGst')}) • Free Express Shipping Pan-India
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Stock Alert */}
-                        {(() => {
-                          const stockInfo = getProductStockStatus(selectedProduct.id);
-                          return (
-                            <div className="flex items-center justify-between gap-1.5 mt-0.5">
-                              <div className="flex items-center gap-1.5">
-                                <span className="relative flex h-2 w-2">
-                                  {stockInfo.status === 'low_stock' && (
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                  )}
-                                  <span className={`relative inline-flex rounded-full h-2 w-2 ${stockInfo.status === 'low_stock' ? 'bg-red-500' : 'bg-emerald-500'}`}></span>
-                                </span>
-                                <span className={`text-[10px] font-black uppercase tracking-wider ${stockInfo.status === 'low_stock' ? 'text-red-600' : 'text-emerald-700'}`}>
-                                  {stockInfo.text}
-                                </span>
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setNotifyMeProduct(selectedProduct)}
-                                className="text-[10px] font-extrabold text-[#C86428] hover:underline flex items-center gap-1 cursor-pointer"
-                              >
-                                <Bell className="w-3 h-3" /> Get Alert
-                              </button>
-                            </div>
-                          );
-                        })()}
-                      </div>
-
-                      {/* Long Description */}
-                      <div className="space-y-2">
-                        <h2 className="font-serif text-sm font-bold uppercase tracking-wider text-[#5C1D13]">Product Therapy Summary</h2>
-                        <p className="text-xs leading-relaxed md:text-sm text-neutral-700">
-                          {selectedProduct.longDescription}
-                        </p>
-                      </div>
-
-                      {/* Key Bio-Active Ingredients preview chips */}
-                      {selectedProduct.keyIngredients && selectedProduct.keyIngredients.length > 0 && (
-                        <div className="space-y-1.5">
-                          <h2 className="font-serif text-xs font-bold uppercase tracking-wider text-[#5C1D13]">Key Bio-Active Ingredients</h2>
-                          <div className="flex flex-wrap gap-1.5">
-                            {selectedProduct.keyIngredients.map((ing: any, idx: number) => {
-                              const ingName = typeof ing === 'string' ? ing : ing.name;
-                              return (
-                                <span key={idx} className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-neutral-100 text-neutral-800 border border-neutral-200">
-                                  🌿 {ingName}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Dosage Guidelines */}
-                      <div className="p-4 rounded-2xl space-y-2 border border-neutral-100 bg-[#FAF8F6]">
-                        <h2 className="font-serif text-sm font-bold flex items-center gap-1.5 text-[#5C1D13]">
-                          <Clock className="w-4 h-4 text-[#C86428]" />
-                          <span>Compliant Dosage Guidelines</span>
-                        </h2>
-                        <div className="text-xs leading-relaxed font-medium whitespace-pre-line pl-1.5 text-neutral-700">
-                          {selectedProduct.dosage}
-                        </div>
-                      </div>
-
-                      {/* Quantity Selector Bar */}
-                      <div className="flex items-center gap-4 py-2 border-y border-neutral-100 flex-wrap">
-                        <span className="text-xs font-black uppercase tracking-wider text-[#5C1D13]">Quantity:</span>
-                        <div className="flex items-center border border-neutral-300 rounded-xl bg-white overflow-hidden shadow-2xs">
-                          <button
-                            type="button"
-                            onClick={() => setDetailQuantity(prev => Math.max(1, prev - 1))}
-                            className="px-3.5 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors font-bold text-sm cursor-pointer"
-                            aria-label="Decrease quantity"
-                          >
-                            -
-                          </button>
-                          <span className="px-4 py-2 font-black text-sm text-neutral-900 min-w-[2.5rem] text-center select-none">
-                            {detailQuantity}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setDetailQuantity(prev => Math.min(10, prev + 1))}
-                            className="px-3.5 py-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors font-bold text-sm cursor-pointer"
-                            aria-label="Increase quantity"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <span className="text-xs text-neutral-500 font-medium ml-auto">
-                          Item Total: <strong className="text-neutral-950 font-black text-sm">₹{(selectedProduct.price * detailQuantity).toLocaleString('en-IN')}</strong>
-                        </span>
-                      </div>
-
-                      {/* Action Buttons Design & Alignment */}
-                      {(() => {
-                        const stockInfo = getProductStockStatus(selectedProduct.id);
-                        if (stockInfo.status === 'out_of_stock') {
-                          return (
-                            <div className="space-y-3 pt-2">
-                              {/* Row 1: side-by-side Outline Back vs. Add to Cart (Disabled) */}
-                              <div className="grid grid-cols-2 gap-3">
-                                <button 
-                                  onClick={() => { setCurrentView('home'); navigate('/'); }}
-                                  className="text-xs font-bold py-3.5 px-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
-                                >
-                                  Back to Products
-                                </button>
-                                <button 
-                                  disabled
-                                  className="text-xs font-black py-3.5 px-4 rounded-xl bg-neutral-100 text-neutral-400 text-center cursor-not-allowed flex items-center justify-center gap-1.5"
-                                >
-                                  Out of Stock
-                                </button>
-                              </div>
-                              
-                              {/* Row 2: Full Width Notify Me button */}
-                              <button 
-                                onClick={() => setNotifyMeProduct(selectedProduct)}
-                                className="w-full text-xs font-black py-4 px-4 rounded-xl bg-[#FAF6F0] border-2 border-[#C86428]/40 hover:border-[#C86428] text-[#C86428] hover:bg-[#C86428]/5 transition-all text-center flex items-center justify-center gap-2 cursor-pointer shadow-md active:scale-95 duration-200"
-                              >
-                                <Bell className="w-4 h-4 text-[#C86428]" />
-                                <span>Notify Me When Restocked</span>
-                              </button>
-
-                              <div className="flex justify-center items-center gap-5 text-[11px] pt-1.5 font-medium text-neutral-500">
-                                <span className="flex items-center gap-1">
-                                  <Lock className="w-3.5 h-3.5 text-emerald-600" /> Secure Checkout
-                                </span>
-                                <span>•</span>
-                                <span>Shipped in 24 Hrs</span>
-                              </div>
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="space-y-3 pt-2">
-                            {/* Row 1: side-by-side Outline Back vs. Add to Cart */}
-                            <div className="grid grid-cols-2 gap-3">
-                              <button 
-                                onClick={() => { setCurrentView('home'); navigate('/'); }}
-                                className="text-xs font-bold py-3.5 px-4 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
-                              >
-                                Back to Products
-                              </button>
-                              <button 
-                                onClick={() => addToCart(selectedProduct, detailQuantity)}
-                                className="text-xs font-black py-3.5 px-4 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/10"
-                              >
-                                Add to Cart ({detailQuantity})
-                              </button>
-                            </div>
-                            
-                            {/* Row 2: Full Width Quick Buy Now (Maroon Burgundy background) */}
-                            <button 
-                              id="detail-quick-buy-btn"
-                              onClick={() => handleQuickBuy(selectedProduct)}
-                              className="w-full text-xs font-black py-4 px-4 rounded-xl bg-[#5C1D13] hover:bg-[#4A1D05] text-white transition-all text-center flex items-center justify-center gap-2 cursor-pointer shadow-lg active:scale-95 shadow-[#5C1D13]/10 animate-breathe"
-                            >
-                              <ShoppingBag className="w-4 h-4 text-white" />
-                              <span>Quick Buy (COD Available)</span>
-                            </button>
-
-                            <div className="flex justify-center items-center gap-5 text-[11px] pt-1.5 font-medium text-neutral-500">
-                              <span className="flex items-center gap-1">
-                                <Lock className="w-3.5 h-3.5 text-emerald-600" /> Secure Checkout
-                              </span>
-                              <span>•</span>
-                              <span>Shipped in 24 Hrs</span>
-                              <span>•</span>
-                              <span>Discreet Packaging</span>
-                            </div>
-
-                            {/* FREE Personalized Diet Plan Banner */}
-                            <div id="detail-diet-plan-banner" className="bg-[#FAF6F0] border-2 border-[#E5A93C]/40 p-4 rounded-2xl flex items-start gap-3 mt-4 text-left shadow-xs">
-                              <div className="w-8 h-8 rounded-xl bg-[#E5A93C]/20 border border-[#E5A93C]/30 flex items-center justify-center shrink-0 text-base mt-0.5">
-                                🥗
-                              </div>
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="text-[9px] font-black uppercase tracking-wider bg-[#5C1D13] text-[#E5A93C] px-2 py-0.5 rounded-full font-sans">
-                                    FREE BONUS INCLUDED
-                                  </span>
-                                  <span className="text-[10px] font-extrabold text-[#C86428]">Customized for You</span>
-                                </div>
-                                <h4 className="text-xs sm:text-sm font-black text-[#4A1D05] leading-snug">
-                                  FREE Personalized Diet Plan based on your body type and weight
-                                </h4>
-                                <p className="text-[11px] text-[#4A1D05]/85 leading-relaxed font-medium">
-                                  Every product order includes a 1-on-1 personalized Ayurvedic nutrition and meal guide formulated around your exact body weight and dosha balance.
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* COD Information Badge */}
-                            <div id="detail-cod-info-badge" className="bg-[#FAF6F0] border border-[#E5A93C]/30 p-4 rounded-2xl flex items-start gap-3 mt-4 text-left">
-                              <Truck className="w-5 h-5 text-[#C86428] shrink-0 mt-0.5" />
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-1.5">
-                                  <h4 className="text-xs font-bold text-[#4A1D05]">Cash on Delivery Available</h4>
-                                  <span className="text-[8px] bg-[#E5A93C]/20 text-[#4A1D05] px-1.5 py-0.5 rounded font-black font-mono uppercase tracking-wider">Policy</span>
-                                </div>
-                                <p className="text-[11px] text-[#4A1D05]/85 leading-relaxed font-medium">
-                                  ₹150 advance payment is required to confirm your COD order. The remaining amount is payable at the time of delivery.
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Write a Review Button */}
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setWriteReviewProductId(selectedProduct.id);
-                                setIsWriteReviewOpen(true);
-                              }}
-                              className="w-full flex items-center justify-center gap-2 bg-[#FAF6F0] hover:bg-[#C86428]/10 text-[#C86428] border border-[#C86428]/40 font-extrabold text-xs py-3.5 px-4 rounded-xl transition-all cursor-pointer active:scale-95 shadow-sm mt-3.5"
-                            >
-                              <Star className="w-4 h-4 fill-[#C86428] text-[#C86428]" />
-                              <span>Write a Product Review</span>
-                            </button>
-                          </div>
-                        );
-                      })()}
-
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Deep-dive: Approved Medical Benefits & Action Mechanisms */}
-            {selectedProduct.id === 'flowelle' ? (
-              <div className="space-y-12">
-                {/* 1. 8 FEMININE HEALTH PROBLEMS ADDITION */}
-                <section className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-10 space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                    
-                    {/* Left side: Grid of problems */}
-                    <div className="md:col-span-7 space-y-6">
-                      <div>
-                        <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
-                          Therapeutic Solution
-                        </span>
-                        <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
-                          8 Feminine Health Problems Addition
-                        </h2>
-                        <p className="text-sm text-neutral-300 mt-2">
-                          FLOWELLE is a deep-acting formulation engineered to address the 8 most critical aspects of women's physiological and hormonal health.
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {[
-                          { title: "White Discharge (Leucorrhoea)", desc: "Controls abnormal secretion, restores healthy vaginal flora, and eliminates irritation." },
-                          { title: "Irregular Periods", desc: "Regulates ovarian cycles to restore consistent, natural 28-day monthly rhythms." },
-                          { title: "Hormonal Imbalance", desc: "Coordinates FSH and LH hormones to establish overall endocrine harmony." },
-                          { title: "Menstrual Pain", desc: "Soothes severe pelvic contractions, backaches, and intense menstrual cramps." },
-                          { title: "Low Energy", desc: "Revives cell mitochondrial stamina to eliminate daily fatigue and lethargy." },
-                          { title: "Uterine Weakness", desc: "Tones and strengthens uterine muscles, preparing them for healthy functioning." },
-                          { title: "Mood Swings", desc: "Reduces pre-period anxiety, irritability, and stress-induced emotional changes." },
-                          { title: "Excessive Bleeding", desc: "Restricts abnormal flow volume, preventing iron loss and anemia." }
-                        ].map((item, idx) => (
-                          <div key={idx} className="p-4 bg-[#4A1D05]/30 border border-white/5 rounded-2xl space-y-1 hover:border-[#E5A93C]/30 transition-all group">
-                            <div className="flex items-center gap-2">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#E5A93C] group-hover:scale-125 transition-transform" />
-                              <h3 className="font-serif font-bold text-white text-sm">{item.title}</h3>
-                            </div>
-                            <p className="text-xs text-neutral-300 leading-normal pl-4">{item.desc}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Right side: 8 Health Problems Image */}
-                    <div className="md:col-span-5">
-                      <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/30 relative group">
-                        <img 
-                          src={optimizeCloudinaryUrl(
-                            selectedProduct?.id === 'ovaira'
-                              ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
-                              : selectedProduct?.id === 'flowelle'
-                                ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_01_PM.png'
-                                : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_22_PM.png',
-                            480
-                          )} 
-                          alt="8 Feminine Health Solutions" 
-                          loading="lazy"
-                          decoding="async"
-                          width="450"
-                          height="350"
-                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
-                          }}
-                        />
-                      </div>
-                    </div>
-
-                  </div>
-                </section>
-
-                {/* 2. POWERFUL 33-HERB FORMULA SECTION */}
-                <section className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-10 space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-                    
-                    {/* Left side: 33-Herb Formula Image */}
-                    <div className="md:col-span-5 order-2 md:order-1">
-                      <div className="rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-black/30 relative group">
-                        <img 
-                          src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png", 480)} 
-                          alt="33-Herb Pure Formulation" 
-                          loading="lazy"
-                          decoding="async"
-                          width="450"
-                          height="350"
-                          className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
-                          <p className="text-xs text-[#E5A93C] font-semibold tracking-wider uppercase font-mono">100% Pure Bharat Pharmacopoeia Standards</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right side: Ingredient feature */}
-                    <div className="md:col-span-7 space-y-6 order-1 md:order-2">
-                      <div>
-                        <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
-                          Sourced Scientifically
-                        </span>
-                        <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide mt-3">
-                          Powerful 33-Herb Formula Section
-                        </h2>
-                        <p className="text-sm text-neutral-300 mt-2">
-                          Crafted under strict pharmaceutical guidelines as per the official <span className="text-[#E5A93C] font-semibold">Bharat Pharmacopoeia standards</span>, this multi-herb synergy incorporates thirty-three active botanical extracts for multi-system wellness.
-                        </p>
-                      </div>
-
-                      <div className="space-y-4">
-                        {[
-                          { name: "Ashok Chal", benefit: "Supports uterine health and balance", desc: "Tones uterine muscles, regularizes menstrual bleeding volume, and manages painful dysmenorrhea." },
-                          { name: "Shatavari", benefit: "Nourishes female reproductive system", desc: "Rich in natural phytoestrogens to regulate estrogen levels, boost ovulation health, and support lactation." },
-                          { name: "Gokhru", benefit: "Supports hormonal balance", desc: "Directly triggers optimal endocrine wellness and combats fluid retention and pre-menstrual bloating." },
-                          { name: "Ashwagandha", benefit: "Helps reduce stress and fatigue", desc: "Reduces high cortisol, calms overactive nervous symptoms, and provides healthy daily physical stamina." }
-                        ].map((herb, hIdx) => (
-                          <div key={hIdx} className="p-4 bg-[#4A1D05]/50 border border-white/5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div className="space-y-1">
-                              <h3 className="font-serif font-bold text-white text-base">{herb.name}</h3>
-                              <p className="text-xs text-neutral-300">{herb.desc}</p>
-                            </div>
-                            <span className="text-[11px] font-extrabold px-3 py-1.5 rounded-full bg-[#C86428]/20 text-[#E5A93C] border border-[#C86428]/30 shrink-0 self-start sm:self-auto">
-                              {herb.benefit}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                  </div>
-                </section>
-
-                {/* 3. EXACT CONSUMPTION RITUAL */}
-                <section className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-10 space-y-8">
-                  <div>
-                    <div className="text-center max-w-xl mx-auto space-y-2">
-                      <span className="text-xs font-bold text-[#E5A93C] uppercase tracking-widest bg-[#E5A93C]/10 px-3 py-1.5 rounded-full border border-[#E5A93C]/20">
-                        Easy 30-Second Habit
-                      </span>
-                      <h2 className="font-serif text-2xl md:text-3xl font-bold text-white tracking-wide">
-                        Exact Consumption Ritual (How to Consume)
-                      </h2>
-                      <p className="text-xs md:text-sm text-neutral-300">
-                        Consistency is the secret to deep tissue rejuvenation. Follow this precise ritual twice daily.
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-10 items-stretch">
-                      
-                      {/* Left: 3 Steps */}
-                      <div className="md:col-span-6 flex flex-col justify-center space-y-6">
-                        {[
-                          { step: "Step 1", title: "Pour 5-10ml", desc: "Measure 5-10ml of FLOWELLE Syrup precisely using the custom measuring cap provided." },
-                          { step: "Step 2", title: "Mix in Water", desc: "Pour into a glass of lukewarm or normal water and mix it well until evenly blended." },
-                          { step: "Step 3", title: "Drink Daily", desc: "Drink daily after your meals (Morning and Evening) as a key part of your wellness routine." }
-                        ].map((stepObj, sIdx) => (
-                          <div key={sIdx} className="p-5 bg-[#4A1D05]/40 border border-white/5 rounded-2xl flex gap-4 items-start">
-                            <span className="text-xs font-extrabold bg-[#E5A93C] text-[#4A1D05] px-3 py-1 rounded-full shrink-0">
-                              {stepObj.step}
-                            </span>
-                            <div className="space-y-1">
-                              <h3 className="font-serif font-bold text-white text-base">{stepObj.title}</h3>
-                              <p className="text-xs text-neutral-300 leading-relaxed">{stepObj.desc}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Right: Images Verified Dosage & Standardized Certification Side by Side */}
-                      <div className="md:col-span-6 grid grid-cols-2 gap-4">
-                        <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl bg-black/20 relative group flex flex-col justify-between">
-                          <div className="p-3 bg-black/40 border-b border-white/10 text-center">
-                            <p className="text-[10px] uppercase font-bold tracking-wider text-[#E5A93C] font-mono">Verified Ayurvedic Dosage</p>
-                          </div>
-                          <div className="flex-grow flex items-center justify-center p-2">
-                            <img 
-                              src={optimizeCloudinaryUrl(
-                                selectedProduct?.id === 'ovaira'
-                                  ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_30_PM.png'
-                                  : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_05_PM.png',
-                                300
-                              )} 
-                              alt="Dosage Info" 
-                              loading="lazy"
-                              decoding="async"
-                              width="220"
-                              height="220"
-                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 300);
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl bg-black/20 relative group flex flex-col justify-between">
-                          <div className="p-3 bg-black/40 border-b border-white/10 text-center">
-                            <p className="text-[10px] uppercase font-bold tracking-wider text-[#E5A93C] font-mono">Standardized Certification</p>
-                          </div>
-                          <div className="flex-grow flex items-center justify-center p-2">
-                            <img 
-                              src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512640/ChatGPT_Image_Jun_20_2026_10_28_34_PM.png", 300)} 
-                              alt="Certification badge" 
-                              loading="lazy"
-                              decoding="async"
-                              width="220"
-                              height="220"
-                              className="w-full h-auto max-w-full object-contain block mx-auto transition-transform duration-500 group-hover:scale-105"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 300);
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                </section>
-              </div>
-            ) : (
-              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                {/* Left Column: Approved Benefits */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 space-y-5">
-                  <h2 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
-                    Approved Therapeutic Benefits
-                  </h2>
-                  <div className="space-y-3.5">
-                    {selectedProduct.benefits.map((benefit, bIdx) => (
-                      <div key={bIdx} className="flex gap-2.5 items-start">
-                        <div className="p-0.5 bg-emerald-500/10 text-emerald-400 rounded-full mt-0.5 border border-emerald-500/20">
-                          <Check className="w-3.5 h-3.5" />
-                        </div>
-                        <p className="text-xs md:text-sm text-[#F7E7D9] leading-normal font-medium">{benefit}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right Column: Ayurvedic Ingredients spotlight */}
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 space-y-5">
-                  <h2 className="font-serif text-xl font-bold text-white border-b border-white/10 pb-3">
-                    Key Bio-Active Ingredients
-                  </h2>
-                  
-                  <div className="rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/20">
-                    <img 
-                      src={optimizeCloudinaryUrl(
-                        selectedProduct?.id === 'ovaira'
-                          ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512635/ChatGPT_Image_Jun_20_2026_10_27_18_PM_copy.png'
-                          : selectedProduct?.id === 'flowelle'
-                            ? 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512638/ChatGPT_Image_Jun_20_2026_10_28_03_PM.png'
-                            : 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png',
-                        480
-                      )} 
-                      alt="Powerful Ingredients" 
-                      loading="lazy"
-                      decoding="async"
-                      width="450"
-                      height="350"
-                      className="w-full h-auto max-w-full object-contain block mx-auto animate-pulse-slow"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    {selectedProduct.keyIngredients.map((ing, iIdx) => {
-                      const isMens = activeCategory === 'men';
-                      return (
-                        <div 
-                          key={iIdx} 
-                          className={`p-3.5 border rounded-xl space-y-1 ${
-                            isMens 
-                              ? 'bg-[#4A1D05]/60 border-[#E5A93C]/20' 
-                              : 'bg-[#4A1D05]/50 border-white/5'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-serif font-bold text-white text-sm">{ing.name}</h4>
-                            <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded border ${
-                              isMens 
-                                ? 'bg-[#E5A93C]/10 text-[#E5A93C] border-[#E5A93C]/20' 
-                                : 'bg-[#C86428]/20 text-[#E5A93C] border-[#C86428]/30'
-                            }`}>
-                              {ing.benefit}
-                            </span>
-                          </div>
-                          <p className={`text-xs leading-normal ${isMens ? 'text-neutral-300' : 'text-neutral-300'}`}>{ing.description}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-              </section>
-            )}
-
-            {/* ----------------- CUSTOMER REVIEWS DEDICATED SECTION ----------------- */}
-            <section className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 shadow-xl mt-12">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
-                <div className="text-left">
-                  <h2 className="font-serif text-2xl font-bold text-white flex items-center gap-2">
-                    Verified Customer Reviews
-                  </h2>
-                  <p className="text-xs text-neutral-300 font-medium">Authentic feedback from real meONmode® users</p>
-                </div>
-                
-                {/* Right side: Overall stars display & Write a Review button */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                  <div className="flex items-center gap-1.5 text-[#E5A93C] text-sm font-extrabold bg-[#4A1D05]/60 px-3.5 py-2 rounded-xl border border-[#E5A93C]/20">
-                    <Star className="w-4 h-4 fill-current animate-pulse-slow" />
-                    {(() => {
-                      const { rating, reviewsCount } = getProductRatingDetails(selectedProduct.id);
-                      return (
-                        <span>
-                          {rating.toFixed(1)} / 5 ({reviewsCount} reviews)
-                        </span>
-                      );
-                    })()}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setWriteReviewProductId(selectedProduct.id);
-                      setIsWriteReviewOpen(true);
-                    }}
-                    className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] hover:from-[#8B3B15] hover:to-[#C86428] text-white font-extrabold text-xs py-2.5 px-5 rounded-xl transition-all cursor-pointer shadow-md hover:shadow-[0_0_15px_rgba(200,100,40,0.3)]"
-                  >
-                    Write a Review
-                  </button>
-                </div>
-              </div>
-
-              {/* Individual reviews list */}
-              {(() => {
-                const prodReviews = currentReviews.filter(r => r.productId === selectedProduct.id);
-                
-                if (prodReviews.length === 0) {
-                  return (
-                    <div className="py-12 text-center text-white/50 italic space-y-3">
-                      <p>No reviews submitted for this remedy yet.</p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setWriteReviewProductId(selectedProduct.id);
-                          setIsWriteReviewOpen(true);
-                        }}
-                        className="bg-[#C86428]/10 hover:bg-[#C86428]/20 border border-[#C86428]/35 text-[#E5A93C] font-extrabold text-xs px-4 py-2 rounded-xl transition-all cursor-pointer"
-                      >
-                        Be the first to share your experience!
-                      </button>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {prodReviews.map((rev, rIdx) => {
-                      const revImages = getReviewImages(rev.image);
-                      return (
-                        <div 
-                          key={rIdx} 
-                          className="bg-[#FAF6F0] text-neutral-900 rounded-2xl p-5 md:p-6 space-y-4 hover:shadow-lg transition-shadow border border-[#E5A93C]/10 text-left flex flex-col justify-between"
-                        >
-                          <div className="space-y-3">
-                            {/* Top row: stars and verified badge */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex text-[#E5A93C]">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <Star 
-                                    key={i} 
-                                    className={`w-4 h-4 ${i < rev.rating ? 'fill-current' : 'text-neutral-300'}`} 
-                                  />
-                                ))}
-                              </div>
-                              {rev.verified && (
-                                <span className="inline-flex items-center gap-1 text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider font-mono">
-                                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span>Verified Buyer</span>
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Swipeable image gallery if images are present */}
-                            {revImages.length > 0 && (
-                              <div className="space-y-1">
-                                {revImages.length > 1 && (
-                                  <span className="block text-[8px] text-neutral-400 font-extrabold uppercase tracking-wider font-mono">◀ Swipe Photos ▶</span>
-                                )}
-                                <div className="flex gap-2 overflow-x-auto snap-x snap-mandatory scrollbar-none py-1.5 scroll-smooth">
-                                  {revImages.map((imgUrl, imgI) => (
-                                    <div 
-                                      key={imgI} 
-                                      className="snap-center shrink-0 w-24 h-24 rounded-xl border border-neutral-200 bg-neutral-50 p-0.5 flex items-center justify-center cursor-pointer hover:border-[#C86428] transition-colors relative"
-                                      onClick={() => {
-                                        setLightboxImage(imgUrl);
-                                        setLightboxZoom(false);
-                                      }}
-                                    >
-                                      <img 
-                                        src={optimizeCloudinaryUrl(imgUrl, 200)} 
-                                        srcSet={`${optimizeCloudinaryUrl(imgUrl, 120)} 120w, ${optimizeCloudinaryUrl(imgUrl, 200)} 200w`}
-                                        sizes="96px"
-                                        alt={`Review image ${imgI + 1}`} 
-                                        loading="lazy"
-                                        decoding="async"
-                                        width="96"
-                                        height="96"
-                                        className="w-full h-full object-cover rounded-lg"
-                                        onError={(e) => {
-                                          (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
-                                        }}
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Review text */}
-                            <div className="space-y-1">
-                              {rev.title && (
-                                <h3 className="font-serif text-sm font-extrabold text-[#4A1D05] leading-snug">
-                                  {rev.title}
-                                </h3>
-                              )}
-                              <p className="text-xs text-neutral-700 leading-relaxed font-sans">{rev.review}</p>
-                            </div>
-                          </div>
-
-                          {/* Footer with name and date */}
-                          <div className="flex items-center justify-between text-[10px] text-neutral-400 font-semibold border-t border-neutral-100 pt-3 mt-4 font-sans uppercase tracking-wider">
-                            <span>{rev.name} {rev.location ? `(${rev.location})` : ''}</span>
-                            <span>{rev.date || "Verified"}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                );
-              })()}
-            </section>
-
-            {/* Related Products Section */}
-            <section className="bg-gradient-to-br from-[#230d07] via-[#3a1508] to-[#1a0803] border border-[#E5A93C]/20 rounded-3xl p-6 md:p-8 space-y-6 shadow-2xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-white/10 pb-4 gap-2">
-                <div>
-                  <h2 className="font-serif text-xl md:text-2xl font-bold text-white flex items-center gap-2">
-                    <span>🌿</span> Related Ayurvedic Remedies & Protocols
-                  </h2>
-                  <p className="text-xs text-neutral-300">Complementary formulas for complete holistic health</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentView('home');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className="text-xs font-bold text-[#E5A93C] hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  View All Products →
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {(() => {
-                  const allUnique = Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values());
-                  const related = allUnique.filter(p => p.id !== selectedProduct.id);
-                  return related.map(rel => (
-                    <div 
-                      key={rel.id} 
-                      onClick={() => {
-                        handleProductClick(rel);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="bg-black/30 border border-white/10 hover:border-[#E5A93C]/40 rounded-2xl p-4 transition-all duration-300 hover:scale-[1.02] cursor-pointer flex flex-col justify-between space-y-3 group"
-                    >
-                      <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
-                        <img 
-                          src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 300) : ''} 
-                          srcSet={rel.images && rel.images.length > 0 ? `${optimizeCloudinaryUrl(rel.images[0], 200)} 200w, ${optimizeCloudinaryUrl(rel.images[0], 300)} 300w, ${optimizeCloudinaryUrl(rel.images[0], 450)} 450w` : ''}
-                          sizes="(max-width: 640px) 140px, 250px"
-                          alt={rel.name} 
-                          loading="lazy"
-                          decoding="async"
-                          width="250"
-                          height="250"
-                          className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-[#E5A93C]/10 text-[#E5A93C] border border-[#E5A93C]/20">
-                          {rel.tag}
-                        </span>
-                        <h3 className="font-serif font-bold text-white text-sm group-hover:text-[#E5A93C] transition-colors line-clamp-1">
-                          {rel.name}
-                        </h3>
-                        <p className="text-[10px] text-neutral-300 line-clamp-2 leading-tight">
-                          {rel.shortDescription}
-                        </p>
-                      </div>
-                      <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                        <div>
-                          <span className="text-xs font-black text-amber-300">₹{rel.price}</span>
-                          <span className="text-[10px] text-neutral-400 line-through ml-1">₹{rel.mrp}</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-[#E5A93C] group-hover:translate-x-1 transition-transform">
-                          View Details →
-                        </span>
-                      </div>
-                    </div>
-                  ));
-                })()}
-              </div>
-            </section>
-
-          </div>
-          );
-        })()}
+        {currentView === 'detail' && currentProduct && (
+          <ProductDetail
+            product={currentProduct}
+            onBack={() => {
+              setCurrentView('home');
+              navigate('/');
+            }}
+            onAddToCart={addToCart}
+            onQuickBuy={handleQuickBuy}
+            onProductClick={handleProductClick}
+            onWriteReview={(prodId) => {
+              setWriteReviewProductId(prodId);
+              setIsWriteReviewOpen(true);
+            }}
+            onNotifyMe={(prod) => setNotifyMeProduct(prod)}
+            wishlist={wishlist}
+            onToggleWishlist={toggleWishlist}
+            onShare={handleShareProduct}
+            onOpenLightbox={(img) => {
+              setLightboxImage(img);
+              setLightboxZoom(false);
+            }}
+            currentReviews={currentReviews}
+            womenProducts={womenProducts}
+            menProducts={menProducts}
+            getProductRatingDetails={getProductRatingDetails}
+            getProductStockStatus={getProductStockStatus}
+            t={t}
+            optimizeCloudinaryUrl={optimizeCloudinaryUrl}
+            getProductCleanSlug={getProductCleanSlug}
+          />
+        )}
 
         {/* ----------------- VIEW 3: SHOPPING CART & CHECKOUT VIEW ----------------- */}
         {currentView === 'cart' && (
@@ -6402,7 +4844,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
               <div className="p-5 border-b border-neutral-100 flex items-center justify-between bg-[#FAF8F6]">
                 <div className="text-left">
                   <h3 className="font-serif text-lg font-black text-neutral-950">Verified Buyer Feedback</h3>
-                  <p className="text-[11px] text-neutral-500 font-medium">Genuine experiences shared by meONmode® members</p>
+                  <p className="text-[11px] text-neutral-500 font-medium">Genuine experiences shared by verified meONmode® customers</p>
                 </div>
                 <button
                   type="button"
@@ -6421,7 +4863,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <div className="flex gap-3 items-center p-3 bg-neutral-100/50 rounded-2xl border border-neutral-200/30">
                   <div className="w-12 h-12 rounded-xl bg-white border border-neutral-200/40 p-1 shrink-0 flex items-center justify-center">
                     <img 
-                      src={activeReviewProduct.images && activeReviewProduct.images[0]} 
+                      src={optimizeCloudinaryUrl(activeReviewProduct.images && activeReviewProduct.images[0], 96)} 
                       alt={activeReviewProduct.name} 
                       loading="lazy"
                       decoding="async"
@@ -6429,7 +4871,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       height="48"
                       className="w-full h-full object-contain"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                        (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 96);
                       }}
                     />
                   </div>
