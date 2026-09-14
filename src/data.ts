@@ -14,15 +14,19 @@ export function optimizeCloudinaryUrl(url: string, width?: number): string {
   const prefix = url.substring(0, uploadIndex + '/image/upload/'.length);
   let rest = url.substring(uploadIndex + '/image/upload/'.length);
   
-  // Strip existing transformations if present (including colons, equals, commas)
-  rest = rest.replace(/^([a-z0-9_:,=-]+)\/(v\d+\/.*)$/i, '$2');
+  // Robustly strip existing transformation segments while preserving the version/public ID path
+  if (/\bv\d+\//.test(rest)) {
+    rest = rest.replace(/^(?:[a-z0-9_:,=-]+\/)*(v\d+\/.*)$/i, '$1');
+  } else {
+    rest = rest.replace(/^(?:[a-z0-9_:,=-]+\/)+([^\/]+\.[a-z0-9]+)$/i, '$1');
+  }
   
   // Use q_auto:best for crystal-sharp text and packaging labels, c_limit to never distort aspect ratio or upscale
   const transform = width ? `f_auto,q_auto:best,w_${width},c_limit` : 'f_auto,q_auto:best';
   return `${prefix}${transform}/${rest}`;
 }
 
-export function getCloudinarySrcSet(url: string, widths: number[] = [480, 720, 960, 1200, 1600]): string {
+export function getCloudinarySrcSet(url: string, widths: number[] = [360, 480, 640, 800, 960, 1200]): string {
   if (!url || !url.includes('res.cloudinary.com')) return '';
   return widths.map(w => `${optimizeCloudinaryUrl(url, w)} ${w}w`).join(', ');
 }
@@ -568,7 +572,7 @@ export const reviews: CustomerReview[] = [
     name: "Dr. Karan Mehta",
     rating: 5,
     review: "Clinically speaking, the concentration of active L-arginine and Safed Musli in meONmode is pristine. It supports natural vascular circulation, decreases cortisol buildup, and enhances daily physical vigor.",
-    image: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787917041/photo_2026-08-28_17.05.16.jpg\nhttps://res.cloudinary.com/ukqeabxy/image/upload/v1787917041/photo_2026-08-28_17.05.12.jpg",
+    image: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787917041/photo_2026-08-28_17.05.16.jpg",
     verified: true,
     date: "May 25, 2026",
     title: "Exceptional pure adaptogens",

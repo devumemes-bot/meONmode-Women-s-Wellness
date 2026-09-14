@@ -59,6 +59,7 @@ import { WOMEN_TRANSPARENCY_HERBS, MEN_TRANSPARENCY_HERBS } from './ingredientDa
 import { AllProductsPage } from './components/AllProductsPage';
 import { HowItWorks } from './components/HowItWorks';
 import { BrandStory } from './components/BrandStory';
+import { AboutUsPage } from './components/AboutUsPage';
 
 // Code-split dynamic views
 const BlogListing = React.lazy(() => import('./components/BlogListing').then(m => ({ default: m.BlogListing })));
@@ -538,10 +539,10 @@ export default function App() {
     } else if (path === '/products' || path === '/combos' || path === '/collections/all-products' || path === '/collections/all' || path === '/all-products' || path === '/collections') {
       if (currentView !== 'home') setCurrentView('home');
       setActiveCategory('all');
-    } else if (path === '/collections/women' || path === '/collections/womens') {
+    } else if (path === '/women' || path === '/womens' || path === '/collections/women' || path === '/collections/womens') {
       if (currentView !== 'home') setCurrentView('home');
       setActiveCategory('women');
-    } else if (path === '/collections/men' || path === '/collections/mens') {
+    } else if (path === '/men' || path === '/mens' || path === '/collections/men' || path === '/collections/mens') {
       if (currentView !== 'home') setCurrentView('home');
       setActiveCategory('men');
     } else if (path === '/') {
@@ -616,10 +617,16 @@ export default function App() {
     try {
       localStorage.setItem('meonmode_phone_lookup', cleanPhone);
       const res = await fetch(`/api/orders-by-phone/${cleanPhone}`);
+      
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error('Unable to retrieve orders at this time. Please try again or contact support.');
+      }
+
       const data = await res.json();
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to query order history from server.');
+        throw new Error(data.error || 'Unable to retrieve orders at this time. Please try again or contact support.');
       }
 
       let fetched: any[] = data.orders || [];
@@ -633,11 +640,15 @@ export default function App() {
 
       setOrderHistoryOrders(fetched);
       if (fetched.length === 0) {
-        setOrderHistorySearchError(`No verified orders found for mobile number +91 ${cleanPhone}. Please ensure you completed payment verification during checkout.`);
+        setOrderHistorySearchError('No orders found for this phone number. Please check the number or place an order first.');
       }
     } catch (err: any) {
       console.error("Order history lookup error:", err);
-      setOrderHistorySearchError(err.message || "Failed to search order history.");
+      // Clean, customer-friendly message - never show technical HTML or JSON parse tokens
+      const friendlyMsg = (err.message && !err.message.includes('<') && !err.message.includes('JSON') && !err.message.includes('token'))
+        ? err.message
+        : 'Unable to retrieve orders at this time. Please try again or contact support.';
+      setOrderHistorySearchError(friendlyMsg);
     } finally {
       setIsLoadingOrderHistory(false);
     }
@@ -662,7 +673,13 @@ export default function App() {
 
       // Re-query backend server to confirm order authenticity
       fetch(`/api/orders/${lastVerifiedOrder.orderId}?token=${lastVerifiedOrder.orderVerificationToken}`)
-        .then(res => res.json())
+        .then(res => {
+          const contentType = res.headers.get('content-type') || '';
+          if (!contentType.includes('application/json')) {
+            throw new Error('Non-JSON response');
+          }
+          return res.json();
+        })
         .then(data => {
           if (!data.success || !data.order) {
             setLastVerifiedOrder(null);
@@ -865,7 +882,42 @@ Payment has been cryptographically verified on the backend server. Please dispat
       robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     };
 
-    if (currentView === 'detail' && selectedProduct) {
+    const currentPath = location.pathname.toLowerCase().replace(/\/+$/, '') || '/';
+    if (currentView === 'home') {
+      if (currentPath === '/women') {
+        seo = {
+          title: "Women's Ayurvedic Wellness Products | meONmode",
+          description: "Explore meONmode Ayurvedic wellness solutions for women: OVAIRA Capsules for PCOS/PCOD and FLOWELLE Drink for cramp and flow balance. 100% natural, free pan-India shipping.",
+          canonicalUrl: "https://meonmode.com/women",
+          ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png",
+          robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        };
+      } else if (currentPath === '/men') {
+        seo = {
+          title: "Men's Ayurvedic Vitality & Performance | meONmode",
+          description: "Discover meONmode Ayurvedic formulations for men: ALPHAMAX Capsules with Shudh Shilajit and WANTMORE Prash for endurance, vigor, and cellular energy with free shipping.",
+          canonicalUrl: "https://meonmode.com/men",
+          ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png",
+          robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        };
+      } else if (currentPath === '/products') {
+        seo = {
+          title: "All Ayurvedic Products | meONmode Wellness",
+          description: "Explore the complete catalogue of authentic Ayurvedic wellness products by meONmode for women and men, featuring free shipping and Cash on Delivery across India.",
+          canonicalUrl: "https://meonmode.com/products",
+          ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+          robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        };
+      } else if (currentPath === '/combos') {
+        seo = {
+          title: "Ayurvedic Wellness Combos | meONmode",
+          description: "Shop meONmode synergistic Ayurvedic combos for women's hormonal balance and men's performance vitality with maximum savings and free pan-India delivery.",
+          canonicalUrl: "https://meonmode.com/combos",
+          ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png",
+          robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        };
+      }
+    } else if (currentView === 'detail' && selectedProduct) {
       const prodSeo = getProductSeoData(selectedProduct);
       seo = {
         title: prodSeo.title,
@@ -1518,7 +1570,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
               <button 
                 onClick={() => {
                   setActiveCategory('women');
-                  navigateToView('home');
+                  setCurrentView('home');
+                  navigate('/women');
                 }} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'women' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
@@ -1528,7 +1581,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
               <button 
                 onClick={() => {
                   setActiveCategory('men');
-                  navigateToView('home');
+                  setCurrentView('home');
+                  navigate('/men');
                 }} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'men' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
@@ -1919,19 +1973,19 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             onClick={() => {
                               handleProductClick(prod);
                             }}
-                            className="w-full focus:outline-none cursor-pointer overflow-hidden relative flex items-center justify-center group"
+                            className="w-full focus:outline-none cursor-pointer overflow-hidden relative flex items-center justify-center group aspect-[4/3] sm:aspect-square max-h-56"
                             title="Click to view pricing & details"
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 
-                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 320)} 320w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 640w`}
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 
+                              srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 360w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 640w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 960)} 960w`}
                               sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 320px"
                               alt={prod.name}
                               loading="lazy"
                               decoding="async"
                               width="320"
-                              height="224"
-                              className="w-full h-auto max-w-full object-contain block mx-auto h-48 md:h-56 p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
+                              height="240"
+                              className="w-full h-full max-w-full object-contain block mx-auto p-2 transform transition-transform duration-500 ease-out group-hover:scale-105"
                               onError={(e) => {
                                 const target = e.target as HTMLImageElement;
                                 target.style.display = 'none';
@@ -2209,8 +2263,8 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {revImages.map((imgUrl, imgIndex) => (
                                 <div key={imgIndex} className="w-full h-full snap-center shrink-0 relative flex items-center justify-center p-2">
                                   <img 
-                                    src={optimizeCloudinaryUrl(imgUrl, 480)} 
-                                    srcSet={`${optimizeCloudinaryUrl(imgUrl, 320)} 320w, ${optimizeCloudinaryUrl(imgUrl, 480)} 480w, ${optimizeCloudinaryUrl(imgUrl, 640)} 640w`}
+                                    src={optimizeCloudinaryUrl(imgUrl, 640)} 
+                                    srcSet={`${optimizeCloudinaryUrl(imgUrl, 320)} 320w, ${optimizeCloudinaryUrl(imgUrl, 480)} 480w, ${optimizeCloudinaryUrl(imgUrl, 640)} 640w, ${optimizeCloudinaryUrl(imgUrl, 960)} 960w`}
                                     sizes="(max-width: 640px) 280px, 320px"
                                     alt={`${rev.name}'s Review Asset ${imgIndex + 1}`} 
                                     loading="lazy"
@@ -2223,7 +2277,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                       setLightboxZoom(false);
                                     }}
                                     onError={(e) => {
-                                      (e.target as HTMLImageElement).src = 'https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png';
+                                      (e.target as HTMLImageElement).src = optimizeCloudinaryUrl('https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png', 480);
                                     }}
                                   />
                                   {revImages.length > 1 && (
@@ -3745,46 +3799,15 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 5E: ABOUT US VIEW ----------------- */}
         {currentView === 'about' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">About meONmode®</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">Authentic Ayurvedic Wellness & Science</p>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C]">Our Mission</h2>
-                <p className="text-white/80">
-                  At meONmode®, our mission is to empower individuals with authentic, pure, and clinically respected Ayurvedic formulations. We bridge the ancient wisdom of classical Ayurveda with modern clinical standards, delivering holistic care for women's reproductive health, cycle regularity, and men's vitality.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C]">Pure Botanicals & GMP Standards</h2>
-                <p className="text-white/80">
-                  Every batch of meONmode formulations is crafted in state-of-the-art GMP-certified facilities adhering to the highest quality control and AYUSH guidelines. We use 100% natural, ethically sourced herbs with zero artificial hormones, steroids, or harmful additives.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Explore Products
-              </button>
-            </div>
-          </div>
+          <AboutUsPage
+            onBackToHome={() => navigateToView('home')}
+            onNavigateToView={navigateToView}
+            onSelectProduct={(product) => {
+              setSelectedProduct(product);
+              navigateToView('detail');
+            }}
+            products={[...PRODUCTS, ...MENS_PRODUCTS, VAYUCORE_PRODUCT]}
+          />
         )}
 
         {/* ----------------- VIEW 5F: CONTACT US VIEW ----------------- */}
@@ -5347,7 +5370,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
             className="w-full h-full max-h-[80vh] flex items-center justify-center relative cursor-zoom-in overflow-auto p-4 md:p-8"
           >
             <img
-              src={lightboxImage}
+              src={optimizeCloudinaryUrl(lightboxImage, 1200)}
+              srcSet={`${optimizeCloudinaryUrl(lightboxImage, 640)} 640w, ${optimizeCloudinaryUrl(lightboxImage, 1080)} 1080w, ${optimizeCloudinaryUrl(lightboxImage, 1600)} 1600w`}
+              sizes="90vw"
               alt="Customer Review Expanded"
               referrerPolicy="no-referrer"
               decoding="async"

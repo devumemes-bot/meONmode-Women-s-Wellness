@@ -3,192 +3,227 @@
   <url>
     <loc>https://meonmode.com/</loc>
     <priority>1.0</priority>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/products/flowelle</loc>
+    <loc>https://meonmode.com/women</loc>
     <priority>0.9</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/products/ovaira</loc>
+    <loc>https://meonmode.com/men</loc>
     <priority>0.9</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/products/alphamax</loc>
+    <loc>https://meonmode.com/products</loc>
     <priority>0.9</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
-    <loc>https://meonmode.com/products/wantmore</loc>
-    <priority>0.9</priority>
-    <changefreq>weekly</changefreq>
-  </url>
-  <url>
-    <loc>https://meonmode.com/products/vayucore</loc>
+    <loc>https://meonmode.com/combos</loc>
     <priority>0.9</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/products/combo-kit</loc>
-    <priority>0.95</priority>
+    <priority>0.85</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/products/mens-combo</loc>
-    <priority>0.95</priority>
+    <priority>0.85</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/products/ovaira</loc>
+    <priority>0.85</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/products/flowelle</loc>
+    <priority>0.85</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/products/alphamax</loc>
+    <priority>0.85</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/products/wantmore</loc>
+    <priority>0.85</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/products/vayucore</loc>
+    <priority>0.85</priority>
     <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog</loc>
     <priority>0.8</priority>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/pcos-kya-hai-pcod-se-alag</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/pcos-vs-pcod</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/white-discharge-shwet-pradar-ayurvedic</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/pcod-diet-plan-hindi</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/kanchnar-guggul-fayde-pcod</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/irregular-periods-causes-medical-advice</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/womens-daily-hormonal-wellness-habits</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/shatavari-in-ayurveda</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/ashoka-lodhra-traditional-ayurveda</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/menstrual-cycle-basics</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/everyday-womens-wellness-routine</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/wantmore-ingredient-guide</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/swaran-bhasma-in-ayurveda</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/chandi-bhasma-in-ayurveda</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/moti-pishti-explained</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/salam-panja-traditional-ayurvedic-context</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/siddh-makardhwaj-traditional-context</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/jayfal-in-ayurveda</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/what-is-an-ayurvedic-prash</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/alphamax-ingredient-guide</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/shilajit-explained</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/ashwagandha-explained</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/safed-musli-explained</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/kaunch-beej-ayurvedic-guide</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/kesar-in-ayurveda</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/ashwagandha-vs-shilajit</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/blog/safed-musli-vs-ashwagandha</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/why-digestive-wellness-matters</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/understanding-bloating</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/everyday-habits-digestive-comfort</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/ayurvedic-view-of-digestion</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/blog/vayucore-ingredient-guide</loc>
     <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://meonmode.com/refund-policy</loc>
-    <priority>0.5</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://meonmode.com/shipping-policy</loc>
-    <priority>0.5</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://meonmode.com/privacy-policy</loc>
-    <priority>0.5</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://meonmode.com/terms-and-conditions</loc>
-    <priority>0.5</priority>
-    <changefreq>monthly</changefreq>
+    <changefreq>weekly</changefreq>
   </url>
   <url>
     <loc>https://meonmode.com/about</loc>
@@ -200,5 +235,24 @@
     <priority>0.6</priority>
     <changefreq>monthly</changefreq>
   </url>
+  <url>
+    <loc>https://meonmode.com/shipping-policy</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/refund-policy</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/privacy-policy</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://meonmode.com/terms-and-conditions</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+  </url>
 </urlset>
-

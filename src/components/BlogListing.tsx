@@ -154,7 +154,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                   "@type": "Organization",
                   "name": "meONmode",
                   "url": "https://meonmode.com/",
-                  "logo": "https://res.cloudinary.com/ukqeabxy/image/upload/v1787581390/ChatGPT_Image_Aug_24_2026_07_29_31_PM.png"
+                  "logo": "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
                 }
               },
               {
@@ -339,7 +339,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 items-center">
-                  <div className="lg:col-span-6 h-64 lg:h-96 relative overflow-hidden bg-neutral-100">
+                  <div className="lg:col-span-6 h-64 lg:h-96 relative overflow-hidden bg-neutral-100 aspect-[16/10]">
                     <img
                       src={getOptimizedImageUrl(featuredPost.featuredImage, { width: 640 })}
                       srcSet={`${getOptimizedImageUrl(featuredPost.featuredImage, { width: 400 })} 400w, ${getOptimizedImageUrl(featuredPost.featuredImage, { width: 640 })} 640w, ${getOptimizedImageUrl(featuredPost.featuredImage, { width: 900 })} 900w`}
@@ -439,7 +439,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                     >
                       <div className="p-6 space-y-4">
                         {/* Header Image & Badge */}
-                        <div className="relative h-48 -mx-6 -mt-6 mb-4 overflow-hidden bg-neutral-100">
+                        <div className="relative h-48 -mx-6 -mt-6 mb-4 overflow-hidden bg-neutral-100 aspect-[16/9]">
                           <img
                             src={getOptimizedImageUrl(post.featuredImage, { width: 480 })}
                             srcSet={`${getOptimizedImageUrl(post.featuredImage, { width: 320 })} 320w, ${getOptimizedImageUrl(post.featuredImage, { width: 480 })} 480w, ${getOptimizedImageUrl(post.featuredImage, { width: 640 })} 640w`}

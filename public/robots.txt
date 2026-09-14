@@ -1,7 +1,52 @@
 User-agent: *
 Allow: /
+Allow: /products/
+Allow: /combos
+Allow: /women
+Allow: /men
+Allow: /blog
+Allow: /blog/
+Allow: /refund-policy
+Allow: /shipping-policy
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+Allow: /about
+Allow: /contact
 Allow: /llms.txt
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /order-history
+Disallow: /track-order
+Disallow: /track-orders
+Disallow: /success
+Disallow: /admin
 Disallow: /api/
+Disallow: /*?*search=
+Disallow: /*?*p=
+Disallow: /*?*product=
+
+# Googlebot Crawlers
+User-agent: Googlebot
+Allow: /
+Disallow: /cart
+Disallow: /checkout
+Disallow: /orders
+Disallow: /success
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Google-InspectionTool
+Allow: /
+
+User-agent: Storebot-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
 
 # AI Search and Assistant Crawlers
 User-agent: GPTBot
@@ -20,3 +65,4 @@ User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: https://meonmode.com/sitemap.xml
+

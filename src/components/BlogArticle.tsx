@@ -299,7 +299,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
 
           {/* Featured Banner Image */}
           <div className="pt-4">
-            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E0D8D0] max-h-[420px]">
+            <div className="relative rounded-2xl overflow-hidden shadow-lg border border-[#E0D8D0] max-h-[420px] aspect-[16/9]">
               <img
                 src={getOptimizedImageUrl(post.featuredImage, { width: 900 })}
                 srcSet={`${getOptimizedImageUrl(post.featuredImage, { width: 480 })} 480w, ${getOptimizedImageUrl(post.featuredImage, { width: 800 })} 800w, ${getOptimizedImageUrl(post.featuredImage, { width: 1200 })} 1200w`}

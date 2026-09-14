@@ -146,7 +146,7 @@ YOUR BRAND & PRODUCT DIRECTORY (Treat this as the absolute source of truth):
    - Benefits: Establishes natural 28-day cycle, dissolves ovarian cysts, stops acne and facial hair growth, relieves severe period cramps, backaches, and bloating.
 
 2. meONmode® OVAIRA Capsules
-   - Price: ₹1199 (MRP: ₹1899)
+   - Price: ₹1199 (MRP: ₹1999)
    - Focus: PCOS/PCOD Care, hormonal balance, insulin resistance, ovarian cysts, and hormonal acne.
    - Volume: 60 Veg Capsules.
    - Precise Dosage: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).
@@ -155,28 +155,35 @@ YOUR BRAND & PRODUCT DIRECTORY (Treat this as the absolute source of truth):
 3. meONmode® FLOWELLE Drink / Syrup
    - Price: ₹999 (MRP: ₹1799)
    - Focus: 100% Pain-Free Periods, irregular periods, white discharge (leucorrhoea), period cramps, and low energy.
-   - Volume: 500 ml Premium Syrup.
+   - Volume: 450 ml Premium Syrup.
    - Precise Dosage: Dilute 5-10ml of syrup in a glass of water and drink after meals twice daily (Morning & Evening).
    - Key Ingredients: Ashok Chal (uterine muscle toner), Shatavari (hormone stabilizer), Gokhru (progesterone balancing), Ashwagandha (reduces cortisol and period fatigue).
 
-4. meONmode® WANTMORE FOR MEN (Powder)
-   - Price: ₹1299 (MRP: ₹2499)
-   - Focus: Vigor, stamina, physical endurance, and sports performance for men.
-   - Volume: 250g Powder.
-   - Precise Dosage: Take 1-2 scoops (5g) daily with lukewarm milk or water after meals.
-   - Key Ingredients: Safed Musli (vigor booster), Ashwagandha (stamina, cortisol reducer).
+4. meONmode® WANTMORE FOR MEN (Prash)
+   - Price: ₹4999 (MRP: ₹8999)
+   - Focus: Maximum stamina, muscle endurance, athletic recovery, and cellular strength for men.
+   - Volume: 200g Authentic Ayurvedic Prash.
+   - Precise Dosage: Take 1-2 teaspoons (5-10g) daily with lukewarm milk or water after dinner/meals.
+   - Key Ingredients: Swaran Bhasma, Chandi Bhasma, Salam Panja, Siddh Makardhwaj, Safed Musli, Ashwagandha.
 
 5. meONmode® AlphaMax FOR MEN (Capsules)
-   - Price: ₹1199 (MRP: ₹1999)
+   - Price: ₹2499 (MRP: ₹4999)
    - Focus: Daily physical energy, cardiovascular circulation, and cell-level recovery for men.
    - Volume: 60 Veg Capsules.
    - Precise Dosage: Take 1 capsule in the morning and 1 capsule in the evening (after meals).
-   - Key Ingredients: Shudh Shilajit (fulvic acid, ATP cell energy), Gokshura (vascular flow), Safed Musli.
+   - Key Ingredients: Pure Himalayan Shudh Shilajit, Safed Musli, Gokshura, Ashwagandha, Kesar.
 
-6. Men's Ultimate Performance Combo (WANTMORE Powder + AlphaMax Capsules)
-   - Price: ₹2199 (MRP: ₹4498) - Save 51%!
-   - Focus: Comprehensive daily strength, stamina, and vitality stack.
-   - Precise Dosage: AlphaMax: 1 capsule with breakfast & 1 capsule with dinner. WANTMORE: 1 scoop with milk after dinner.
+6. Men's Ultimate Performance Combo (WANTMORE Prash + AlphaMax Capsules + FREE VAYUCORE)
+   - Price: ₹6999 (MRP: ₹15997) - Save 56%!
+   - Focus: Comprehensive male vitality, muscular endurance, and cellular rejuvenation stack bundled with a full-size 450 ML VAYUCORE gut tonic at zero cost.
+   - Precise Dosage: AlphaMax: 1 capsule morning & 1 capsule evening. WANTMORE: 1-2 teaspoons with warm milk after dinner.
+
+7. meONmode® VAYUCORE Digestive Liquid
+   - Price: ₹999 (MRP: ₹1999)
+   - Focus: Fast relief from gas, acidity, bloating, and post-meal heaviness while restoring digestive fire (Agni).
+   - Volume: 450 ml Authentic Ayurvedic Liquid.
+   - Precise Dosage: 10-15 ml diluted with equal water twice daily after meals.
+   - Key Ingredients: Kutki, Kalmegh, Chirayita, Ajwain, Mulethi.
 
 KEY FAQs & SUPPORT PROTOCOLS:
 - Visible Results Timeline:
@@ -220,7 +227,7 @@ app.post("/api/chat", async (req, res) => {
       } else if (lowerMsg.includes("flowelle") || lowerMsg.includes("period") || lowerMsg.includes("cramp")) {
         simulatedReply += "FLOWELLE Syrup is a direct uterine tonic designed to ease painful cramps, backaches, and balance flow. Please drink 5-10ml diluted in water twice daily after meals. Within 15 days, you will feel significant relief. May I help you order our best-selling Combo Kit?";
       } else if (lowerMsg.includes("stamina") || lowerMsg.includes("vigor") || lowerMsg.includes("men") || lowerMsg.includes("shilajit") || lowerMsg.includes("alphamax") || lowerMsg.includes("wantmore")) {
-        simulatedReply += "For men's stamina and energy, our meONmode® AlphaMax Capsules (with Shudh Shilajit) and WANTMORE Powder work synergistically. Most men feel a powerful difference in energy within 7 to 10 days. Would you like to know more about our Men's Ultimate Performance Combo (₹2199)?";
+        simulatedReply += "For men's stamina and energy, our meONmode® AlphaMax Capsules (with Shudh Shilajit) and WANTMORE Prash work synergistically. Most men feel a powerful difference in energy within 7 to 10 days. Would you like to know more about our Men's Ultimate Performance Combo (₹6999)?";
       } else if (lowerMsg.includes("refund") || lowerMsg.includes("return") || lowerMsg.includes("policy")) {
         simulatedReply += "We accept replacements or refunds solely for damaged, incorrect, or defective shipments. To validate a claim, recording an unboxing video at delivery is strictly mandatory. Subjective results timing does not qualify for refunds. Can I help you with any other policy information?";
       } else {
@@ -511,6 +518,13 @@ app.get("/api/orders/:orderId", (req, res) => {
 });
 
 // 4. Query Verified Orders by Customer Phone Number
+app.get("/api/orders-by-phone", (req, res) => {
+  return res.status(400).json({
+    success: false,
+    error: "Please enter a valid 10-digit mobile number."
+  });
+});
+
 app.get("/api/orders-by-phone/:phone", (req, res) => {
   const rawPhone = req.params.phone || "";
   const cleanPhone = rawPhone.replace(/\D/g, "").slice(-10); // get last 10 digits

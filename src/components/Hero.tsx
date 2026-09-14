@@ -315,6 +315,8 @@ export const Hero: React.FC<HeroProps> = ({
               >
                 <img 
                   src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 
+                  srcSet={`${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 380)} 380w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 480w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 640)} 640w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 960)} 960w`}
+                  sizes="(max-width: 640px) 280px, 320px"
                   alt="meONmode Women's Combo Kit"
                   loading="eager"
                   fetchPriority="high"
@@ -442,6 +444,8 @@ export const Hero: React.FC<HeroProps> = ({
             >
               <img 
                 src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 480)} 
+                srcSet={`${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 380)} 380w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 480)} 480w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 640)} 640w, ${optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 960)} 960w`}
+                sizes="(max-width: 640px) 280px, 320px"
                 alt="meONmode Men's Combo"
                 loading="eager"
                 fetchPriority="high"

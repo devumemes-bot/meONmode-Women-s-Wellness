@@ -261,9 +261,12 @@ export const ConcernSelector: React.FC<ConcernSelectorProps> = ({
                 <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 p-1 shrink-0 flex items-center justify-center overflow-hidden">
                   <img
                     src={optimizeCloudinaryUrl(concern.image, 160)}
+                    srcSet={`${optimizeCloudinaryUrl(concern.image, 96)} 96w, ${optimizeCloudinaryUrl(concern.image, 160)} 160w, ${optimizeCloudinaryUrl(concern.image, 240)} 240w`}
+                    sizes="48px"
                     alt={concern.productName}
                     className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     loading="lazy"
+                    decoding="async"
                     width="48"
                     height="48"
                   />

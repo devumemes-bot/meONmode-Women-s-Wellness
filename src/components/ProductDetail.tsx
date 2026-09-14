@@ -69,8 +69,8 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   // Helper for parsing review images safely
   const getReviewImages = (img?: string | string[]): string[] => {
     if (!img) return [];
-    if (Array.isArray(img)) return img;
-    return [img];
+    if (Array.isArray(img)) return img.filter(Boolean);
+    return img.split(/[\s\n,]+/).map(u => u.trim()).filter(u => u.startsWith('http'));
   };
 
   return (
@@ -94,12 +94,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   "@type": "Brand",
                   "name": "meONmode"
                 },
-                "review": prodReviews.slice(0, 5).map(rev => ({
+                "review": prodReviews.map(rev => ({
                   "@type": "Review",
                   "reviewRating": {
                     "@type": "Rating",
                     "ratingValue": rev.rating || 5,
-                    "bestRating": 5
+                    "bestRating": 5,
+                    "worstRating": 1
                   },
                   "author": {
                     "@type": "Person",
@@ -107,13 +108,15 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   },
                   "reviewBody": rev.review
                 })),
-                "aggregateRating": {
-                  "@type": "AggregateRating",
-                  "ratingValue": Number(rating.toFixed(1)),
-                  "reviewCount": reviewsCount,
-                  "bestRating": 5,
-                  "worstRating": 1
-                },
+                ...(prodReviews.length > 0 ? {
+                  "aggregateRating": {
+                    "@type": "AggregateRating",
+                    "ratingValue": Number((prodReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / prodReviews.length).toFixed(1)),
+                    "reviewCount": prodReviews.length,
+                    "bestRating": 5,
+                    "worstRating": 1
+                  }
+                } : {}),
                 "offers": {
                   "@type": "Offer",
                   "url": `https://meonmode.com/products/${getProductCleanSlug(product.id)}`,
@@ -128,6 +131,42 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     "@type": "Organization",
                     "name": "meONmode",
                     "url": "https://meonmode.com/"
+                  },
+                  "shippingDetails": {
+                    "@type": "OfferShippingDetails",
+                    "shippingRate": {
+                      "@type": "MonetaryAmount",
+                      "value": "0",
+                      "currency": "INR"
+                    },
+                    "shippingDestination": {
+                      "@type": "DefinedRegion",
+                      "addressCountry": "IN"
+                    },
+                    "deliveryTime": {
+                      "@type": "ShippingDeliveryTime",
+                      "handlingTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 1,
+                        "maxValue": 2,
+                        "unitCode": "DAY"
+                      },
+                      "transitTime": {
+                        "@type": "QuantitativeValue",
+                        "minValue": 2,
+                        "maxValue": 5,
+                        "unitCode": "DAY"
+                      }
+                    }
+                  },
+                  "hasMerchantReturnPolicy": {
+                    "@type": "MerchantReturnPolicy",
+                    "applicableCountry": "IN",
+                    "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                    "merchantReturnDays": 2,
+                    "returnMethod": "https://schema.org/ReturnByMail",
+                    "returnFees": "https://schema.org/FreeReturn",
+                    "refundType": "https://schema.org/FullRefund"
                   }
                 }
               },
@@ -144,7 +183,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     "@type": "ListItem",
                     "position": 2,
                     "name": isMenProduct ? "Men's Wellness" : "Women's Wellness",
-                    "item": `https://meonmode.com/?category=${isMenProduct ? 'men' : 'women'}`
+                    "item": isMenProduct ? "https://meonmode.com/men" : "https://meonmode.com/women"
                   },
                   {
                     "@type": "ListItem",
@@ -621,7 +660,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                             className="w-12 h-12 rounded-lg overflow-hidden border border-white/20 cursor-pointer shrink-0"
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(imgUrl, 100)} 
+                              src={optimizeCloudinaryUrl(imgUrl, 160)} 
+                              srcSet={`${optimizeCloudinaryUrl(imgUrl, 96)} 96w, ${optimizeCloudinaryUrl(imgUrl, 160)} 160w`}
+                              sizes="48px"
                               alt="Review attachment" 
                               loading="lazy"
                               decoding="async"
@@ -676,7 +717,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             >
               <div className="aspect-square w-full rounded-xl overflow-hidden bg-black/40 border border-white/5 p-2 flex items-center justify-center">
                 <img 
-                  src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 300) : ''} 
+                  src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 480) : ''} 
+                  srcSet={rel.images && rel.images.length > 0 ? `${optimizeCloudinaryUrl(rel.images[0], 240)} 240w, ${optimizeCloudinaryUrl(rel.images[0], 360)} 360w, ${optimizeCloudinaryUrl(rel.images[0], 480)} 480w, ${optimizeCloudinaryUrl(rel.images[0], 640)} 640w` : undefined}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 250px"
                   alt={rel.name} 
                   loading="lazy"
                   decoding="async"

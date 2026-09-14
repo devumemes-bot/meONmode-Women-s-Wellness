@@ -9,7 +9,7 @@
 export interface ImageTransformOptions {
   width?: number;
   height?: number;
-  quality?: 'auto' | 'good' | 'eco' | 'low' | number;
+  quality?: 'auto' | 'auto:best' | 'auto:good' | 'good' | 'eco' | 'low' | number;
   format?: 'auto' | 'webp' | 'avif' | 'jpg' | 'png';
   crop?: 'fill' | 'fit' | 'limit' | 'thumb' | 'scale';
   dpr?: number | 'auto';
@@ -17,7 +17,7 @@ export interface ImageTransformOptions {
 
 /**
  * Optimizes an image URL with Cloudinary or Unsplash parameters.
- * If the URL is Cloudinary, injects f_auto, q_auto, and specified dimensions.
+ * If the URL is Cloudinary, injects f_auto, q_auto:best, and specified dimensions.
  */
 export function getOptimizedImageUrl(
   url: string,
@@ -30,7 +30,7 @@ export function getOptimizedImageUrl(
   const {
     width,
     height,
-    quality = 'auto',
+    quality = 'auto:best',
     format = 'auto',
     crop = 'limit',
     dpr = 'auto',
@@ -42,7 +42,12 @@ export function getOptimizedImageUrl(
     if (uploadIndex === -1) return url;
 
     const rest = url.substring(uploadIndex + 8);
-    const hasExistingTransforms = /^[a-z]_[^/]+\//.test(rest);
+    let cleanRest = rest;
+    if (/\bv\d+\//.test(cleanRest)) {
+      cleanRest = cleanRest.replace(/^(?:[a-z0-9_:,=-]+\/)*(v\d+\/.*)$/i, '$1');
+    } else {
+      cleanRest = cleanRest.replace(/^(?:[a-z0-9_:,=-]+\/)+([^/]+\.[a-z0-9]+)$/i, '$1');
+    }
 
     const transforms: string[] = [
       `f_${format}`,
@@ -55,12 +60,7 @@ export function getOptimizedImageUrl(
     if (crop && (width || height)) transforms.push(`c_${crop}`);
 
     const transformString = transforms.join(',');
-
-    if (hasExistingTransforms) {
-      return url.replace(/\/upload\/[^/]+\//, `/upload/${transformString}/`);
-    }
-
-    return `${url.substring(0, uploadIndex + 8)}${transformString}/${rest}`;
+    return `${url.substring(0, uploadIndex + 8)}${transformString}/${cleanRest}`;
   }
 
   // 2. Unsplash URLs

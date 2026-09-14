@@ -146,7 +146,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
 
       {/* Main Large Image Container with Swipe & Navigation */}
       <div 
-        className="relative w-full overflow-hidden flex items-center justify-center min-h-[280px] sm:min-h-[350px] md:min-h-[380px] rounded-2xl bg-[#FAF8F6] select-none"
+        className="relative w-full overflow-hidden flex items-center justify-center aspect-square min-h-[280px] sm:min-h-[350px] md:min-h-[380px] rounded-2xl bg-[#FAF8F6] select-none"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -162,16 +162,16 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={optimizeCloudinaryUrl(images[currentIndex], 640)} 
-                srcSet={`${optimizeCloudinaryUrl(images[currentIndex], 480)} 480w, ${optimizeCloudinaryUrl(images[currentIndex], 640)} 640w, ${optimizeCloudinaryUrl(images[currentIndex], 800)} 800w`}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 480px"
+                src={optimizeCloudinaryUrl(images[currentIndex], 720)} 
+                srcSet={`${optimizeCloudinaryUrl(images[currentIndex], 480)} 480w, ${optimizeCloudinaryUrl(images[currentIndex], 640)} 640w, ${optimizeCloudinaryUrl(images[currentIndex], 800)} 800w, ${optimizeCloudinaryUrl(images[currentIndex], 1080)} 1080w`}
+                sizes="(max-width: 640px) 95vw, (max-width: 1024px) 50vw, 480px"
                 alt={`${product.name} - Ayurvedic packaging & product view ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
                 fetchPriority={currentIndex === 0 ? "high" : "auto"}
                 decoding="async"
                 width="480"
                 height="480"
-                className="w-auto h-auto max-h-[260px] sm:max-h-[330px] md:max-h-[360px] max-w-full object-contain block mx-auto transition-transform duration-500 ease-out group-hover/mainimg:scale-105"
+                className="w-full h-full max-h-[260px] sm:max-h-[330px] md:max-h-[360px] max-w-full object-contain block mx-auto transition-transform duration-500 ease-out group-hover/mainimg:scale-105"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';

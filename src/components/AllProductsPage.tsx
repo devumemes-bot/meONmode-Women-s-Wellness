@@ -203,7 +203,7 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredAndSortedProducts.map((product) => {
+          {filteredAndSortedProducts.map((product, pIdx) => {
             const discount = product.mrp > product.price 
               ? Math.round(((product.mrp - product.price) / product.mrp) * 100) 
               : 0;
@@ -216,7 +216,7 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
               >
                 {/* Product Image Area */}
                 <div 
-                  className="relative bg-black/40 p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/5"
+                  className="relative bg-black/40 p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/5 aspect-[4/3] sm:aspect-square"
                   onClick={() => onSelectProduct(product)}
                 >
                   {/* Tag badge if present */}
@@ -231,13 +231,16 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                     </span>
                   )}
                   <img
-                    src={optimizeCloudinaryUrl(product.images[0], 480)}
+                    src={optimizeCloudinaryUrl(product.images[0], 640)}
+                    srcSet={`${optimizeCloudinaryUrl(product.images[0], 360)} 360w, ${optimizeCloudinaryUrl(product.images[0], 480)} 480w, ${optimizeCloudinaryUrl(product.images[0], 640)} 640w, ${optimizeCloudinaryUrl(product.images[0], 960)} 960w`}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
                     alt={product.name}
-                    loading="lazy"
+                    loading={pIdx === 0 ? "eager" : "lazy"}
+                    fetchPriority={pIdx === 0 ? "high" : "auto"}
                     decoding="async"
-                    width="320"
-                    height="280"
-                    className="w-full h-56 sm:h-64 object-contain group-hover:scale-105 transition-transform duration-500"
+                    width="360"
+                    height="270"
+                    className="w-full h-full max-h-56 sm:max-h-64 object-contain group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
 
