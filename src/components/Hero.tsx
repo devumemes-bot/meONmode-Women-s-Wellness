@@ -48,12 +48,12 @@ export const Hero: React.FC<HeroProps> = ({
             <span>Ayurvedic Botanical Science • Made in India</span>
           </div>
 
-          <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.12]">
+          <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.12]">
             Ancient Ayurvedic Wisdom. <br />
             <span className="bg-gradient-to-r from-[#E5A93C] via-[#F7D28B] to-[#C86428] bg-clip-text text-transparent">
               Targeted Modern Restorations.
             </span>
-          </h1>
+          </h2>
 
           <p className="text-[#FAF6F0]/85 text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto font-sans font-normal">
             Pure, standardized herbal extracts crafted to restore internal rhythm, cellular vitality, and hormonal harmony for women and men — with zero synthetic additives.

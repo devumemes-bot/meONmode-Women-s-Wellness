@@ -1,5 +1,6 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import dotenv from "dotenv";
 import crypto from "crypto";
 import Razorpay from "razorpay";
@@ -87,7 +88,35 @@ interface ConfirmedOrderRecord {
 }
 
 const pendingOrders: Record<string, PendingOrderSession> = {};
-const confirmedOrders: Record<string, ConfirmedOrderRecord> = {};
+
+// Durable persistent file storage for confirmed orders across server restarts
+const ORDERS_STORAGE_FILE = path.join(process.cwd(), 'data', 'confirmed_orders.json');
+
+function loadPersistedOrders(): Record<string, ConfirmedOrderRecord> {
+  try {
+    if (fs.existsSync(ORDERS_STORAGE_FILE)) {
+      const content = fs.readFileSync(ORDERS_STORAGE_FILE, 'utf-8');
+      return JSON.parse(content) || {};
+    }
+  } catch (err) {
+    console.error("Error reading persisted orders:", err);
+  }
+  return {};
+}
+
+function savePersistedOrders(records: Record<string, ConfirmedOrderRecord>) {
+  try {
+    const parent = path.dirname(ORDERS_STORAGE_FILE);
+    if (!fs.existsSync(parent)) {
+      fs.mkdirSync(parent, { recursive: true });
+    }
+    fs.writeFileSync(ORDERS_STORAGE_FILE, JSON.stringify(records, null, 2), 'utf-8');
+  } catch (err) {
+    console.error("Error saving persisted orders:", err);
+  }
+}
+
+const confirmedOrders: Record<string, ConfirmedOrderRecord> = loadPersistedOrders();
 
 // Clean up expired pending orders (>30 mins old)
 setInterval(() => {
@@ -478,8 +507,9 @@ app.post("/api/verify-payment", async (req, res) => {
       paymentMethod: session.paymentMethod
     };
 
-    // Store in confirmed orders and clear pending
+    // Store in confirmed orders, persist to disk, and clear pending
     confirmedOrders[session.orderId] = verifiedRecord;
+    savePersistedOrders(confirmedOrders);
     delete pendingOrders[session.orderId];
 
     return res.json({
@@ -500,14 +530,40 @@ app.post("/api/verify-payment", async (req, res) => {
   }
 });
 
-// 3. Query Verified Order Endpoint (Used to validate success page & prevent bypass)
+// 3. Query Verified Order Endpoint (Used to validate success page & track orders)
 app.get("/api/orders/:orderId", (req, res) => {
   const { orderId } = req.params;
   const token = req.query.token as string;
+  const phone = (req.query.phone as string || '').replace(/\D/g, '').slice(-10);
 
   const order = confirmedOrders[orderId];
-  if (order && order.paymentStatus === "VERIFIED_SUCCESS" && order.orderVerificationToken === token) {
-    return res.json({ success: true, order });
+  if (order && order.paymentStatus === "VERIFIED_SUCCESS") {
+    // If full secret token is provided or matching customer phone, return full order record
+    if ((token && order.orderVerificationToken === token) || 
+        (phone && order.checkoutDetails?.phone?.replace(/\D/g, '').slice(-10) === phone)) {
+      return res.json({ success: true, order });
+    }
+
+    // Safe public order status view (sanitized phone number)
+    return res.json({
+      success: true,
+      order: {
+        orderId: order.orderId,
+        paymentStatus: order.paymentStatus,
+        verifiedAt: order.verifiedAt,
+        items: order.items,
+        grandTotal: order.grandTotal,
+        paymentMethod: order.paymentMethod,
+        checkoutDetails: {
+          fullName: order.checkoutDetails.fullName,
+          phone: `******${order.checkoutDetails.phone.slice(-4)}`,
+          address: order.checkoutDetails.address,
+          pincode: order.checkoutDetails.pincode
+        },
+        advancePaid: order.advancePaid,
+        balanceDue: order.balanceDue
+      }
+    });
   }
 
   return res.status(404).json({

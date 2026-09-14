@@ -64,15 +64,15 @@ export const BrandStory: React.FC = () => {
           <div className="pt-4 border-t border-neutral-200/80 grid grid-cols-3 gap-3 text-center">
             <div>
               <p className="font-mono text-xl sm:text-2xl font-black text-[#E8621A]">100%</p>
-              <p className="text-[10px] font-bold text-neutral-500 uppercase">Herbal Purity</p>
+              <p className="text-[10px] font-bold text-neutral-600 uppercase">Herbal Purity</p>
             </div>
             <div>
               <p className="font-mono text-xl sm:text-2xl font-black text-[#2D5A2D]">26K+</p>
-              <p className="text-[10px] font-bold text-neutral-500 uppercase">PIN Codes Served</p>
+              <p className="text-[10px] font-bold text-neutral-600 uppercase">PIN Codes Served</p>
             </div>
             <div>
-              <p className="font-mono text-xl sm:text-2xl font-black text-[#E5A93C]">4.9★</p>
-              <p className="text-[10px] font-bold text-neutral-500 uppercase">Avg Rating</p>
+              <p className="font-mono text-xl sm:text-2xl font-black text-[#965B0A]">4.9★</p>
+              <p className="text-[10px] font-bold text-neutral-600 uppercase">Avg Rating</p>
             </div>
           </div>
 

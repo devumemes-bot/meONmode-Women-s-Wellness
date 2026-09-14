@@ -576,9 +576,9 @@ export const AboutUsPage: React.FC<AboutUsPageProps> = ({
         {/* Doctor Consultation CTA */}
         <div className="bg-gradient-to-r from-emerald-950/60 to-black/60 border border-emerald-500/30 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="space-y-1 text-center sm:text-left">
-            <h4 className="font-serif text-base font-bold text-white flex items-center justify-center sm:justify-start gap-2">
+            <h3 className="font-serif text-base font-bold text-white flex items-center justify-center sm:justify-start gap-2">
               <span>🌿 Need Guidance on Choosing the Right Remedy?</span>
-            </h4>
+            </h3>
             <p className="text-xs text-neutral-300">
               Chat directly with our Ayurvedic wellness support desk on WhatsApp (+91 72908 10336) for confidential guidance.
             </p>

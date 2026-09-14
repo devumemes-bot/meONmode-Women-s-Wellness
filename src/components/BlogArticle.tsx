@@ -328,10 +328,10 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
             {/* Quick Facts Card (if provided at post level) */}
             {post.quickFacts && post.quickFacts.length > 0 && (
               <div className="bg-[#FAF7F2] border border-[#8B4A5A]/25 rounded-2xl p-5 shadow-sm space-y-3">
-                <h3 className="font-serif text-sm font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-2">
+                <h2 className="font-serif text-sm font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#E8621A]" />
                   <span>Mukhya Tathya (Quick Facts)</span>
-                </h3>
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   {post.quickFacts.map((fact, fidx) => (
                     <div key={fidx} className="bg-white p-3 rounded-xl border border-[#E0D8D0]/60 text-xs">
@@ -376,10 +376,10 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                 {/* Section Quick Facts */}
                 {section.quickFacts && section.quickFacts.length > 0 && (
                   <div className="bg-[#FAF7F2] border border-[#8B4A5A]/20 rounded-xl p-4 my-4 space-y-2.5">
-                    <h4 className="font-serif text-xs font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-1.5">
+                    <h3 className="font-serif text-xs font-bold text-[#8B4A5A] uppercase tracking-wider flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-[#E8621A]" />
                       <span>Key Takeaways</span>
-                    </h4>
+                    </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {section.quickFacts.map((fact, fidx) => (
                         <div key={fidx} className="bg-white p-2.5 rounded-lg border border-[#E0D8D0]/60 text-xs">

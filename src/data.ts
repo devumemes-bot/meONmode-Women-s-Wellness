@@ -1,8 +1,8 @@
 import { Product } from './types';
 
 /**
- * Optimizes Cloudinary URLs preserving maximum visual fidelity, sharp label text, and high DPI support.
- * Uses visually lossless quality (q_auto:best) and avoids downscaling text or fine packaging details.
+ * Optimizes Cloudinary URLs preserving high visual fidelity, sharp packaging labels, and high DPI support.
+ * Uses smart adaptive quality (q_auto) with automatic modern format negotiation (AVIF/WebP) and width constraints.
  */
 export function optimizeCloudinaryUrl(url: string, width?: number): string {
   if (!url || typeof url !== 'string') return url;
@@ -21,8 +21,8 @@ export function optimizeCloudinaryUrl(url: string, width?: number): string {
     rest = rest.replace(/^(?:[a-z0-9_:,=-]+\/)+([^\/]+\.[a-z0-9]+)$/i, '$1');
   }
   
-  // Use q_auto:best for crystal-sharp text and packaging labels, c_limit to never distort aspect ratio or upscale
-  const transform = width ? `f_auto,q_auto:best,w_${width},c_limit` : 'f_auto,q_auto:best';
+  // Use f_auto,q_auto for optimal file size and crisp resolution, c_limit to avoid distorting aspect ratios
+  const transform = width ? `f_auto,q_auto,w_${width},c_limit` : 'f_auto,q_auto';
   return `${prefix}${transform}/${rest}`;
 }
 

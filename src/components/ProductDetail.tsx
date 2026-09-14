@@ -324,7 +324,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <p className="text-xs font-bold text-emerald-600 flex items-center gap-1">
                     <Check className="w-3.5 h-3.5" /> {t('inclusiveGst')}
                   </p>
-                  <p className="text-[10px] text-neutral-500 font-medium">
+                  <p className="text-[10px] text-neutral-700 font-medium">
                     ({t('priceInclusiveOfGst')}) • Free Express Shipping Pan-India
                   </p>
                 </div>
@@ -417,7 +417,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   +
                 </button>
               </div>
-              <span className="text-xs text-neutral-500 font-medium ml-auto font-sans">
+              <span className="text-xs text-neutral-700 font-medium ml-auto font-sans">
                 Item Total: <strong className="text-neutral-950 font-black text-sm">₹{(product.price * detailQuantity).toLocaleString('en-IN')}</strong>
               </span>
             </div>
@@ -480,7 +480,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <span>Quick Buy (COD Available)</span>
                 </button>
 
-                <div className="flex justify-center items-center gap-5 text-[11px] pt-1.5 font-medium text-neutral-500">
+                <div className="flex justify-center items-center gap-5 text-[11px] pt-1.5 font-medium text-neutral-700">
                   <span className="flex items-center gap-1">
                     <Lock className="w-3.5 h-3.5 text-emerald-600" /> Secure Checkout
                   </span>
@@ -502,9 +502,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                       </span>
                       <span className="text-[10px] font-extrabold text-[#C86428]">Customized for You</span>
                     </div>
-                    <h4 className="text-xs sm:text-sm font-black text-[#4A1D05] leading-snug">
+                    <p className="text-xs sm:text-sm font-black text-[#4A1D05] leading-snug">
                       FREE Personalized Diet Plan based on your body type and weight
-                    </h4>
+                    </p>
                     <p className="text-[11px] text-[#4A1D05]/85 leading-relaxed font-medium">
                       Every product order includes a 1-on-1 personalized Ayurvedic nutrition guide formulated around your body weight and dosha balance.
                     </p>
@@ -516,7 +516,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                   <Truck className="w-5 h-5 text-[#C86428] shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <div className="flex items-center gap-1.5">
-                      <h4 className="text-xs font-bold text-[#4A1D05]">Cash on Delivery Available</h4>
+                      <p className="text-xs font-bold text-[#4A1D05]">Cash on Delivery Available</p>
                       <span className="text-[8px] bg-[#E5A93C]/20 text-[#4A1D05] px-1.5 py-0.5 rounded font-black font-mono uppercase tracking-wider">Policy</span>
                     </div>
                     <p className="text-[11px] text-[#4A1D05]/85 leading-relaxed font-medium">
@@ -642,9 +642,9 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                     </div>
 
                     {rev.title && (
-                      <h4 className="font-serif text-sm font-bold text-white">
+                      <h3 className="font-serif text-sm font-bold text-white">
                         {rev.title}
-                      </h4>
+                      </h3>
                     )}
 
                     <p className="text-xs text-neutral-300 leading-relaxed font-sans">

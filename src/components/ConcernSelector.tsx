@@ -226,7 +226,7 @@ export const ConcernSelector: React.FC<ConcernSelectorProps> = ({
                 <span className="text-[10px] font-black uppercase tracking-wider bg-white/10 text-[#E5A93C] border border-white/15 px-2.5 py-1 rounded-full">
                   {concern.concernBadge}
                 </span>
-                <span className="text-[10px] font-bold text-neutral-400">
+                <span className="text-[10px] font-bold text-neutral-300">
                   {concern.targetCategory === 'women' ? '👩 Women' : concern.targetCategory === 'men' ? '👨 Men' : '🌿 Everyday'}
                 </span>
               </div>
@@ -275,7 +275,7 @@ export const ConcernSelector: React.FC<ConcernSelectorProps> = ({
                   <p className="text-xs font-bold text-white truncate">{concern.productName}</p>
                   <div className="flex items-center gap-2 text-xs">
                     <span className="font-black text-[#E5A93C]">₹{concern.price.toLocaleString('en-IN')}</span>
-                    <span className="line-through text-[10px] text-neutral-400">₹{concern.mrp.toLocaleString('en-IN')}</span>
+                    <span className="line-through text-[10px] text-neutral-300">₹{concern.mrp.toLocaleString('en-IN')}</span>
                   </div>
                 </div>
               </div>

@@ -45,23 +45,22 @@ import {
   Phone
 } from 'lucide-react';
 import { PRODUCTS, MENS_PRODUCTS, VAYUCORE_PRODUCT, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
-import { BLOG_POSTS } from './blogData';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
 import { ProductGallery } from './components/ProductGallery';
 import { Hero } from './components/Hero';
-import { ProductDetail } from './components/ProductDetail';
 import { ConcernSelector } from './components/ConcernSelector';
 import { WhyMeonmode } from './components/WhyMeonmode';
 import { WhyOurFormulations } from './components/WhyOurFormulations';
 import { IngredientTransparency } from './components/IngredientTransparency';
 import { WOMEN_TRANSPARENCY_HERBS, MEN_TRANSPARENCY_HERBS } from './ingredientData';
-import { AllProductsPage } from './components/AllProductsPage';
 import { HowItWorks } from './components/HowItWorks';
 import { BrandStory } from './components/BrandStory';
-import { AboutUsPage } from './components/AboutUsPage';
 
-// Code-split dynamic views
+// Code-split dynamic views for reduced initial bundle payload
+const ProductDetail = React.lazy(() => import('./components/ProductDetail').then(m => ({ default: m.ProductDetail })));
+const AllProductsPage = React.lazy(() => import('./components/AllProductsPage').then(m => ({ default: m.AllProductsPage })));
+const AboutUsPage = React.lazy(() => import('./components/AboutUsPage').then(m => ({ default: m.AboutUsPage })));
 const BlogListing = React.lazy(() => import('./components/BlogListing').then(m => ({ default: m.BlogListing })));
 const BlogArticleView = React.lazy(() => import('./components/BlogArticleView').then(m => ({ default: m.BlogArticleView })));
 
@@ -498,12 +497,8 @@ export default function App() {
     } else if (path.startsWith('/blog/')) {
       const slug = path.split('/blog/')[1]?.split('/')[0]?.split('?')[0];
       const cleanSlug = (slug || '').toLowerCase();
-      const foundBlog = BLOG_POSTS.find(b => 
-        b.slug.toLowerCase() === cleanSlug || 
-        b.legacySlugs?.some(ls => ls.toLowerCase() === cleanSlug)
-      );
-      if (foundBlog) {
-        setSelectedBlogSlug(foundBlog.slug);
+      if (cleanSlug) {
+        setSelectedBlogSlug(cleanSlug);
         if (currentView !== 'blog-article') setCurrentView('blog-article');
       } else {
         if (currentView !== 'not-found') setCurrentView('not-found');
@@ -603,48 +598,106 @@ export default function App() {
   const [selectedInvoiceModalOrder, setSelectedInvoiceModalOrder] = useState<any | null>(null);
 
   const handleLookupOrdersByPhone = async (phoneToQuery?: string) => {
-    const rawNum = phoneToQuery !== undefined ? phoneToQuery : orderHistoryPhoneInput;
-    const cleanPhone = rawNum.replace(/\D/g, '').slice(-10);
-
-    if (!cleanPhone || cleanPhone.length < 10) {
-      setOrderHistorySearchError('Please enter a valid 10-digit mobile number.');
+    const rawInput = (phoneToQuery !== undefined ? phoneToQuery : orderHistoryPhoneInput).trim();
+    if (!rawInput) {
+      setOrderHistorySearchError('Please enter your 10-digit mobile number or Order ID.');
       return;
     }
+
+    const cleanPhone = rawInput.replace(/\D/g, '').slice(-10);
+    const isOrderQuery = rawInput.toUpperCase().startsWith('MEON') || (!cleanPhone || cleanPhone.length < 10);
 
     setIsLoadingOrderHistory(true);
     setOrderHistorySearchError(null);
 
+    // 1. Direct Order ID lookup path
+    if (isOrderQuery && rawInput.length >= 4) {
+      const cleanOrderId = rawInput.toUpperCase();
+      try {
+        const res = await fetch(`/api/orders/${encodeURIComponent(cleanOrderId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.order) {
+            setOrderHistoryOrders([data.order]);
+            setIsLoadingOrderHistory(false);
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // Fallback: Check locally stored confirmed orders
+      try {
+        if (lastVerifiedOrder && lastVerifiedOrder.orderId?.toUpperCase() === cleanOrderId) {
+          setOrderHistoryOrders([lastVerifiedOrder]);
+          setIsLoadingOrderHistory(false);
+          return;
+        }
+        const cachedRaw = localStorage.getItem('meonmode_cached_orders');
+        if (cachedRaw) {
+          const cachedList = JSON.parse(cachedRaw);
+          const found = cachedList.find((o: any) => o?.orderId?.toUpperCase() === cleanOrderId);
+          if (found) {
+            setOrderHistoryOrders([found]);
+            setIsLoadingOrderHistory(false);
+            return;
+          }
+        }
+      } catch (e) {}
+    }
+
+    // 2. Phone Number lookup path
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setOrderHistorySearchError('Please enter a valid 10-digit mobile number or Order ID.');
+      setIsLoadingOrderHistory(false);
+      return;
+    }
+
     try {
       localStorage.setItem('meonmode_phone_lookup', cleanPhone);
-      const res = await fetch(`/api/orders-by-phone/${cleanPhone}`);
-      
-      const contentType = res.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        throw new Error('Unable to retrieve orders at this time. Please try again or contact support.');
+      let fetched: any[] = [];
+
+      try {
+        const res = await fetch(`/api/orders-by-phone/${cleanPhone}`);
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.orders)) {
+            fetched = data.orders;
+          }
+        }
+      } catch (netErr) {
+        console.warn("Network order fetch notice:", netErr);
       }
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Unable to retrieve orders at this time. Please try again or contact support.');
-      }
-
-      let fetched: any[] = data.orders || [];
-
-      // Also merge lastVerifiedOrder if matches phone and not present
+      // Merge lastVerifiedOrder if phone matches
       if (lastVerifiedOrder && lastVerifiedOrder.checkoutDetails?.phone?.replace(/\D/g, '').slice(-10) === cleanPhone) {
         if (!fetched.some(o => o.orderId === lastVerifiedOrder.orderId)) {
           fetched.unshift(lastVerifiedOrder);
         }
       }
 
+      // Merge locally stored cached orders if phone matches
+      try {
+        const cachedRaw = localStorage.getItem('meonmode_cached_orders');
+        if (cachedRaw) {
+          const cachedList = JSON.parse(cachedRaw);
+          if (Array.isArray(cachedList)) {
+            cachedList.forEach((co: any) => {
+              const cPhone = co?.checkoutDetails?.phone?.replace(/\D/g, '').slice(-10);
+              if (cPhone === cleanPhone && !fetched.some(o => o.orderId === co.orderId)) {
+                fetched.push(co);
+              }
+            });
+          }
+        }
+      } catch (e) {}
+
       setOrderHistoryOrders(fetched);
       if (fetched.length === 0) {
-        setOrderHistorySearchError('No orders found for this phone number. Please check the number or place an order first.');
+        setOrderHistorySearchError('No orders found for this phone number or ID. Please check your 10-digit number.');
       }
     } catch (err: any) {
       console.error("Order history lookup error:", err);
-      // Clean, customer-friendly message - never show technical HTML or JSON parse tokens
       const friendlyMsg = (err.message && !err.message.includes('<') && !err.message.includes('JSON') && !err.message.includes('token'))
         ? err.message
         : 'Unable to retrieve orders at this time. Please try again or contact support.';
@@ -731,7 +784,7 @@ export default function App() {
       setLastVerifiedOrder(data.order);
       setLastOrderId(data.orderId);
       sessionStorage.setItem('meonmode_verified_order', JSON.stringify(data.order));
-      saveOrderToHistory(data.orderId);
+      saveOrderToHistory(data.order || data.orderId);
 
       // Clear cart ONLY AFTER payment is verified
       setCart([]);
@@ -792,8 +845,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
     window.open(whatsappUrl, '_blank');
   };
 
-  const saveOrderToHistory = (orderId: string) => {
-    const clean = orderId.trim().toUpperCase();
+  const saveOrderToHistory = (orderRecord: any) => {
+    const orderId = typeof orderRecord === 'string' ? orderRecord : orderRecord?.orderId;
+    const clean = (orderId || '').trim().toUpperCase();
     if (!clean || clean.length < 4) return;
     setOrderHistory(prev => {
       const filtered = prev.filter(id => id.toUpperCase() !== clean);
@@ -803,6 +857,16 @@ Payment has been cryptographically verified on the backend server. Please dispat
       } catch (e) {}
       return updated;
     });
+
+    if (typeof orderRecord === 'object' && orderRecord) {
+      try {
+        const cachedRaw = localStorage.getItem('meonmode_cached_orders');
+        const list = cachedRaw ? JSON.parse(cachedRaw) : [];
+        const filteredList = Array.isArray(list) ? list.filter((o: any) => o?.orderId?.toUpperCase() !== clean) : [];
+        const updatedList = [orderRecord, ...filteredList].slice(0, 20);
+        localStorage.setItem('meonmode_cached_orders', JSON.stringify(updatedList));
+      } catch (e) {}
+    }
   };
 
   // Wishlist toggle handler
@@ -935,12 +999,15 @@ Payment has been cryptographically verified on the backend server. Please dispat
         robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
       };
     } else if (currentView === 'blog-article') {
-      const post = BLOG_POSTS.find(p => p.slug === selectedBlogSlug);
+      const formattedTitle = (selectedBlogSlug || '')
+        .split('-')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
       seo = {
-        title: post ? `${post.title} | meONmode` : "Ayurvedic Health Article | meONmode",
-        description: post?.metaDescription || "Expert Ayurvedic health tips and wellness advice in Hindi from meONmode.",
+        title: formattedTitle ? `${formattedTitle} | meONmode` : "Ayurvedic Health Article | meONmode",
+        description: "Expert Ayurvedic health tips and wellness advice in Hindi from meONmode.",
         canonicalUrl: `https://meonmode.com/blog/${selectedBlogSlug || ''}`,
-        ogImage: post?.featuredImage || "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
         robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
       };
     } else if (currentView === 'refund-policy') {
@@ -1816,13 +1883,15 @@ Payment has been cryptographically verified on the backend server. Please dispat
             </div>
 
             {activeCategory === 'all' ? (
-              <AllProductsPage
-                products={Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values())}
-                onSelectProduct={handleProductClick}
-                onQuickBuy={handleQuickBuy}
-                onAddToCart={addToCart}
-                onBackToHome={() => setActiveCategory('women')}
-              />
+              <React.Suspense fallback={<div className="min-h-[40vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+                <AllProductsPage
+                  products={Array.from(new Map([...womenProducts, ...menProducts].map(p => [p.id, p])).values())}
+                  onSelectProduct={handleProductClick}
+                  onQuickBuy={handleQuickBuy}
+                  onAddToCart={addToCart}
+                  onBackToHome={() => setActiveCategory('women')}
+                />
+              </React.Suspense>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
             
@@ -2409,36 +2478,38 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 2: PRODUCT DETAIL VIEW ----------------- */}
         {currentView === 'detail' && currentProduct && (
-          <ProductDetail
-            product={currentProduct}
-            onBack={() => {
-              setCurrentView('home');
-              navigate('/');
-            }}
-            onAddToCart={addToCart}
-            onQuickBuy={handleQuickBuy}
-            onProductClick={handleProductClick}
-            onWriteReview={(prodId) => {
-              setWriteReviewProductId(prodId);
-              setIsWriteReviewOpen(true);
-            }}
-            onNotifyMe={(prod) => setNotifyMeProduct(prod)}
-            wishlist={wishlist}
-            onToggleWishlist={toggleWishlist}
-            onShare={handleShareProduct}
-            onOpenLightbox={(img) => {
-              setLightboxImage(img);
-              setLightboxZoom(false);
-            }}
-            currentReviews={currentReviews}
-            womenProducts={womenProducts}
-            menProducts={menProducts}
-            getProductRatingDetails={getProductRatingDetails}
-            getProductStockStatus={getProductStockStatus}
-            t={t}
-            optimizeCloudinaryUrl={optimizeCloudinaryUrl}
-            getProductCleanSlug={getProductCleanSlug}
-          />
+          <React.Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+            <ProductDetail
+              product={currentProduct}
+              onBack={() => {
+                setCurrentView('home');
+                navigate('/');
+              }}
+              onAddToCart={addToCart}
+              onQuickBuy={handleQuickBuy}
+              onProductClick={handleProductClick}
+              onWriteReview={(prodId) => {
+                setWriteReviewProductId(prodId);
+                setIsWriteReviewOpen(true);
+              }}
+              onNotifyMe={(prod) => setNotifyMeProduct(prod)}
+              wishlist={wishlist}
+              onToggleWishlist={toggleWishlist}
+              onShare={handleShareProduct}
+              onOpenLightbox={(img) => {
+                setLightboxImage(img);
+                setLightboxZoom(false);
+              }}
+              currentReviews={currentReviews}
+              womenProducts={womenProducts}
+              menProducts={menProducts}
+              getProductRatingDetails={getProductRatingDetails}
+              getProductStockStatus={getProductStockStatus}
+              t={t}
+              optimizeCloudinaryUrl={optimizeCloudinaryUrl}
+              getProductCleanSlug={getProductCleanSlug}
+            />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 3: SHOPPING CART & CHECKOUT VIEW ----------------- */}
@@ -3799,15 +3870,17 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 5E: ABOUT US VIEW ----------------- */}
         {currentView === 'about' && (
-          <AboutUsPage
-            onBackToHome={() => navigateToView('home')}
-            onNavigateToView={navigateToView}
-            onSelectProduct={(product) => {
-              setSelectedProduct(product);
-              navigateToView('detail');
-            }}
-            products={[...PRODUCTS, ...MENS_PRODUCTS, VAYUCORE_PRODUCT]}
-          />
+          <React.Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+            <AboutUsPage
+              onBackToHome={() => navigateToView('home')}
+              onNavigateToView={navigateToView}
+              onSelectProduct={(product) => {
+                setSelectedProduct(product);
+                navigateToView('detail');
+              }}
+              products={[...PRODUCTS, ...MENS_PRODUCTS, VAYUCORE_PRODUCT]}
+            />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 5F: CONTACT US VIEW ----------------- */}
@@ -4006,12 +4079,18 @@ Payment has been cryptographically verified on the backend server. Please dispat
                       </button>
                     )}
                     {orderHistory.filter(id => id !== lastVerifiedOrder?.orderId).map((oid) => (
-                      <span
+                      <button
                         key={oid}
-                        className="bg-white/10 text-white/80 border border-white/15 px-2.5 py-1 rounded-full font-mono font-medium text-[11px]"
+                        type="button"
+                        onClick={() => {
+                          setOrderHistoryPhoneInput(oid);
+                          handleLookupOrdersByPhone(oid);
+                        }}
+                        className="bg-white/10 hover:bg-white/20 text-white/90 border border-white/15 px-2.5 py-1 rounded-full font-mono font-medium text-[11px] cursor-pointer transition-colors"
+                        title="Click to track this order"
                       >
                         {oid}
-                      </span>
+                      </button>
                     ))}
                   </div>
                 )}

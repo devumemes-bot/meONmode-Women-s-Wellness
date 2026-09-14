@@ -162,7 +162,7 @@ export const IngredientTransparency: React.FC<IngredientTransparencyProps> = ({
                     <p className="font-serif text-base font-bold text-neutral-900 truncate">
                       {herb.name}
                     </p>
-                    <p className="text-[11px] text-neutral-500 font-sans italic truncate">
+                    <p className="text-[11px] text-neutral-600 font-sans italic truncate">
                       {herb.botanicalName}
                     </p>
                   </div>
@@ -194,7 +194,7 @@ export const IngredientTransparency: React.FC<IngredientTransparencyProps> = ({
                 <h3 className="font-serif text-2xl md:text-3xl font-black text-neutral-950 mt-0.5">
                   {activeHerb.name}
                 </h3>
-                <p className="text-xs font-mono text-neutral-500 italic mt-0.5">
+                <p className="text-xs font-mono text-neutral-600 italic mt-0.5">
                   {activeHerb.botanicalName}
                 </p>
               </div>

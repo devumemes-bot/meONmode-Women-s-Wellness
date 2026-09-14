@@ -188,7 +188,7 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
                           </svg>
                         </span>
                         <span class="font-serif font-extrabold text-lg text-[#5C1D13] block">${product.name}</span>
-                        <p class="text-[10px] text-neutral-500 mt-0.5 uppercase tracking-widest font-bold">${product.volumeOrQty}</p>
+                        <p class="text-[10px] text-neutral-700 mt-0.5 uppercase tracking-widest font-bold">${product.volumeOrQty}</p>
                       `;
                       parent.appendChild(fallback);
                     }
