@@ -36,7 +36,7 @@ export const WhyOurFormulations: React.FC = () => {
   return (
     <section 
       id="why-our-formulations" 
-      className="lg:col-span-12 rounded-[2.5rem] bg-gradient-to-br from-[#1C110D] via-[#2A160F] to-[#140B07] border-2 border-white/10 p-6 sm:p-8 md:p-12 space-y-8 shadow-2xl relative overflow-hidden text-white"
+      className="lg:col-span-12 rounded-[2.5rem] bg-gradient-to-br from-[#1C110D] via-[#2A160F] to-[#140B07] border-2 border-white/10 p-6 sm:p-8 md:p-12 space-y-8 shadow-2xl relative overflow-hidden text-white content-auto"
     >
       {/* Soft ambient lighting */}
       <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#E5A93C]/10 rounded-full blur-[120px] pointer-events-none" />

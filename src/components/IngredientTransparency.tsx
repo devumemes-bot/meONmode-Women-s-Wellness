@@ -52,7 +52,7 @@ export const IngredientTransparency: React.FC<IngredientTransparencyProps> = ({
   }, [filteredHerbs, selectedHerbId, baseHerbs]);
 
   return (
-    <section id="ingredient-transparency" className="lg:col-span-12 rounded-[2.5rem] bg-[#FAF8F5] border border-neutral-200/80 p-8 md:p-12 space-y-8 shadow-xl text-neutral-900">
+    <section id="ingredient-transparency" className="lg:col-span-12 rounded-[2.5rem] bg-[#FAF8F5] border border-neutral-200/80 p-8 md:p-12 space-y-8 shadow-xl text-neutral-900 content-auto">
       {/* Header */}
       <div className="text-center space-y-2 max-w-2xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-[#2D5A2D]/10 text-[#2D5A2D] text-xs font-black uppercase tracking-widest py-1.5 px-4 rounded-full border border-[#2D5A2D]/20">

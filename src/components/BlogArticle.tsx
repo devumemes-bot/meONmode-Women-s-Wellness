@@ -120,7 +120,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
           "@type": "Organization",
           "name": "meONmode",
           "url": "https://meonmode.com/",
-          "logo": "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png"
+          "logo": "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png"
         },
         "mainEntityOfPage": {
           "@type": "WebPage",

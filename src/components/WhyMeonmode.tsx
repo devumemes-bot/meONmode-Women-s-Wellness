@@ -42,7 +42,7 @@ export const WhyMeonmode: React.FC = () => {
   ];
 
   return (
-    <section id="why-meonmode" className="lg:col-span-12 rounded-[2.5rem] bg-gradient-to-br from-[#1C110D] via-[#2A160F] to-[#140B07] border-2 border-[#FAF6F0]/20 p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden text-white">
+    <section id="why-meonmode" className="lg:col-span-12 rounded-[2.5rem] bg-gradient-to-br from-[#1C110D] via-[#2A160F] to-[#140B07] border-2 border-[#FAF6F0]/20 p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden text-white content-auto">
       {/* Soft glowing ambient lighting */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#E5A93C]/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-[#E8621A]/10 rounded-full blur-[140px] pointer-events-none" />

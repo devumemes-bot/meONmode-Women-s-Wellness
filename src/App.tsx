@@ -942,7 +942,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
       title: "meONmode | Ayurvedic Wellness Products",
       description: "Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India.",
       canonicalUrl: "https://meonmode.com/",
-      ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+      ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
       robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
     };
 
@@ -969,7 +969,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
           title: "All Ayurvedic Products | meONmode Wellness",
           description: "Explore the complete catalogue of authentic Ayurvedic wellness products by meONmode for women and men, featuring free shipping and Cash on Delivery across India.",
           canonicalUrl: "https://meonmode.com/products",
-          ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+          ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
           robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
         };
       } else if (currentPath === '/combos') {
@@ -1007,7 +1007,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: formattedTitle ? `${formattedTitle} | meONmode` : "Ayurvedic Health Article | meONmode",
         description: "Expert Ayurvedic health tips and wellness advice in Hindi from meONmode.",
         canonicalUrl: `https://meonmode.com/blog/${selectedBlogSlug || ''}`,
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
       };
     } else if (currentView === 'refund-policy') {
@@ -1015,7 +1015,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Refund & Return Policy | meONmode Ayurvedic Wellness",
         description: "Read meONmode's transparent return, replacement, and refund policies for authentic Ayurvedic wellness orders with unboxing video guidelines.",
         canonicalUrl: "https://meonmode.com/refund-policy",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'shipping-policy') {
@@ -1023,7 +1023,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Shipping & Delivery Policy | meONmode Ayurvedic Wellness",
         description: "Learn about meONmode's 100% free pan-India shipping, discreet unbranded packaging, and fast 3-5 business day delivery.",
         canonicalUrl: "https://meonmode.com/shipping-policy",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'privacy-policy') {
@@ -1031,7 +1031,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Privacy Policy & Data Security | meONmode Ayurvedic Wellness",
         description: "meONmode's strict privacy policy guarantees 100% confidential health consultations, 256-bit SSL encrypted checkout, and zero data sharing.",
         canonicalUrl: "https://meonmode.com/privacy-policy",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'terms-and-conditions') {
@@ -1039,7 +1039,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Terms & Conditions | meONmode Ayurvedic Wellness",
         description: "Review the official terms, conditions, AYUSH-compliant Ayurvedic wellness product guidelines, and order policies for meONmode.",
         canonicalUrl: "https://meonmode.com/terms-and-conditions",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'about') {
@@ -1047,7 +1047,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "About Us | meONmode Ayurvedic Wellness",
         description: "Discover meONmode's mission to bring authentic, AYUSH-compliant Ayurvedic wellness, herbal purity, and hormonal balance to everyday lives.",
         canonicalUrl: "https://meonmode.com/about",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'contact') {
@@ -1055,7 +1055,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Contact & Doctor Support | meONmode Ayurvedic Wellness",
         description: "Get in touch with meONmode Ayurvedic doctors and customer support desk via WhatsApp (+91 72908 10336) and email.",
         canonicalUrl: "https://meonmode.com/contact",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "index, follow"
       };
     } else if (currentView === 'order-history') {
@@ -1063,7 +1063,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "Track Your Order | meONmode Ayurvedic Wellness",
         description: "Track your meONmode Ayurvedic order status, delivery timeline, and shipment details.",
         canonicalUrl: "https://meonmode.com/",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "noindex, follow"
       };
     } else if (currentView === 'not-found') {
@@ -1071,7 +1071,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
         title: "404 - Page Not Found | meONmode Ayurvedic Wellness",
         description: "The requested page could not be found. Explore meONmode AYUSH-compliant Ayurvedic formulations.",
         canonicalUrl: "https://meonmode.com/",
-        ogImage: "https://i.postimg.cc/Jh4rYcBN/IMG-3616.png",
+        ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
         robots: "noindex, nofollow"
       };
     }
@@ -2277,7 +2277,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
             <BrandStory />
 
             {/* Bento Block 7: Dynamic Customer Reviews Section (Col Span 12) */}
-            <section id="review-gallery" className="lg:col-span-12 space-y-8 relative overflow-hidden bg-[#23120b]/30 border-2 border-[#FAF6F0]/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md">
+            <section id="review-gallery" className="lg:col-span-12 space-y-8 relative overflow-hidden bg-[#23120b]/30 border-2 border-[#FAF6F0]/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md content-auto">
               {/* Soft glowing background element */}
               <div className="absolute top-12 left-1/3 w-80 h-80 bg-gradient-to-tr from-[#E5A93C]/5 via-[#C86428]/5 to-transparent rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -2441,7 +2441,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
             </section>
 
             {/* Bento Block 9: SEO & Ayurvedic Wellness Knowledge Base */}
-            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl text-[#F7E7D9]/90">
+            <section className="lg:col-span-12 bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-10 space-y-6 shadow-xl text-[#F7E7D9]/90 content-auto">
               <div className="space-y-2 border-b border-white/10 pb-4">
                 <span className="text-[#E5A93C] uppercase text-xs tracking-widest font-bold font-sans">Ayurvedic Heritage & Modern Wellness</span>
                 <h2 className="font-serif text-2xl md:text-3.5xl font-extrabold text-white">

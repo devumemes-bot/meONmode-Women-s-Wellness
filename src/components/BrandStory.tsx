@@ -3,7 +3,7 @@ import { Heart, Sparkles, CheckCircle, ShieldCheck } from 'lucide-react';
 
 export const BrandStory: React.FC = () => {
   return (
-    <section id="brand-story" className="lg:col-span-12 rounded-[2.5rem] bg-white border border-neutral-200/90 p-8 md:p-14 space-y-8 shadow-xl text-neutral-900 overflow-hidden relative">
+    <section id="brand-story" className="lg:col-span-12 rounded-[2.5rem] bg-white border border-neutral-200/90 p-8 md:p-14 space-y-8 shadow-xl text-neutral-900 overflow-hidden relative content-auto">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
         {/* Left Column: Brand Story Narrative */}
         <div className="lg:col-span-7 space-y-5">

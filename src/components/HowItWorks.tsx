@@ -27,7 +27,7 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="lg:col-span-12 rounded-[2.5rem] bg-[#140B07] border-2 border-[#FAF6F0]/15 p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden text-white">
+    <section id="how-it-works" className="lg:col-span-12 rounded-[2.5rem] bg-[#140B07] border-2 border-[#FAF6F0]/15 p-8 md:p-12 space-y-10 shadow-2xl relative overflow-hidden text-white content-auto">
       {/* Background ambient lighting */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-[#E8621A]/10 rounded-full blur-[140px] pointer-events-none" />
 

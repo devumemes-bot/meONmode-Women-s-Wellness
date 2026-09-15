@@ -621,6 +621,18 @@ app.get("/llms.txt", (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "llms.txt"));
 });
 
+// Public static assets with caching headers
+app.use(express.static(path.join(process.cwd(), "public"), {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.ico') || filePath.endsWith('.png') || filePath.endsWith('.webp') || filePath.endsWith('.jpg')) {
+      res.setHeader('Cache-Control', 'public, max-age=2592000, immutable'); // 30 days immutable for icons/images
+    } else if (filePath.endsWith('.json') || filePath.endsWith('.xml') || filePath.endsWith('.txt')) {
+      res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day for manifest/sitemap/robots
+    }
+  }
+}));
+
 // Serve frontend assets using Vite middleware or static files
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
