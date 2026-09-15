@@ -1088,7 +1088,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
       el.setAttribute('content', contentVal);
     };
 
-    const setLink = (rel: string, hrefVal: string) => {
+    const setLink = (rel: string, hrefVal: string, typeVal?: string, sizesVal?: string) => {
       let el = document.querySelector(`link[rel="${rel}"]`);
       if (!el) {
         el = document.createElement('link');
@@ -1096,12 +1096,20 @@ Payment has been cryptographically verified on the backend server. Please dispat
         document.head.appendChild(el);
       }
       el.setAttribute('href', hrefVal);
+      if (typeVal) el.setAttribute('type', typeVal);
+      if (sizesVal) el.setAttribute('sizes', sizesVal);
     };
 
     setMeta('name', 'description', seo.description);
     setMeta('name', 'title', seo.title);
     setMeta('name', 'robots', seo.robots);
     setLink('canonical', seo.canonicalUrl);
+
+    // Ensure active favicon matches the official meONmode brand logo
+    const officialFaviconUrl = "https://res.cloudinary.com/ukqeabxy/image/upload/w_48,h_48,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png";
+    setLink('icon', officialFaviconUrl, 'image/png', '48x48');
+    setLink('shortcut icon', officialFaviconUrl, 'image/png', '48x48');
+    setLink('apple-touch-icon', "https://res.cloudinary.com/ukqeabxy/image/upload/w_180,h_180,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png", 'image/png', '180x180');
 
     // Open Graph
     setMeta('property', 'og:title', seo.title);

@@ -621,6 +621,49 @@ app.get("/llms.txt", (req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "llms.txt"));
 });
 
+// Explicit Favicon & App Icon endpoints for crawlers, browsers, and mobile devices
+app.get(["/favicon.ico"], (req, res) => {
+  res.header("Content-Type", "image/x-icon");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "favicon.ico"));
+});
+
+app.get(["/favicon.png", "/favicon-48x48.png"], (req, res) => {
+  res.header("Content-Type", "image/png");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "favicon-48x48.png"));
+});
+
+app.get(["/favicon-96x96.png"], (req, res) => {
+  res.header("Content-Type", "image/png");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "favicon-96x96.png"));
+});
+
+app.get(["/favicon-192x192.png", "/icon-192.png"], (req, res) => {
+  res.header("Content-Type", "image/png");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "icon-192.png"));
+});
+
+app.get(["/icon-512.png"], (req, res) => {
+  res.header("Content-Type", "image/png");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "icon-512.png"));
+});
+
+app.get(["/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"], (req, res) => {
+  res.header("Content-Type", "image/png");
+  res.header("Cache-Control", "public, max-age=86400, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "apple-touch-icon.png"));
+});
+
+app.get(["/manifest.json"], (req, res) => {
+  res.header("Content-Type", "application/manifest+json");
+  res.header("Cache-Control", "public, max-age=3600, must-revalidate");
+  res.sendFile(path.join(process.cwd(), "public", "manifest.json"));
+});
+
 // Public static assets with caching headers
 app.use(express.static(path.join(process.cwd(), "public"), {
   maxAge: '7d',
