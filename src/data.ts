@@ -99,7 +99,7 @@ export const PRODUCTS: Product[] = [
       "Supports healthy androgen balance and manages facial hair growth",
       "Calms stubborn hormonal skin flare-ups and purifies pores",
       "Supports metabolic balance and healthy weight management",
-      "100% natural, non-habit forming plant-based capsules"
+      "natural, non-habit forming plant-based capsules"
     ],
     keyIngredients: [
       { name: "Shatavari", benefit: "Egg Quality", description: "Fosters healthy egg development and stabilizes mood and energy swings." },
@@ -275,7 +275,7 @@ export const VAYUCORE_PRODUCT: Product = {
   ],
   tag: "BESTSELLER - GUT HEALTH",
   shortDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid formulated with carefully selected herbs to support healthy digestion, reduce gas and bloating, relieve acidity, and maintain overall gut health. Suitable for daily use by adults.",
-  longDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid crafted to support healthy digestion, eliminate persistent gas and bloating, soothe acidity, and maintain overall gut health. Formulated by expert Ayurvedic doctors using 100% natural, potent extracts including Kutki, Kalmegh, Palakya, Chirayita, Kasamarda, Kasni Beej, Kakamachi, Bhringraj, Punarnava, Zirak, Vaividang, Nishoth, Jauka, Shankh Drav, Turmeric, and Mulethi. VAYUCORE gently balances Vata, Pitta, and Kapha doshas while promoting daily digestive comfort without synthetic additions or chemicals.",
+  longDescription: "VAYUCORE is an Ayurvedic digestive wellness liquid crafted to support healthy digestion, eliminate persistent gas and bloating, soothe acidity, and maintain overall gut health. Formulated by expert Ayurvedic doctors using natural, potent extracts including Kutki, Kalmegh, Palakya, Chirayita, Kasamarda, Kasni Beej, Kakamachi, Bhringraj, Punarnava, Zirak, Vaividang, Nishoth, Jauka, Shankh Drav, Turmeric, and Mulethi. VAYUCORE gently balances Vata, Pitta, and Kapha doshas while promoting daily digestive comfort without synthetic additions or chemicals.",
   volumeOrQty: "450 ml Liquid",
   dosage: "7–10 ml daily or as directed by a physician.",
   benefits: [
@@ -362,7 +362,7 @@ export const FAQS = [
   },
   {
     question: "Is meONmode safe to take alongside modern medicine?",
-    answer: "Yes, our products are 100% natural, plant-based herbs and do not interfere with other treatments. However, we recommend maintaining a 1-hour gap between taking Ayurvedic and allopathic medicines."
+    answer: "Yes, our products are natural, plant-based herbs and do not interfere with other treatments. However, we recommend maintaining a 1-hour gap between taking Ayurvedic and allopathic medicines."
   },
   {
     question: "What is discreet packaging?",

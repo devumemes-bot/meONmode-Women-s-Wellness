@@ -422,7 +422,7 @@ export const getTranslatedFAQs = (lang: 'en' | 'hi', isMen: boolean) => {
       },
       {
         question: "Is meONmode safe to take alongside modern medicine?",
-        answer: "Yes, our products are 100% natural, plant-based herbs and do not interfere with other treatments. However, we recommend maintaining a 1-hour gap between taking Ayurvedic and allopathic medicines."
+        answer: "Yes, our products are natural, plant-based herbs and do not interfere with other treatments. However, we recommend maintaining a 1-hour gap between taking Ayurvedic and allopathic medicines."
       },
       {
         question: "What is discreet packaging?",

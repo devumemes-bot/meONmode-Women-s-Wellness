@@ -218,7 +218,7 @@ KEY FAQs & SUPPORT PROTOCOLS:
 - Visible Results Timeline:
   * For female products (OVAIRA & FLOWELLE), a noticeable reduction in cramp intensity, mood swings, and bloating occurs within 15 days. For cycle regularity and ovarian cyst reduction, 3 to 6 months of consistent use is highly recommended.
   * For male products (WANTMORE & AlphaMax), energy levels and reduced fatigue are felt in 7 to 10 days. A 90-day continuous protocol is recommended for sustainable gains.
-- Medical Safety: meONmode products are 100% natural, plant-based, and formulated under Ayush ministry guidelines. They have zero side effects and contain no steroids or heavy metals. They are completely safe to take alongside modern/allopathic medicines (just maintain a 1-hour gap).
+- Medical Safety: meONmode products are natural, plant-based, and formulated under Ayush ministry guidelines. They have zero side effects and contain no steroids or heavy metals. They are completely safe to take alongside modern/allopathic medicines (just maintain a 1-hour gap).
 - Discreet Packaging: We fully respect your privacy. All orders are packed in a 100% plain, unmarked outer cardboard box with no branding or product descriptions.
 - Refund & Return Policy: Returns/replacements are only offered for damaged, incorrect, or defective shipments. A complete, unedited unboxing video recorded from the moment of opening the package is strictly mandatory for return validation. Subjective preferences or results timelines do not qualify for refunds.
 - Order Tracking: Orders are processed within 24 hours and shipped via express partners, arriving in 3-5 business days. Ask the user for their Order ID if they request tracking, and provide a helpful, polite check.

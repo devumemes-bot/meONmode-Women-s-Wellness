@@ -91,7 +91,7 @@ export const alphamaxArticles: BlogPost[] = [
         id: "safety-and-compliance",
         title: "5. Non-Habit Forming & Clean Label Standards",
         paragraphs: [
-          "ALPHAMAX is 100% natural, vegetarian, non-habit forming, and free from synthetic preservatives, steroids, or heavy metal contaminants.",
+          "ALPHAMAX is natural, vegetarian, non-habit forming, and free from synthetic preservatives, steroids, or heavy metal contaminants.",
           "Every batch undergoes rigorous quality testing in certified GMP facilities to ensure therapeutic potency and complete consumer safety."
         ]
       }

@@ -940,7 +940,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
   useEffect(() => {
     let seo = {
       title: "meONmode | Ayurvedic Wellness Products",
-      description: "Discover authentic Ayurvedic wellness products by meONmode. Shop 100% natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India.",
+      description: "Discover authentic Ayurvedic wellness products by meONmode. Shop natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India.",
       canonicalUrl: "https://meonmode.com/",
       ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png",
       robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
@@ -951,7 +951,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
       if (currentPath === '/women') {
         seo = {
           title: "Women's Ayurvedic Wellness Products | meONmode",
-          description: "Explore meONmode Ayurvedic wellness solutions for women: OVAIRA Capsules for PCOS/PCOD and FLOWELLE Drink for cramp and flow balance. 100% natural, free pan-India shipping.",
+          description: "Explore meONmode Ayurvedic wellness solutions for women: OVAIRA Capsules for PCOS/PCOD and FLOWELLE Drink for cramp and flow balance. natural, free pan-India shipping.",
           canonicalUrl: "https://meonmode.com/women",
           ogImage: "https://res.cloudinary.com/ukqeabxy/image/upload/v1787512639/ChatGPT_Image_Jun_20_2026_10_28_24_PM.png",
           robots: "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
@@ -2459,7 +2459,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
               <div className="space-y-4 text-xs md:text-sm leading-relaxed font-sans text-neutral-300">
                 <p>
-                  Welcome to <strong className="text-white font-semibold">meONmode®</strong>, India’s premier destination for science-backed Ayurvedic wellness and restorative lifestyle formulations. Rooted in ancient Vedic herbal wisdom and validated by modern pharmacological standardization, meONmode crafts 100% natural, potent, and toxin-free formulations tailored specifically for modern men and women. Every remedy is produced using standardized extracts, rich in active phytochemicals, to harmonize vital doshas (Vata, Pitta, Kapha), rekindle metabolic vitality, and nurture long-term vitality.
+                  Welcome to <strong className="text-white font-semibold">meONmode®</strong>, India’s premier destination for science-backed Ayurvedic wellness and restorative lifestyle formulations. Rooted in ancient Vedic herbal wisdom and validated by modern pharmacological standardization, meONmode crafts natural, potent, and toxin-free formulations tailored specifically for modern men and women. Every remedy is produced using standardized extracts, rich in active phytochemicals, to harmonize vital doshas (Vata, Pitta, Kapha), rekindle metabolic vitality, and nurture long-term vitality.
                 </p>
 
                 <p>
