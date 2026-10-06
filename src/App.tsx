@@ -36,6 +36,14 @@ import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
 import { Hero } from './components/Hero';
 import { ConcernSelector } from './components/ConcernSelector';
+import { 
+  trackAddToCart, 
+  trackViewCart, 
+  trackBeginCheckout, 
+  trackAddShippingInfo, 
+  trackAddPaymentInfo, 
+  trackPurchase 
+} from './analytics';
 
 // Code-split dynamic views and below-the-fold sections for optimal mobile FCP/LCP
 const WhyOurFormulations = React.lazy(() => import('./components/WhyOurFormulations').then(m => ({ default: m.WhyOurFormulations })));
@@ -778,6 +786,9 @@ export default function App() {
       sessionStorage.setItem('meonmode_verified_order', JSON.stringify(data.order));
       saveOrderToHistory(data.order || data.orderId);
 
+      // GA4 Recommended purchase Ecommerce Event (Cryptographically verified orders only, zero PII, deduplicated)
+      trackPurchase(data.order);
+
       // Clear cart ONLY AFTER payment is verified
       setCart([]);
 
@@ -927,6 +938,29 @@ Payment has been cryptographically verified on the backend server. Please dispat
       setCookie('meonmode_user_session', JSON.stringify(checkout), 7);
     }
   }, [checkout.fullName, checkout.phone, checkout.address, checkout.pincode]);
+
+  // GA4 Recommended view_cart & begin_checkout tracking state
+  const hasTrackedCartViewRef = useRef<boolean>(false);
+  const hasTrackedBeginCheckoutRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (currentView === 'cart') {
+      if (!hasTrackedCartViewRef.current && cart.length > 0) {
+        trackViewCart(cart, getCartTotal());
+        hasTrackedCartViewRef.current = true;
+      }
+    } else {
+      hasTrackedCartViewRef.current = false;
+      hasTrackedBeginCheckoutRef.current = false;
+    }
+  }, [currentView, cart]);
+
+  const handleCheckoutFieldFocus = () => {
+    if (!hasTrackedBeginCheckoutRef.current && cart.length > 0) {
+      hasTrackedBeginCheckoutRef.current = true;
+      trackBeginCheckout(cart, getCartTotal());
+    }
+  };
 
   // Comprehensive Dynamic Head Metadata, Canonical URL, Open Graph & Twitter Tags Updater
   useEffect(() => {
@@ -1219,6 +1253,9 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
   // Cart Functions
   const addToCart = (product: Product, quantity: number = 1) => {
+    // GA4 Recommended add_to_cart Ecommerce Event
+    trackAddToCart(product, quantity);
+
     setCart(prevCart => {
       const existing = prevCart.find(item => item.product.id === product.id);
       if (existing) {
@@ -1274,6 +1311,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
     setCheckoutStep(1);
     setPaymentMethod('cod');
     setCurrentView('cart');
+
+    // GA4 Recommended begin_checkout for direct quick-buy
+    if (!hasTrackedBeginCheckoutRef.current) {
+      hasTrackedBeginCheckoutRef.current = true;
+      const checkoutItems = exists ? cart : [...cart, { product, quantity: 1 }];
+      const checkoutTotal = exists ? getCartTotal() : getCartTotal() + product.price;
+      trackBeginCheckout(checkoutItems, checkoutTotal);
+    }
   };
 
   // Form Validation and WhatsApp Redirection
@@ -1300,13 +1345,19 @@ Payment has been cryptographically verified on the backend server. Please dispat
     if (!validateForm()) return;
 
     if (checkoutStep === 1) {
+      // GA4 Recommended add_shipping_info: Customer completes shipping/delivery details
+      trackAddShippingInfo(cart, getCartTotal());
       setCheckoutStep(2);
       return;
     }
 
-    if (checkoutStep === 2 && paymentMethod === 'cod' && !codAcknowledged) {
-      alert("Please accept the mandatory ₹150 advance payment policy for Cash on Delivery orders to proceed.");
-      return;
+    if (checkoutStep === 2) {
+      // GA4 Recommended add_payment_info: Customer confirms payment method selection
+      trackAddPaymentInfo(cart, getCartTotal(), paymentMethod);
+      if (paymentMethod === 'cod' && !codAcknowledged) {
+        alert("Please accept the mandatory ₹150 advance payment policy for Cash on Delivery orders to proceed.");
+        return;
+      }
     }
 
     setIsProcessingPayment(true);
@@ -2857,6 +2908,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               type="text"
                               placeholder="Enter your full name"
                               value={checkout.fullName}
+                              onFocus={handleCheckoutFieldFocus}
                               onChange={(e) => {
                                 setCheckout({ ...checkout, fullName: e.target.value });
                                 if (formErrors.fullName) setFormErrors({ ...formErrors, fullName: '' });
@@ -2882,6 +2934,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                 maxLength={10}
                                 placeholder="Enter 10-digit mobile number"
                                 value={checkout.phone}
+                                onFocus={handleCheckoutFieldFocus}
                                 onChange={(e) => {
                                   // Only allow numbers
                                   const cleaned = e.target.value.replace(/\D/g, '');
@@ -2909,6 +2962,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               rows={3}
                               placeholder="House No, Building, Street, Landmark, Village, City, State"
                               value={checkout.address}
+                              onFocus={handleCheckoutFieldFocus}
                               onChange={(e) => {
                                 setCheckout({ ...checkout, address: e.target.value });
                                 if (formErrors.address) setFormErrors({ ...formErrors, address: '' });
@@ -2932,6 +2986,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               maxLength={6}
                               placeholder="Enter 6-digit Pincode"
                               value={checkout.pincode}
+                              onFocus={handleCheckoutFieldFocus}
                               onChange={(e) => {
                                 // Only allow numbers
                                 const cleaned = e.target.value.replace(/\D/g, '');
@@ -2954,6 +3009,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               onClick={(e) => {
                                 e.preventDefault();
                                 if (validateForm()) {
+                                  trackAddShippingInfo(cart, getCartTotal());
                                   setCheckoutStep(2);
                                 }
                               }}
@@ -3002,7 +3058,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {/* COD Option */}
                               <button
                                 type="button"
-                                onClick={() => setPaymentMethod('cod')}
+                                onClick={() => {
+                                  setPaymentMethod('cod');
+                                  trackAddPaymentInfo(cart, getCartTotal(), 'cod');
+                                }}
                                 className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                                   paymentMethod === 'cod'
                                     ? 'border-[#C86428] bg-[#C86428]/5 ring-2 ring-[#C86428]'
@@ -3023,7 +3082,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {/* UPI Option */}
                               <button
                                 type="button"
-                                onClick={() => setPaymentMethod('upi')}
+                                onClick={() => {
+                                  setPaymentMethod('upi');
+                                  trackAddPaymentInfo(cart, getCartTotal(), 'upi');
+                                }}
                                 className={`p-4 rounded-2xl border text-left flex items-start gap-3 transition-all cursor-pointer ${
                                   paymentMethod === 'upi'
                                     ? 'border-[#C86428] bg-[#C86428]/5 ring-2 ring-[#C86428]'

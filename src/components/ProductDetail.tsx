@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowLeft, Star, Heart, Check, Clock, Lock, ShoppingBag, 
   Truck, Bell, ShieldCheck, ChevronRight 
@@ -6,6 +6,7 @@ import {
 import { Product } from '../types';
 import { CustomerReview, PRODUCTS, MENS_PRODUCTS } from '../data';
 import { ProductGallery } from './ProductGallery';
+import { trackViewItem } from '../analytics';
 
 interface ProductDetailProps {
   product: Product;
@@ -53,6 +54,13 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [activeImageIndex, setActiveImageIndex] = useState<number>(0);
   const [detailQuantity, setDetailQuantity] = useState<number>(1);
   const [showShareDropdown, setShowShareDropdown] = useState<boolean>(false);
+
+  // GA4 Recommended view_item Ecommerce Event
+  useEffect(() => {
+    if (product && product.id) {
+      trackViewItem(product);
+    }
+  }, [product.id]);
 
   const { rating, reviewsCount } = getProductRatingDetails(product.id);
   const prodReviews = currentReviews.filter(r => r.productId === product.id);
