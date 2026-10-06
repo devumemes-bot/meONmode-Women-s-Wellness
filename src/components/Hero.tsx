@@ -108,9 +108,10 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Bottom Action Row */}
             <div className="pt-2 flex items-center justify-between gap-3 border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => {
+              <a
+                href="/women"
+                onClick={(e) => {
+                  e.preventDefault();
                   setActiveCategory('women');
                   scrollToCatalog();
                 }}
@@ -118,7 +119,7 @@ export const Hero: React.FC<HeroProps> = ({
               >
                 <span>Explore Women's Care</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
             </div>
           </div>
 
@@ -167,9 +168,10 @@ export const Hero: React.FC<HeroProps> = ({
 
             {/* Bottom Action Row */}
             <div className="pt-2 flex items-center justify-between gap-3 border-t border-white/10">
-              <button
-                type="button"
-                onClick={() => {
+              <a
+                href="/men"
+                onClick={(e) => {
+                  e.preventDefault();
                   setActiveCategory('men');
                   scrollToCatalog();
                 }}
@@ -177,7 +179,7 @@ export const Hero: React.FC<HeroProps> = ({
               >
                 <span>Explore Men's Vitality</span>
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </a>
             </div>
           </div>
 
@@ -305,13 +307,15 @@ export const Hero: React.FC<HeroProps> = ({
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
+              <a
+                href="/products/combo-kit"
+                onClick={(e) => {
+                  e.preventDefault();
                   if (womenCombo) onProductClick(womenCombo);
                 }}
                 className="w-full relative z-20 focus:outline-none cursor-pointer overflow-hidden block group/hero-img rounded-2xl mt-auto"
-                title="Click to view details"
+                title="Click to view details for meONmode Women's Combo Kit"
+                aria-label="meONmode Women's Combo Kit details"
               >
                 <img 
                   src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png", 480)} 
@@ -325,7 +329,7 @@ export const Hero: React.FC<HeroProps> = ({
                   height="320"
                   className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
                 />
-              </button>
+              </a>
 
               <div className="absolute bottom-6 left-6 bg-[#4A1D05] text-white text-[9px] font-black tracking-wider uppercase px-3 py-1.5 rounded-full shadow-lg border border-[#E5A93C]/30 z-20">
                 🌿 Standardized Shastras
@@ -434,13 +438,15 @@ export const Hero: React.FC<HeroProps> = ({
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
+            <a
+              href="/products/mens-combo"
+              onClick={(e) => {
+                e.preventDefault();
                 if (menCombo) onProductClick(menCombo);
               }}
               className="w-full relative z-20 focus:outline-none cursor-pointer overflow-hidden block group/hero-img rounded-2xl mt-auto"
-              title="Click to view details"
+              title="Click to view details for meONmode Men's Combo"
+              aria-label="meONmode Men's Combo details"
             >
               <img 
                 src={optimizeCloudinaryUrl("https://res.cloudinary.com/ukqeabxy/image/upload/v1787581402/ChatGPT_Image_Aug_24_2026_07_42_58_PM.png", 480)} 
@@ -454,7 +460,7 @@ export const Hero: React.FC<HeroProps> = ({
                 height="320"
                 className="w-full h-auto max-w-[280px] md:max-w-[320px] object-contain block mx-auto rounded-2xl transform transition-transform duration-700 ease-out group-hover/hero-img:scale-105 filter drop-shadow-[0_25px_25px_rgba(0,0,0,0.6)]"
               />
-            </button>
+            </a>
 
             <div className="absolute bottom-6 left-6 bg-[#2B221B] text-white text-[9px] font-black tracking-wider uppercase px-3 py-1.5 rounded-full shadow-lg border border-[#E5A93C]/30 z-20">
               🌿 Standardized Rasayana

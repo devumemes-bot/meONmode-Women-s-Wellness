@@ -373,11 +373,17 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                       </span>
                     </div>
 
-                    <h2 
-                      onClick={() => onSelectArticle(featuredPost.slug)}
-                      className="font-serif text-2xl md:text-3xl font-extrabold text-[#1A1A1A] hover:text-[#E8621A] transition-colors leading-snug cursor-pointer"
-                    >
-                      {featuredPost.title}
+                    <h2 className="font-serif text-2xl md:text-3xl font-extrabold text-[#1A1A1A] hover:text-[#E8621A] transition-colors leading-snug">
+                      <a 
+                        href={`/blog/${featuredPost.slug}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectArticle(featuredPost.slug);
+                        }}
+                        className="hover:text-[#E8621A] cursor-pointer"
+                      >
+                        {featuredPost.title}
+                      </a>
                     </h2>
 
                     <p className="text-xs md:text-sm text-neutral-600 leading-relaxed line-clamp-3">
@@ -398,13 +404,17 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                         <span>{featuredPost.author}</span>
                       </div>
 
-                      <button
-                        onClick={() => onSelectArticle(featuredPost.slug)}
+                      <a
+                        href={`/blog/${featuredPost.slug}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectArticle(featuredPost.slug);
+                        }}
                         className="bg-[#E8621A] hover:bg-[#d55210] text-white font-extrabold text-xs py-3 px-6 rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-95"
                       >
                         <span>Padhiye Full Article</span>
                         <ChevronRight className="w-4 h-4" />
-                      </button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -443,7 +453,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                           <img
                             src={getOptimizedImageUrl(post.featuredImage, { width: 480 })}
                             srcSet={`${getOptimizedImageUrl(post.featuredImage, { width: 320 })} 320w, ${getOptimizedImageUrl(post.featuredImage, { width: 480 })} 480w, ${getOptimizedImageUrl(post.featuredImage, { width: 640 })} 640w`}
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 380px"
+                            sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 380px"
                             alt={post.title}
                             loading="lazy"
                             decoding="async"
@@ -484,7 +494,16 @@ export const BlogListing: React.FC<BlogListingProps> = ({
 
                         {/* Title */}
                         <h2 className="font-serif text-xl font-extrabold text-[#1A1A1A] group-hover:text-[#E8621A] transition-colors leading-snug">
-                          {post.title}
+                          <a 
+                            href={`/blog/${post.slug}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              onSelectArticle(post.slug);
+                            }}
+                            className="group-hover:text-[#E8621A] cursor-pointer"
+                          >
+                            {post.title}
+                          </a>
                         </h2>
 
                         {/* Excerpt */}
@@ -622,7 +641,7 @@ export const BlogListing: React.FC<BlogListingProps> = ({
                       <img
                         src={getOptimizedImageUrl(herb.image, { width: 360 })}
                         srcSet={`${getOptimizedImageUrl(herb.image, { width: 240 })} 240w, ${getOptimizedImageUrl(herb.image, { width: 360 })} 360w, ${getOptimizedImageUrl(herb.image, { width: 480 })} 480w`}
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                        sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 300px"
                         alt={herb.name}
                         loading="lazy"
                         decoding="async"

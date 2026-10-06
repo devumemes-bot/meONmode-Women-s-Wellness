@@ -25,6 +25,21 @@ app.use(compression({
   threshold: 1024, // only compress responses > 1KB
 }));
 
+// Canonical Host & HTTPS Enforcer (Single-hop 301 direct to https://meonmode.com)
+app.use((req, res, next) => {
+  const host = (req.headers.host || "").toLowerCase().split(':')[0];
+  const isWww = host === "www.meonmode.com";
+  const isApex = host === "meonmode.com";
+  const proto = (req.headers["x-forwarded-proto"] || req.protocol || "").toString().toLowerCase();
+  const isHttp = proto === "http";
+
+  // Bypass multi-step redirect chains: single-hop 301 direct to canonical URL
+  if (isWww || (isApex && isHttp)) {
+    return res.redirect(301, `https://meonmode.com${req.originalUrl}`);
+  }
+  next();
+});
+
 // Middleware
 app.use(express.json());
 
@@ -575,9 +590,26 @@ app.get("/api/orders/:orderId", (req, res) => {
 
 // 4. Query Verified Orders by Customer Phone Number
 app.get("/api/orders-by-phone", (req, res) => {
-  return res.status(400).json({
-    success: false,
-    error: "Please enter a valid 10-digit mobile number."
+  const queryPhone = (req.query.phone || req.query.q || "") as string;
+  const cleanPhone = queryPhone.replace(/\D/g, "").slice(-10);
+
+  if (!cleanPhone || cleanPhone.length < 10) {
+    return res.status(400).json({
+      success: false,
+      error: "Please enter a valid 10-digit mobile number."
+    });
+  }
+
+  const matches = Object.values(confirmedOrders).filter(order => {
+    if (!order.checkoutDetails || !order.checkoutDetails.phone) return false;
+    const orderPhone = order.checkoutDetails.phone.replace(/\D/g, "").slice(-10);
+    return orderPhone === cleanPhone;
+  });
+
+  return res.json({
+    success: true,
+    phone: cleanPhone,
+    orders: matches
   });
 });
 

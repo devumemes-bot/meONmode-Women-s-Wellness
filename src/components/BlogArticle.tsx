@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BlogPost, Product } from '../types';
-import { PRODUCTS, MENS_PRODUCTS, optimizeCloudinaryUrl } from '../data';
+import { PRODUCTS, MENS_PRODUCTS, optimizeCloudinaryUrl, getProductCleanSlug } from '../data';
 import { BLOG_POSTS } from '../blogData';
 import { getOptimizedImageUrl } from '../blogImages';
 import { 
@@ -203,19 +203,41 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
       {/* Article Top Nav & Breadcrumb */}
       <div className="bg-white border-b border-[#E0D8D0] sticky top-0 z-30 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          <button
-            onClick={onGoBackToBlog}
+          <a
+            href="/blog"
+            onClick={(e) => {
+              e.preventDefault();
+              onGoBackToBlog();
+            }}
             className="flex items-center gap-2 text-xs font-bold text-[#8B4A5A] hover:text-[#E8621A] transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back to All Articles</span>
-          </button>
+          </a>
 
           {/* Breadcrumb Links */}
           <nav className="hidden md:flex items-center gap-1.5 text-[11px] text-neutral-500 font-medium truncate">
-            <button onClick={onGoBackToBlog} className="hover:underline">Home</button>
+            <a 
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                onGoBackToBlog();
+              }} 
+              className="hover:underline cursor-pointer"
+            >
+              Home
+            </a>
             <span>&gt;</span>
-            <button onClick={onGoBackToBlog} className="hover:underline">Blog</button>
+            <a 
+              href="/blog"
+              onClick={(e) => {
+                e.preventDefault();
+                onGoBackToBlog();
+              }} 
+              className="hover:underline cursor-pointer"
+            >
+              Blog
+            </a>
             <span>&gt;</span>
             <span className="text-[#8B4A5A] font-bold">{post.category}</span>
             <span>&gt;</span>
@@ -357,7 +379,7 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                     <img
                       src={getOptimizedImageUrl(section.image.url, { width: 720 })}
                       srcSet={`${getOptimizedImageUrl(section.image.url, { width: 400 })} 400w, ${getOptimizedImageUrl(section.image.url, { width: 720 })} 720w`}
-                      sizes="(max-width: 768px) 100vw, 680px"
+                      sizes="(max-width: 768px) calc(100vw - 32px), 680px"
                       alt={section.image.alt || section.title}
                       loading="lazy"
                       decoding="async"
@@ -495,12 +517,16 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                         height="80"
                         className="w-20 h-20 object-contain rounded-lg border border-neutral-100 p-1"
                       />
-                      <button
-                        onClick={() => onSelectProduct(relatedProduct)}
-                        className="w-full bg-[#E8621A] hover:bg-[#d55210] text-white text-xs font-bold py-2.5 px-5 rounded-xl shadow transition-all cursor-pointer whitespace-nowrap"
+                      <a
+                        href={`/products/${getProductCleanSlug(relatedProduct.id)}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          onSelectProduct(relatedProduct);
+                        }}
+                        className="w-full bg-[#E8621A] hover:bg-[#d55210] text-white text-xs font-bold py-2.5 px-5 rounded-xl shadow transition-all cursor-pointer whitespace-nowrap text-center block"
                       >
                         Order Karo →
-                      </button>
+                      </a>
                     </div>
                   </div>
                 )}
@@ -633,12 +659,16 @@ export const BlogArticle: React.FC<BlogArticleProps> = ({
                 </div>
 
                 <div className="pt-2 flex flex-wrap gap-3">
-                  <button
-                    onClick={() => onSelectProduct(relatedProduct)}
-                    className="bg-white text-[#8B4A5A] hover:bg-neutral-100 font-extrabold text-xs py-3 px-6 rounded-xl shadow-lg cursor-pointer transition-all active:scale-95"
+                  <a
+                    href={`/products/${getProductCleanSlug(relatedProduct.id)}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onSelectProduct(relatedProduct);
+                    }}
+                    className="bg-white text-[#8B4A5A] hover:bg-neutral-100 font-extrabold text-xs py-3 px-6 rounded-xl shadow-lg cursor-pointer transition-all active:scale-95 inline-block text-center"
                   >
                     Order Karo — meonmode.com
-                  </button>
+                  </a>
 
                   <a
                     href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20mujhe%20order%20place%20karna%20hai."

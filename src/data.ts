@@ -31,6 +31,44 @@ export function getCloudinarySrcSet(url: string, widths: number[] = [360, 480, 6
   return widths.map(w => `${optimizeCloudinaryUrl(url, w)} ${w}w`).join(', ');
 }
 
+// Product Clean Canonical Slug Mapping
+export function getProductCleanSlug(id: string): string {
+  switch (id) {
+    case 'flowelle': return 'flowelle';
+    case 'ovaira': return 'ovaira';
+    case 'wantmore-men':
+    case 'wantmore': return 'wantmore';
+    case 'alphamax-men':
+    case 'alphamax': return 'alphamax';
+    case 'vayucore': return 'vayucore';
+    case 'combo-kit':
+    case 'female-combo-kit': return 'combo-kit';
+    case 'mens-combo':
+    case 'mens-ultimate-performance-combo': return 'mens-combo';
+    default: return id;
+  }
+}
+
+export function getProductFromSlug(slug: string): Product | undefined {
+  if (!slug) return undefined;
+  const clean = slug
+    .toLowerCase()
+    .replace('/products/', '')
+    .replace('/product/', '')
+    .replace('/combos/', '')
+    .replace('/combo/', '')
+    .replace(/^\/+|\/+$/g, '')
+    .split('?')[0]
+    .split('#')[0]
+    .trim();
+
+  const all = [...PRODUCTS, ...MENS_PRODUCTS];
+  return all.find(p => {
+    const canonicalSlug = getProductCleanSlug(p.id);
+    return canonicalSlug === clean || p.id.toLowerCase() === clean;
+  });
+}
+
 export const PRODUCTS: Product[] = [
   {
     id: 'combo-kit',

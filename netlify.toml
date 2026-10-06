@@ -2,6 +2,26 @@
   publish = "dist"
   command = "npm run build"
 
+# Single-hop Canonical 301 Redirects: Bypass intermediate Netlify SSL/Domain-alias redirect chains
+[[redirects]]
+  from = "http://www.meonmode.com/*"
+  to = "https://meonmode.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.meonmode.com/*"
+  to = "https://meonmode.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://meonmode.com/*"
+  to = "https://meonmode.com/:splat"
+  status = 301
+  force = true
+
+# SPA Fallback for client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"

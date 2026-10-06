@@ -162,9 +162,9 @@ export const ProductGallery: React.FC<ProductGalleryProps> = ({
             >
               <img 
                 key={currentIndex}
-                src={optimizeCloudinaryUrl(images[currentIndex], 720)} 
+                src={optimizeCloudinaryUrl(images[currentIndex], 480)} 
                 srcSet={`${optimizeCloudinaryUrl(images[currentIndex], 480)} 480w, ${optimizeCloudinaryUrl(images[currentIndex], 640)} 640w, ${optimizeCloudinaryUrl(images[currentIndex], 800)} 800w, ${optimizeCloudinaryUrl(images[currentIndex], 1080)} 1080w`}
-                sizes="(max-width: 640px) 95vw, (max-width: 1024px) 50vw, 480px"
+                sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 480px"
                 alt={`${product.name} - Ayurvedic packaging & product view ${currentIndex + 1} of ${totalImages}`}
                 loading={currentIndex === 0 ? "eager" : "lazy"}
                 fetchPriority={currentIndex === 0 ? "high" : "auto"}

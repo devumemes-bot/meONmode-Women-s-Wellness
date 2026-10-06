@@ -4,23 +4,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NCJKJMW9');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Early Stylesheet Discovery for Rapid First Contentful Paint -->
+    <link rel="stylesheet" href="/src/index.css" />
+
     <!-- Resource Hints & Preconnections for Critical Origins -->
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="dns-prefetch" href="https://res.cloudinary.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- LCP Hero Image Preload with Responsive srcSet for Mobile & Desktop -->
+    <!-- LCP Hero Image Preload with Responsive srcSet (Preloaded without starving critical CSS/JS) -->
     <link 
       rel="preload" 
       as="image" 
       href="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_480,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png" 
       imagesrcset="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_380,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 380w, https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_480,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 480w, https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_640,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 640w, https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_960,c_limit/v1787512641/ChatGPT_Image_Jun_27_2026_at_04_11_06_PM.png 960w" 
       imagesizes="(max-width: 640px) 280px, 320px" 
-      fetchpriority="high" 
     />
 
-    <!-- Lean Asynchronous Non-blocking Google Fonts (Critical Weights Only) -->
+    <!-- Lean Asynchronous Non-blocking Google Fonts (Critical Weights Only with display=swap) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" media="print" onload="this.media='all'" />
     <noscript>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" />
@@ -47,14 +57,9 @@
     <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png?v=3" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=3" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=3" />
-    <link rel="icon" type="image/png" sizes="48x48" href="https://res.cloudinary.com/ukqeabxy/image/upload/w_48,h_48,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
-    <link rel="icon" type="image/png" sizes="96x96" href="https://res.cloudinary.com/ukqeabxy/image/upload/w_96,h_96,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
-    <link rel="icon" type="image/png" sizes="192x192" href="https://res.cloudinary.com/ukqeabxy/image/upload/w_192,h_192,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3" />
-    <link rel="shortcut icon" type="image/png" href="https://res.cloudinary.com/ukqeabxy/image/upload/w_48,h_48,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="apple-touch-icon-precomposed" sizes="180x180" href="/apple-touch-icon-precomposed.png?v=3" />
-    <link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/ukqeabxy/image/upload/w_180,h_180,c_fill,f_png/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
     <link rel="manifest" href="/manifest.json?v=3" />
     <link rel="canonical" href="https://meonmode.com/" />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="https://meonmode.com/sitemap.xml" />
@@ -75,8 +80,64 @@
     <meta name="twitter:title" content="meONmode | Ayurvedic Wellness Products" />
     <meta name="twitter:description" content="Discover authentic Ayurvedic wellness products by meONmode. Shop natural, herbal formulations for women and men including OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, and VAYUCORE with free shipping and Cash on Delivery across India." />
     <meta name="twitter:image" content="https://res.cloudinary.com/ukqeabxy/image/upload/f_auto,q_auto,w_1200,h_630,c_fill/v1789500041/07423c38-2e23-4015-8305-246530cbbbcf.png" />
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NCJKJMW9"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="root">
+      <!-- Server / Crawlable Pre-Render Fallback (Replaced upon client React hydration) -->
+      <header>
+        <nav aria-label="Main Navigation">
+          <a href="/">Home</a>
+          <a href="/women">Women's Ayurvedic Wellness</a>
+          <a href="/men">Men's Vitality & Stamina</a>
+          <a href="/products">All Ayurvedic Products</a>
+          <a href="/combos">Ayurvedic Combos & Kits</a>
+          <a href="/blog">Ayurvedic Health Blog</a>
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact Support</a>
+        </nav>
+        <h1>meONmode®<br><span>Ayurvedic Wellness & Lifestyle Products</span></h1>
+      </header>
+      <main>
+        <section>
+          <h2>Holistic Ayurvedic Wellness by meONmode</h2>
+          <p>
+            Welcome to meONmode, your premier sanctuary for authentic Ayurvedic wellness and restorative lifestyle formulations. Rooted in ancient Vedic herbal wisdom and validated by rigorous modern standardization, meONmode delivers natural, potent, and safe wellness solutions tailored specifically for men and women across India. Every formulation is meticulously crafted with pure bioactive botanicals, standard-grade extracts, and time-tested rasayanas designed to rebalance vital bodily doshas, enhance vitality, and nurture sustainable health.
+          </p>
+          <nav aria-label="Flagship Formulations">
+            <h3>Our Flagship Ayurvedic Formulations</h3>
+            <ul>
+              <li><a href="/products/ovaira">OVAIRA Capsules</a> – Women's hormonal balance, ovarian wellness, and cycle harmony.</li>
+              <li><a href="/products/flowelle">FLOWELLE Syrup</a> – Natural uterine restorative tonic and smooth flow regulation.</li>
+              <li><a href="/products/combo-kit">meONmode Women's Combo Kit</a> – Synergistic OVAIRA + FLOWELLE dual regimen.</li>
+              <li><a href="/products/alphamax">ALPHAMAX Capsules</a> – Himalayan Shudh Shilajit, Safed Musli & Ashwagandha for male vitality.</li>
+              <li><a href="/products/wantmore">WANTMORE Prash</a> – Herbal stamina, endurance, and cellular energy prash.</li>
+              <li><a href="/products/mens-combo">meONmode Men's Vitality Combo</a> – Comprehensive ALPHAMAX + WANTMORE performance pack.</li>
+              <li><a href="/products/vayucore">VAYUCORE Liquid</a> – Digestive agni optimizer for acidity, gas, and bloating relief.</li>
+            </ul>
+          </nav>
+          <p>
+            Experience seamless shopping with meONmode: all orders include 100% Free Shipping across all Indian pincodes, Cash on Delivery (COD) availability, inclusive GST pricing, and 100% discreet, tamper-evident private packaging delivered right to your doorstep.
+          </p>
+        </section>
+      </main>
+      <footer>
+        <nav aria-label="Customer Policies">
+          <a href="/refund-policy">Refund & Return Policy</a>
+          <a href="/shipping-policy">Shipping Policy</a>
+          <a href="/privacy-policy">Privacy Policy</a>
+          <a href="/terms-and-conditions">Terms & Conditions</a>
+          <a href="/about">About Us</a>
+          <a href="/contact">Contact Support</a>
+        </nav>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
 
-    <!-- JSON-LD Structured Data for Organization & WebSite -->
+    <!-- JSON-LD Structured Data for Organization & WebSite (Crawled by all search bots) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -120,35 +181,6 @@
         ]
       }
     </script>
-  </head>
-  <body>
-    <div id="root">
-      <!-- Server / Crawlable Pre-Render Fallback -->
-      <header>
-        <h1>meONmode®<br><span>Ayurvedic Wellness & Lifestyle Products</span></h1>
-      </header>
-      <main>
-        <section>
-          <h2>Holistic Ayurvedic Wellness by meONmode</h2>
-          <p>
-            Welcome to meONmode, your premier sanctuary for authentic Ayurvedic wellness and restorative lifestyle formulations. Rooted in ancient Vedic herbal wisdom and validated by rigorous modern standardization, meONmode delivers natural, potent, and safe wellness solutions tailored specifically for men and women across India. Every formulation is meticulously crafted with pure bioactive botanicals, standard-grade extracts, and time-tested rasayanas designed to rebalance vital bodily doshas, enhance vitality, and nurture sustainable health.
-          </p>
-          <p>
-            Our flagship Men's Wellness collection features ALPHAMAX capsules and WANTMORE Prash. ALPHAMAX is an elite male vitality and endurance formula enriched with pure Himalayan Shudh Shilajit, Gokshura, Safed Musli, and Ashwagandha to restore natural stamina, cellular energy, and daily resilience. WANTMORE is a revitalizing Ayurvedic Prash crafted for prolonged athletic performance, vascular flow, and expedited post-exercise recovery without synthetic stimulants or sugar spikes.
-          </p>
-          <p>
-            For women, meONmode offers OVAIRA and FLOWELLE—targeted hormonal harmony and cycle regulation remedies. OVAIRA balances female endocrine rhythms, supports healthy ovarian function, assists PCOS/PCOD management, and alleviates painful cramps with Shatavari, Lodhra, and Ashoka extracts. FLOWELLE nurtures regular flow timing and mood equilibrium.
-          </p>
-          <p>
-            Our digestive care range introduces VAYUCORE, an authentic Ayurvedic drinking liquid (450 ML) engineered to relieve chronic acidity, severe gastric discomfort, bloating, and post-meal heaviness by promoting balanced gut flora and natural digestive agni.
-          </p>
-          <p>
-            Experience seamless shopping with meONmode: all orders include 100% Free Shipping across all Indian pincodes, Cash on Delivery (COD) availability, inclusive GST pricing, and 100% discreet, tamper-evident private packaging delivered right to your doorstep.
-          </p>
-        </section>
-      </main>
-    </div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
 

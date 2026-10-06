@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Product } from '../types';
 import { Star, ShieldCheck, ShoppingCart, Zap, ArrowRight, SlidersHorizontal, Search, X } from 'lucide-react';
-import { optimizeCloudinaryUrl } from '../data';
+import { optimizeCloudinaryUrl, getProductCleanSlug } from '../data';
 
 interface AllProductsPageProps {
   products: Product[];
@@ -215,9 +215,14 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                 className="group bg-[#1A0F0A] border border-white/10 rounded-3xl overflow-hidden shadow-lg hover:border-[#E5A93C]/50 hover:shadow-2xl transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Product Image Area */}
-                <div 
-                  className="relative bg-black/40 p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/5 aspect-[4/3] sm:aspect-square"
-                  onClick={() => onSelectProduct(product)}
+                <a 
+                  href={`/products/${getProductCleanSlug(product.id)}`}
+                  className="relative bg-black/40 p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/5 aspect-[4/3] sm:aspect-square block"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onSelectProduct(product);
+                  }}
+                  aria-label={`View details for ${product.name}`}
                 >
                   {/* Tag badge if present */}
                   {product.tag && (
@@ -231,9 +236,9 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                     </span>
                   )}
                   <img
-                    src={optimizeCloudinaryUrl(product.images[0], 640)}
+                    src={optimizeCloudinaryUrl(product.images[0], 480)}
                     srcSet={`${optimizeCloudinaryUrl(product.images[0], 360)} 360w, ${optimizeCloudinaryUrl(product.images[0], 480)} 480w, ${optimizeCloudinaryUrl(product.images[0], 640)} 640w, ${optimizeCloudinaryUrl(product.images[0], 960)} 960w`}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+                    sizes="(max-width: 640px) calc(100vw - 32px), (max-width: 1024px) 50vw, 360px"
                     alt={product.name}
                     loading={pIdx === 0 ? "eager" : "lazy"}
                     fetchPriority={pIdx === 0 ? "high" : "auto"}
@@ -242,7 +247,7 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                     height="270"
                     className="w-full h-full max-h-56 sm:max-h-64 object-contain group-hover:scale-105 transition-transform duration-500"
                   />
-                </div>
+                </a>
 
                 {/* Product Details Area */}
                 <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
@@ -260,12 +265,18 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                     </div>
 
                     {/* Title & Subtitle */}
-                    <div 
-                      className="cursor-pointer"
-                      onClick={() => onSelectProduct(product)}
-                    >
+                    <div>
                       <h3 className="font-serif text-xl font-bold text-white group-hover:text-[#E5A93C] transition-colors line-clamp-1">
-                        {product.name}
+                        <a 
+                          href={`/products/${getProductCleanSlug(product.id)}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            onSelectProduct(product);
+                          }}
+                          className="hover:text-[#E5A93C] cursor-pointer"
+                        >
+                          {product.name}
+                        </a>
                       </h3>
                       <p className="text-xs text-neutral-400 line-clamp-2 mt-1 font-sans">
                         {product.shortDescription || product.subtitle}

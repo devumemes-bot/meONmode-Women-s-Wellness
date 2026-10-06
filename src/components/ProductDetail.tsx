@@ -201,21 +201,27 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
       {/* Breadcrumb back navigation link */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <nav className="flex items-center gap-2 text-xs text-white/70 font-medium">
-          <button 
-            type="button"
-            onClick={onBack}
+          <a 
+            href="/"
+            onClick={(e) => {
+              e.preventDefault();
+              onBack();
+            }}
             className="hover:text-[#E5A93C] transition-colors cursor-pointer"
           >
             Home
-          </button>
+          </a>
           <span className="text-white/40">/</span>
-          <button 
-            type="button"
-            onClick={onBack}
+          <a 
+            href={isMenProduct ? "/men" : "/women"}
+            onClick={(e) => {
+              e.preventDefault();
+              onBack();
+            }}
             className="hover:text-[#E5A93C] transition-colors cursor-pointer"
           >
             {isMenProduct ? "Men's Wellness" : "Women's Wellness"}
-          </button>
+          </a>
           <span className="text-white/40">/</span>
           <span className="text-[#E5A93C] font-bold truncate max-w-[200px] sm:max-w-none">
             {product.name}
@@ -719,7 +725,7 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
                 <img 
                   src={rel.images && rel.images.length > 0 ? optimizeCloudinaryUrl(rel.images[0], 480) : ''} 
                   srcSet={rel.images && rel.images.length > 0 ? `${optimizeCloudinaryUrl(rel.images[0], 240)} 240w, ${optimizeCloudinaryUrl(rel.images[0], 360)} 360w, ${optimizeCloudinaryUrl(rel.images[0], 480)} 480w, ${optimizeCloudinaryUrl(rel.images[0], 640)} 640w` : undefined}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 250px"
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 50vw, 250px"
                   alt={rel.name} 
                   loading="lazy"
                   decoding="async"

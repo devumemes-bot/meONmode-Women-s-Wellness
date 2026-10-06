@@ -8,7 +8,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   ShoppingBag, 
   ChevronRight, 
-  ChevronLeft,
   Star, 
   ArrowLeft, 
   Plus, 
@@ -17,52 +16,45 @@ import {
   Lock, 
   Check, 
   ShieldCheck, 
-  Activity, 
   Heart, 
   Sparkles,
-  Droplet,
-  Flame,
-  HelpCircle,
-  Clock,
   Send,
-  Leaf,
   Share2,
   Copy,
-  MessageSquare,
   MessageCircle,
   Facebook,
   Instagram,
   Search,
   X,
-  Truck,
   Package,
-  Calendar,
-  MapPin,
   Clipboard,
   Bell,
-  Pill,
-  Flower2,
   Phone
 } from 'lucide-react';
-import { PRODUCTS, MENS_PRODUCTS, VAYUCORE_PRODUCT, TESTIMONIALS, FAQS, MENS_TESTIMONIALS, MENS_FAQS, reviews, CustomerReview, reviewImages, optimizeCloudinaryUrl, getCloudinarySrcSet } from './data';
+import { PRODUCTS, MENS_PRODUCTS, VAYUCORE_PRODUCT, reviews, CustomerReview, optimizeCloudinaryUrl } from './data';
 import { Product, CartItem, ViewType, CheckoutDetails } from './types';
 import { UI_TRANSLATIONS, getTranslatedProducts, getTranslatedFAQs, getTranslatedTestimonials, getTranslatedReviews } from './translations';
-import { ProductGallery } from './components/ProductGallery';
 import { Hero } from './components/Hero';
 import { ConcernSelector } from './components/ConcernSelector';
-import { WhyMeonmode } from './components/WhyMeonmode';
-import { WhyOurFormulations } from './components/WhyOurFormulations';
-import { IngredientTransparency } from './components/IngredientTransparency';
-import { WOMEN_TRANSPARENCY_HERBS, MEN_TRANSPARENCY_HERBS } from './ingredientData';
-import { HowItWorks } from './components/HowItWorks';
-import { BrandStory } from './components/BrandStory';
 
-// Code-split dynamic views for reduced initial bundle payload
+// Code-split dynamic views and below-the-fold sections for optimal mobile FCP/LCP
+const WhyOurFormulations = React.lazy(() => import('./components/WhyOurFormulations').then(m => ({ default: m.WhyOurFormulations })));
+const WhyMeonmode = React.lazy(() => import('./components/WhyMeonmode').then(m => ({ default: m.WhyMeonmode })));
+const IngredientTransparency = React.lazy(() => import('./components/IngredientTransparency').then(m => ({ default: m.IngredientTransparency })));
+const HowItWorks = React.lazy(() => import('./components/HowItWorks').then(m => ({ default: m.HowItWorks })));
+const BrandStory = React.lazy(() => import('./components/BrandStory').then(m => ({ default: m.BrandStory })));
+
 const ProductDetail = React.lazy(() => import('./components/ProductDetail').then(m => ({ default: m.ProductDetail })));
 const AllProductsPage = React.lazy(() => import('./components/AllProductsPage').then(m => ({ default: m.AllProductsPage })));
 const AboutUsPage = React.lazy(() => import('./components/AboutUsPage').then(m => ({ default: m.AboutUsPage })));
 const BlogListing = React.lazy(() => import('./components/BlogListing').then(m => ({ default: m.BlogListing })));
 const BlogArticleView = React.lazy(() => import('./components/BlogArticleView').then(m => ({ default: m.BlogArticleView })));
+
+const RefundPolicyView = React.lazy(() => import('./components/PolicyPages').then(m => ({ default: m.RefundPolicyView })));
+const ShippingPolicyView = React.lazy(() => import('./components/PolicyPages').then(m => ({ default: m.ShippingPolicyView })));
+const PrivacyPolicyView = React.lazy(() => import('./components/PolicyPages').then(m => ({ default: m.PrivacyPolicyView })));
+const TermsAndConditionsView = React.lazy(() => import('./components/PolicyPages').then(m => ({ default: m.TermsAndConditionsView })));
+const OrderHistoryView = React.lazy(() => import('./components/OrderHistoryView').then(m => ({ default: m.OrderHistoryView })));
 
 // Cookie helpers for pre-filling user data
 function getCookie(name: string): string | null {
@@ -1470,13 +1462,17 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </button>
             )}
             <div>
-              <button 
-                onClick={() => {
+              <a 
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
                   if (currentView !== 'success') {
                     setCurrentView('home');
+                    navigate('/');
                   }
                 }}
-                className="text-left cursor-pointer"
+                className="text-left cursor-pointer inline-block"
+                aria-label="meONmode Home"
               >
                 <span className="font-serif text-lg md:text-2xl font-black tracking-wide text-white flex items-center gap-1">
                   meONmode<span className="text-[#E5A93C] text-[10px] md:text-sm align-super">®</span>
@@ -1484,7 +1480,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 <span className="block text-[7px] md:text-[9px] tracking-[0.2em] uppercase text-[#E5A93C] font-semibold -mt-1 font-sans">
                   A y u r v e d i c &nbsp; W e l l n e s s
                 </span>
-              </button>
+              </a>
             </div>
           </div>
 
@@ -1635,15 +1631,21 @@ Payment has been cryptographically verified on the backend server. Please dispat
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
             {/* Nav links for desktop */}
             <nav className="hidden lg:flex items-center gap-5 text-xs font-medium">
-              <button 
-                onClick={() => navigateToView('home')} 
-                className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
+              <a 
+                href="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToView('home');
+                }} 
+                className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${currentView === 'home' && activeCategory !== 'women' && activeCategory !== 'men' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Home
-              </button>
+              </a>
 
-              <button 
-                onClick={() => {
+              <a 
+                href="/women"
+                onClick={(e) => {
+                  e.preventDefault();
                   setActiveCategory('women');
                   setCurrentView('home');
                   navigate('/women');
@@ -1651,10 +1653,12 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'women' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Women
-              </button>
+              </a>
 
-              <button 
-                onClick={() => {
+              <a 
+                href="/men"
+                onClick={(e) => {
+                  e.preventDefault();
                   setActiveCategory('men');
                   setCurrentView('home');
                   navigate('/men');
@@ -1662,105 +1666,151 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${activeCategory === 'men' && currentView === 'home' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Men
-              </button>
+              </a>
 
-              <button 
-                onClick={() => navigateToView('blog')} 
+              <a 
+                href="/blog"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToView('blog');
+                }} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer flex items-center gap-1.5 ${currentView === 'blog' || currentView === 'blog-article' ? 'text-[#E8621A] font-extrabold' : 'text-white/80'}`}
               >
                 <span>Blog</span>
                 <span className="text-[9px] bg-[#E8621A] text-white px-1.5 py-0.2 rounded-full font-bold">Health Tips</span>
-              </button>
+              </a>
 
-              <button 
-                onClick={() => navigateToView('refund-policy')} 
+              <a 
+                href="/refund-policy"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToView('refund-policy');
+                }} 
                 className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${currentView === 'refund-policy' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
               >
                 Return Policy
-              </button>
+              </a>
               {activeCategory === 'all' ? (
                 <>
-                  <button 
-                    onClick={() => handleProductClick(PRODUCTS[0])} 
+                  <a 
+                    href="/products/combo-kit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(PRODUCTS[0]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Women's Combo
-                  </button>
-                  <button 
-                    onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
+                  </a>
+                  <a 
+                    href="/products/mens-combo"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(MENS_PRODUCTS[2]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Men's Combo
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products/vayucore"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
-                  </button>
+                  </a>
                 </>
               ) : activeCategory === 'men' ? (
                 <>
-                  <button 
-                    onClick={() => handleProductClick(MENS_PRODUCTS[2])} 
+                  <a 
+                    href="/products/mens-combo"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(MENS_PRODUCTS[2]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'mens-combo' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Men's Combo
-                  </button>
-                  <button 
-                    onClick={() => handleProductClick(MENS_PRODUCTS[0])} 
+                  </a>
+                  <a 
+                    href="/products/wantmore"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(MENS_PRODUCTS[0]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'wantmore-men' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     WANTMORE Prash
-                  </button>
-                  <button 
-                    onClick={() => handleProductClick(MENS_PRODUCTS[1])} 
+                  </a>
+                  <a 
+                    href="/products/alphamax"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(MENS_PRODUCTS[1]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'alphamax-men' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     ALPHAMAX
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products/vayucore"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
-                  </button>
+                  </a>
                 </>
               ) : (
                 <>
-                  <button 
-                    onClick={() => handleProductClick(PRODUCTS[0])} 
+                  <a 
+                    href="/products/combo-kit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(PRODUCTS[0]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'combo-kit' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     Combo Kit
-                  </button>
-                  <button 
-                    onClick={() => handleProductClick(PRODUCTS[1])} 
+                  </a>
+                  <a 
+                    href="/products/ovaira"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(PRODUCTS[1]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'ovaira' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     OVAIRA Capsules
-                  </button>
-                  <button 
-                    onClick={() => handleProductClick(PRODUCTS[2])} 
+                  </a>
+                  <a 
+                    href="/products/flowelle"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleProductClick(PRODUCTS[2]);
+                    }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'flowelle' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     FLOWELLE Syrup
-                  </button>
-                  <button 
-                    onClick={() => {
+                  </a>
+                  <a 
+                    href="/products/vayucore"
+                    onClick={(e) => {
+                      e.preventDefault();
                       const vayu = [...womenProducts, ...menProducts].find(p => p.id === 'vayucore');
                       if (vayu) handleProductClick(vayu);
                     }} 
                     className={`transition-colors hover:text-[#E5A93C] cursor-pointer ${selectedProduct?.id === 'vayucore' ? 'text-[#E5A93C] font-semibold' : 'text-white/80'}`}
                   >
                     VAYUCORE
-                  </button>
+                  </a>
                 </>
               )}
             </nav>
@@ -1854,8 +1904,13 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 Select Your Wellness Collection
               </span>
               <div className="inline-flex flex-wrap md:flex-nowrap justify-center p-1 rounded-3xl md:rounded-full bg-black/45 backdrop-blur-md border border-white/10 shadow-inner shadow-black/60 relative gap-1 md:gap-0">
-                <button
-                  onClick={() => setActiveCategory('women')}
+                <a
+                  href="/women"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveCategory('women');
+                    navigate('/women');
+                  }}
                   className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'women'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#C86428] to-[#8B3B15]'
@@ -1864,9 +1919,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 >
                   <span>👩</span>
                   <span>Women's</span>
-                </button>
-                <button
-                  onClick={() => setActiveCategory('men')}
+                </a>
+                <a
+                  href="/men"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveCategory('men');
+                    navigate('/men');
+                  }}
                   className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'men'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#D4AF37] to-[#8A6D1C] border border-[#D4AF37]/25'
@@ -1875,9 +1935,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 >
                   <span>👨</span>
                   <span>Men's</span>
-                </button>
-                <button
-                  onClick={() => setActiveCategory('all')}
+                </a>
+                <a
+                  href="/products"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveCategory('all');
+                    navigate('/products');
+                  }}
                   className={`relative z-10 px-5 md:px-7 py-2.5 rounded-full text-xs sm:text-sm font-extrabold tracking-wide uppercase transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                     activeCategory === 'all'
                       ? 'text-white shadow-lg bg-gradient-to-r from-[#8C5D3A] to-[#3B2314] border border-[#E5A93C]/25'
@@ -1886,7 +1951,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                 >
                   <span>✨</span>
                   <span>All Products</span>
-                </button>
+                </a>
               </div>
             </div>
 
@@ -2045,16 +2110,18 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             </button>
                           </div>
                           
-                          <button
-                            type="button"
-                            onClick={() => {
+                          <a
+                            href={`/products/${getProductCleanSlug(prod.id)}`}
+                            onClick={(e) => {
+                              e.preventDefault();
                               handleProductClick(prod);
                             }}
                             className="w-full focus:outline-none cursor-pointer overflow-hidden relative flex items-center justify-center group aspect-[4/3] sm:aspect-square max-h-56"
-                            title="Click to view pricing & details"
+                            title={`Click to view pricing & details for ${prod.name}`}
+                            aria-label={`View ${prod.name} details`}
                           >
                             <img 
-                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 
+                              src={optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 
                               srcSet={`${optimizeCloudinaryUrl(prod.images && prod.images[0], 360)} 360w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 480)} 480w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 640)} 640w, ${optimizeCloudinaryUrl(prod.images && prod.images[0], 960)} 960w`}
                               sizes="(max-width: 640px) 280px, (max-width: 1024px) 340px, 320px"
                               alt={prod.name}
@@ -2091,7 +2158,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                                 }
                               }}
                             />
-                          </button>
+                          </a>
                         </div>
 
                         {/* Product Detail & Content Area */}
@@ -2118,11 +2185,17 @@ Payment has been cryptographically verified on the backend server. Please dispat
                             </button>
 
                             {/* Main Title: serif typography */}
-                            <h3 
-                              onClick={() => handleProductClick(prod)}
-                              className="font-serif text-xl md:text-2xl font-black text-neutral-950 tracking-tight leading-snug hover:text-[#5C1D13] cursor-pointer transition-colors"
-                            >
-                              {prod.name}
+                            <h3 className="font-serif text-xl md:text-2xl font-black text-neutral-950 tracking-tight leading-snug hover:text-[#5C1D13] transition-colors">
+                              <a 
+                                href={`/products/${getProductCleanSlug(prod.id)}`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  handleProductClick(prod);
+                                }}
+                                className="hover:text-[#5C1D13] cursor-pointer"
+                              >
+                                {prod.name}
+                              </a>
                             </h3>
 
                             {/* Subtitle: slightly tracked out uppercase sans-serif text */}
@@ -2203,12 +2276,16 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               return (
                                 <div className="space-y-2.5 pt-3 border-t border-neutral-100">
                                   <div className="grid grid-cols-2 gap-2.5">
-                                    <button 
-                                      onClick={() => handleProductClick(prod)}
+                                    <a 
+                                      href={`/products/${getProductCleanSlug(prod.id)}`}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        handleProductClick(prod);
+                                      }}
                                       className="text-xs font-bold py-3 px-3.5 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
                                     >
                                       View Details
-                                    </button>
+                                    </a>
                                     <button 
                                       disabled
                                       className="text-xs font-black py-3 px-3.5 rounded-xl bg-neutral-100 text-neutral-400 text-center cursor-not-allowed flex items-center justify-center gap-1.5"
@@ -2232,12 +2309,16 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               <div className="space-y-2.5 pt-3 border-t border-neutral-100">
                                 {/* Row 1: Side by side View Details & Add to Cart */}
                                 <div className="grid grid-cols-2 gap-2.5">
-                                  <button 
-                                    onClick={() => handleProductClick(prod)}
+                                  <a 
+                                    href={`/products/${getProductCleanSlug(prod.id)}`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      handleProductClick(prod);
+                                    }}
                                     className="text-xs font-bold py-3 px-3.5 rounded-xl border border-neutral-200 text-neutral-700 bg-white hover:bg-neutral-50 hover:border-neutral-300 text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5"
                                   >
                                     View Details
-                                  </button>
+                                  </a>
                                   <button 
                                     onClick={() => addToCart(prod, 1)}
                                     className="text-xs font-black py-3 px-3.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-center cursor-pointer transition-all active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-orange-500/10"
@@ -2266,23 +2347,14 @@ Payment has been cryptographically verified on the backend server. Please dispat
               </div>
             </section>
 
-            {/* Why Our Formulations? (Clean 4-card responsive section with zero giant posters) */}
-            <WhyOurFormulations />
-
-            {/* Why meONmode? Pillars of Quality, Safety, and Trust */}
-            <WhyMeonmode />
-
-            {/* Full Ingredient Transparency: Category-specific verified formulations (Zero Fillers) */}
-            <IngredientTransparency 
-              category={activeCategory === 'men' ? 'men' : 'women'}
-              ingredients={activeCategory === 'men' ? MEN_TRANSPARENCY_HERBS : WOMEN_TRANSPARENCY_HERBS}
-            />
-
-            {/* How It Works: The 90-Day Protocol & Personalized Diet Routine */}
-            <HowItWorks />
-
-            {/* Brand Story & Ayurvedic Roots */}
-            <BrandStory />
+            {/* Below-the-fold sections lazy-loaded smoothly on scroll */}
+            <React.Suspense fallback={null}>
+              <WhyOurFormulations />
+              <WhyMeonmode />
+              <IngredientTransparency category={activeCategory === 'men' ? 'men' : 'women'} />
+              <HowItWorks />
+              <BrandStory />
+            </React.Suspense>
 
             {/* Bento Block 7: Dynamic Customer Reviews Section (Col Span 12) */}
             <section id="review-gallery" className="lg:col-span-12 space-y-8 relative overflow-hidden bg-[#23120b]/30 border-2 border-[#FAF6F0]/20 rounded-[2.5rem] p-8 md:p-12 shadow-2xl backdrop-blur-md content-auto">
@@ -2340,7 +2412,7 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               {revImages.map((imgUrl, imgIndex) => (
                                 <div key={imgIndex} className="w-full h-full snap-center shrink-0 relative flex items-center justify-center p-2">
                                   <img 
-                                    src={optimizeCloudinaryUrl(imgUrl, 640)} 
+                                    src={optimizeCloudinaryUrl(imgUrl, 480)} 
                                     srcSet={`${optimizeCloudinaryUrl(imgUrl, 320)} 320w, ${optimizeCloudinaryUrl(imgUrl, 480)} 480w, ${optimizeCloudinaryUrl(imgUrl, 640)} 640w, ${optimizeCloudinaryUrl(imgUrl, 960)} 960w`}
                                     sizes="(max-width: 640px) 280px, 320px"
                                     alt={`${rev.name}'s Review Asset ${imgIndex + 1}`} 
@@ -3557,323 +3629,30 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 5: REFUND & RETURN POLICY VIEW ----------------- */}
         {currentView === 'refund-policy' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => setCurrentView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">Refund & Return Policy</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Ayurvedic Wellness Standards</p>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
-              
-              {/* Section 1 */}
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
-                  Eligibility & Scope
-                </h2>
-                <p className="text-white/80 pl-10">
-                  At meONmode, we want you to be completely satisfied with your wellness purchase. We offer full refund or replacements only on damaged, incorrect, or defective products. Due to the high-purity, clinical nature of Ayurvedic medicine, personal preference or subjective changes in symptom relief timing do not qualify as defects.
-                </p>
-              </div>
-
-              {/* Section 2 - Highlighted Callout Box */}
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
-                  Mandatory Unboxing Video Requirement
-                </h2>
-                <div className="pl-10">
-                  <div className="bg-gradient-to-br from-[#5C1D13] to-[#4A1D05] border-2 border-[#E5A93C] rounded-2xl p-5 md:p-6 space-y-3.5 shadow-lg">
-                    <div className="flex items-center gap-2.5 text-[#E5A93C] font-serif font-black text-sm uppercase tracking-wide">
-                      <span className="text-xl">⚠️</span> IMPORTANT: Unboxing Video Required
-                    </div>
-                    <p className="text-xs text-[#F7E7D9] leading-relaxed">
-                      To qualify for a refund, return, or replacement, you MUST record a continuous unboxing video. No claims will be entertained without this proof under any circumstances.
-                    </p>
-                    <div className="space-y-2 border-t border-white/10 pt-3">
-                      <h3 className="text-xs font-extrabold text-[#E5A93C] uppercase tracking-wider">How to record a valid unboxing video:</h3>
-                      <ol className="list-decimal list-inside text-xs text-[#F7E7D9]/90 space-y-1.5 pl-1 leading-relaxed font-medium">
-                        <li>Start recording <strong className="text-white font-extrabold underline">BEFORE</strong> opening the outer corrugated box packaging.</li>
-                        <li>The shipping courier label showing your name, complete address, and barcode must be clearly visible and in focus.</li>
-                        <li>Keep the video completely continuous and unedited. Absolutely NO cuts, pans, or pauses are permitted.</li>
-                        <li>Physically show all items inside and inspect them in front of the camera, highlighting any leakage or breakages.</li>
-                      </ol>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 3 */}
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
-                  How to Submit a Claim
-                </h2>
-                <div className="text-white/80 pl-10 space-y-2">
-                  <p>
-                    Please submit your claim within <strong className="text-white">48 hours</strong> of package delivery. Send the raw, uncut unboxing video along with your Order ID through either of the channels below:
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <a 
-                      href="https://api.whatsapp.com/send?phone=917290810336&text=Hello%20meONmode%20Team%2C%20I%20would%20like%20to%20file%20a%20refund%2Freplacement%20claim." 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="bg-emerald-600/25 hover:bg-emerald-600/35 border border-emerald-500/30 p-3 rounded-xl flex items-center gap-2 text-white font-semibold text-xs transition-colors"
-                    >
-                      <span className="text-base">💬</span>
-                      WhatsApp Support: +91 72908 10336
-                    </a>
-                    <a 
-                      href="mailto:meonmodewellness@gmail.com" 
-                      className="bg-blue-600/25 hover:bg-blue-600/35 border border-blue-500/30 p-3 rounded-xl flex items-center gap-2 text-white font-semibold text-xs transition-colors"
-                    >
-                      <span className="text-base">✉️</span>
-                      Email: meonmodewellness@gmail.com
-                    </a>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section 4 */}
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
-                  Review & Processing Timeframe
-                </h2>
-                <p className="text-white/80 pl-10">
-                  Our quality assurance team will inspect your submitted video evidence within <strong className="text-white">2 to 3 business days</strong>. Once approved, a replacement package will be dispatched at zero additional cost, or a direct refund will be credited to your original payment method/bank account within <strong className="text-white">7 business days</strong>.
-                </p>
-              </div>
-
-              {/* Section 5 */}
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">05</span>
-                  Non-Returnable & Void Conditions
-                </h2>
-                <div className="text-white/80 pl-10">
-                  <p className="mb-2">A claim is strictly void and rejected if any of the following occur:</p>
-                  <ul className="list-disc list-inside space-y-1.5 pl-1 text-white/70">
-                    <li>Missing unboxing video, or video with cuts/edits.</li>
-                    <li>The unboxing video starts after the outer courier tape/packaging has already been sliced, opened, or tampered with.</li>
-                    <li>Claims submitted after the strict 48-hour delivery window.</li>
-                    <li>Submitting a cropped or low-resolution video where the package shipping label is illegible.</li>
-                  </ul>
-                </div>
-              </div>
-
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Return to Shop
-              </button>
-            </div>
-          </div>
+          <React.Suspense fallback={null}>
+            <RefundPolicyView onBackToHome={() => navigateToView('home')} />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 5B: SHIPPING POLICY VIEW ----------------- */}
         {currentView === 'shipping-policy' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">Shipping & Delivery Policy</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Fast & Discreet Pan-India Delivery</p>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
-                  Free Shipping All Across India
-                </h2>
-                <p className="text-white/80 pl-10">
-                  We offer 100% Free Express Shipping on all prepaid and Cash on Delivery (COD) orders across India with zero hidden delivery charges or surge fees.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
-                  Discreet & Confidential Packaging
-                </h2>
-                <p className="text-white/80 pl-10">
-                  Your privacy is our utmost priority. All meONmode orders are shipped in unmarked, plain brown corrugated boxes with no product names, medical descriptions, or logos printed on the outer exterior packaging.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
-                  Dispatch & Delivery Timelines
-                </h2>
-                <div className="text-white/80 pl-10 space-y-1.5">
-                  <p>• <strong>Order Processing:</strong> Dispatched within 24 to 48 business hours from our certified Ayurvedic pharmacy hubs.</p>
-                  <p>• <strong>Metro Cities:</strong> Delivered within 2 to 4 business days.</p>
-                  <p>• <strong>Rest of India:</strong> Delivered within 3 to 6 business days depending on pin code accessibility.</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">04</span>
-                  Order Tracking
-                </h2>
-                <p className="text-white/80 pl-10">
-                  Once your parcel is dispatched, you will receive real-time SMS & WhatsApp notifications containing your AWB tracking link from our courier partners (Bluedart, Delhivery, ExpressBees, Xpressbees, Shadowfax).
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Return to Shop
-              </button>
-            </div>
-          </div>
+          <React.Suspense fallback={null}>
+            <ShippingPolicyView onBackToHome={() => navigateToView('home')} />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 5C: PRIVACY POLICY VIEW ----------------- */}
         {currentView === 'privacy-policy' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">Privacy Policy</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Data Protection & Security</p>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
-                  Commitment to Privacy
-                </h2>
-                <p className="text-white/80 pl-10">
-                  meONmode is committed to safeguarding the privacy and confidentiality of our customers. Any personal details, contact numbers, or health consultation inquiries shared with us are treated with strict confidentiality.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
-                  Data We Collect
-                </h2>
-                <p className="text-white/80 pl-10">
-                  We collect basic order fulfillment information including your name, delivery address, phone number, and email. We do not store financial payment credentials or card details on our servers — all transactions are processed via bank-grade 256-bit SSL encrypted payment gateways.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
-                  Zero Third-Party Sharing
-                </h2>
-                <p className="text-white/80 pl-10">
-                  We strictly never sell, rent, lease, or trade your personal or medical inquiry data with unauthorized third parties or marketing brokers. Information is shared strictly with verified courier delivery partners solely for doorstep order delivery.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Return to Shop
-              </button>
-            </div>
-          </div>
+          <React.Suspense fallback={null}>
+            <PrivacyPolicyView onBackToHome={() => navigateToView('home')} />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 5D: TERMS AND CONDITIONS VIEW ----------------- */}
         {currentView === 'terms-and-conditions' && (
-          <div className="max-w-3xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-3xl font-extrabold text-white">Terms & Conditions</h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-1">meONmode Official Terms of Service</p>
-              </div>
-            </div>
-
-            <div className="space-y-6 text-sm text-white/90 leading-relaxed bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 shadow-xl">
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">01</span>
-                  Ayurvedic Product Information
-                </h2>
-                <p className="text-white/80 pl-10">
-                  meONmode products (OVAIRA, FLOWELLE, ALPHAMAX, WANTMORE, VAYUCORE) are authentic proprietary Ayurvedic wellness formulations manufactured in GMP-certified facilities compliant with AYUSH guidelines. They are formulated to support natural bodily balance and hormonal harmony.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">02</span>
-                  Dosage & Holistic Health
-                </h2>
-                <p className="text-white/80 pl-10">
-                  Please follow the recommended dosages as printed on the product pack or guided by Ayurvedic physicians. Individual results may vary depending on diet, sleep, and lifestyle habits.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h2 className="font-serif text-lg font-bold text-[#E5A93C] flex items-center gap-2">
-                  <span className="text-sm bg-[#E5A93C]/10 px-2.5 py-1 rounded-md text-[#E5A93C] font-sans font-extrabold">03</span>
-                  Order Confirmation & Verification
-                </h2>
-                <p className="text-white/80 pl-10">
-                  Orders placed on meONmode are verified via automated SMS/WhatsApp and customer care verification. For Cash on Delivery orders, an advance payment of ₹150 is collected to confirm intentional delivery booking and prevent transit wastage.
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center pt-2">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Return to Shop
-              </button>
-            </div>
-          </div>
+          <React.Suspense fallback={null}>
+            <TermsAndConditionsView onBackToHome={() => navigateToView('home')} />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 5E: ABOUT US VIEW ----------------- */}
@@ -3992,448 +3771,22 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
         {/* ----------------- VIEW 6: ORDER HISTORY & PAYMENT VERIFICATION VIEW ----------------- */}
         {currentView === 'order-history' && (
-          <div className="max-w-4xl mx-auto space-y-8 py-4 animate-fade-in text-left">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="p-2 hover:bg-white/10 rounded-full text-white transition-colors flex items-center justify-center cursor-pointer"
-                aria-label="Back to home"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="font-serif text-2xl md:text-3xl font-extrabold text-white flex items-center gap-2">
-                  <Package className="w-6 h-6 text-[#E5A93C]" />
-                  <span>Order History & Verification</span>
-                </h1>
-                <p className="text-[#E5A93C] text-xs font-semibold tracking-wider uppercase mt-0.5">
-                  meONmode Verified Customer Order Hub
-                </p>
-              </div>
-            </div>
-
-            {/* Search Box Card */}
-            <div className="bg-gradient-to-br from-[#4A1D05] to-[#2D120B] border border-[#E5A93C]/30 rounded-3xl p-6 md:p-8 shadow-2xl space-y-5">
-              <div className="space-y-1">
-                <h2 className="text-base font-serif font-extrabold text-white flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-[#E5A93C]" />
-                  <span>Look Up Orders by Registered Phone Number</span>
-                </h2>
-                <p className="text-xs text-white/70 leading-relaxed">
-                  Enter your 10-digit mobile number used during checkout to view all server-verified orders, payment status, dispatch receipts, and tax invoices.
-                </p>
-              </div>
-
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleLookupOrdersByPhone();
-                }}
-                className="space-y-3"
-              >
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <div className="relative flex-grow">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50 text-sm font-bold font-mono">
-                      +91
-                    </span>
-                    <input
-                      type="tel"
-                      value={orderHistoryPhoneInput}
-                      onChange={(e) => setOrderHistoryPhoneInput(e.target.value)}
-                      placeholder="e.g. 98765 43210"
-                      maxLength={13}
-                      className="w-full bg-black/40 border-2 border-white/20 focus:border-[#E5A93C] rounded-2xl pl-14 pr-4 py-3 text-sm font-mono text-white placeholder-white/40 focus:outline-none transition-all font-bold"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isLoadingOrderHistory}
-                    className="bg-[#C86428] hover:bg-[#A8521F] disabled:bg-neutral-600 text-white font-extrabold text-sm px-6 py-3 rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    {isLoadingOrderHistory ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        <span>Searching Server...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Search className="w-4 h-4" />
-                        <span>Search My Orders</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Quick Chip Badges for Recently Saved Local Orders */}
-                {(lastVerifiedOrder || orderHistory.length > 0) && (
-                  <div className="pt-2 flex flex-wrap items-center gap-2 text-xs">
-                    <span className="text-white/60 font-medium text-[11px]">Recent Orders on Device:</span>
-                    {lastVerifiedOrder && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (lastVerifiedOrder.checkoutDetails?.phone) {
-                            setOrderHistoryPhoneInput(lastVerifiedOrder.checkoutDetails.phone);
-                            handleLookupOrdersByPhone(lastVerifiedOrder.checkoutDetails.phone);
-                          } else {
-                            setOrderHistoryOrders([lastVerifiedOrder]);
-                          }
-                        }}
-                        className="bg-[#E5A93C]/20 hover:bg-[#E5A93C]/30 text-[#E5A93C] border border-[#E5A93C]/40 px-3 py-1 rounded-full font-mono font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer"
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>{lastVerifiedOrder.orderId} (Verified)</span>
-                      </button>
-                    )}
-                    {orderHistory.filter(id => id !== lastVerifiedOrder?.orderId).map((oid) => (
-                      <button
-                        key={oid}
-                        type="button"
-                        onClick={() => {
-                          setOrderHistoryPhoneInput(oid);
-                          handleLookupOrdersByPhone(oid);
-                        }}
-                        className="bg-white/10 hover:bg-white/20 text-white/90 border border-white/15 px-2.5 py-1 rounded-full font-mono font-medium text-[11px] cursor-pointer transition-colors"
-                        title="Click to track this order"
-                      >
-                        {oid}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </form>
-            </div>
-
-            {/* Search Error / Notice Banner */}
-            {orderHistorySearchError && (
-              <div className="bg-amber-950/60 border-2 border-amber-500/40 rounded-2xl p-4 text-xs text-amber-200 leading-relaxed space-y-1">
-                <div className="font-extrabold flex items-center gap-1.5 text-amber-400 text-sm">
-                  <span>ℹ️</span>
-                  <span>Order Search Notice</span>
-                </div>
-                <p>{orderHistorySearchError}</p>
-              </div>
-            )}
-
-            {/* Order Results Cards */}
-            {orderHistoryOrders.length > 0 && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <h2 className="font-serif text-lg font-bold text-white flex items-center gap-2">
-                    <span>Found {orderHistoryOrders.length} Verified Order{orderHistoryOrders.length > 1 ? 's' : ''}</span>
-                  </h2>
-                  <span className="text-xs text-[#E5A93C] font-mono font-semibold">
-                    Server-Authoritative Status
-                  </span>
-                </div>
-
-                {orderHistoryOrders.map((ord: any, index: number) => {
-                  const isCod = ord.paymentMethod === 'cod';
-                  return (
-                    <div
-                      key={ord.orderId || index}
-                      className="bg-white/5 border border-white/15 hover:border-[#E5A93C]/40 rounded-3xl p-5 md:p-7 space-y-5 shadow-2xl transition-all text-white text-xs"
-                    >
-                      {/* Order Header Badge & ID */}
-                      <div className="flex flex-wrap justify-between items-start gap-3 border-b border-white/10 pb-4">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-serif text-lg font-black text-[#E5A93C] font-mono tracking-tight">
-                              {ord.orderId}
-                            </span>
-                            <span className="bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 font-extrabold text-[10px] px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 font-mono">
-                              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                              <span>Verified Payment</span>
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-neutral-400 mt-1">
-                            Verified Date: {ord.verifiedAt ? new Date(ord.verifiedAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Verified'}
-                          </p>
-                        </div>
-
-                        <div className="text-right font-mono">
-                          <span className="text-[10px] text-neutral-400 block uppercase font-sans">Payment Reference / UTR</span>
-                          <span className="text-xs font-bold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-500/30 inline-block mt-0.5">
-                            {ord.paymentId || 'Verified'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Customer & Shipping Details */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-black/30 p-4 rounded-2xl border border-white/5">
-                        <div className="space-y-1">
-                          <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider">
-                            Customer Delivery Address
-                          </span>
-                          <p className="font-bold text-sm text-white">{ord.checkoutDetails?.fullName}</p>
-                          <p className="text-neutral-300 leading-relaxed text-[11px]">
-                            {ord.checkoutDetails?.address}<br />
-                            Pincode: <strong className="text-white">{ord.checkoutDetails?.pincode}</strong><br />
-                            Phone: <span className="font-mono">{ord.checkoutDetails?.phone}</span>
-                          </p>
-                        </div>
-
-                        <div className="space-y-1 md:text-right border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-4">
-                          <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider">
-                            Payment Breakdown
-                          </span>
-                          <p className="text-neutral-200 font-medium">
-                            Method: <strong className="text-white uppercase">{isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}</strong>
-                          </p>
-                          <p className="text-emerald-400 font-bold">
-                            {isCod 
-                              ? `COD Advance Paid: ₹150 (Verified)` 
-                              : `Full Amount Paid: ₹${(ord.grandTotal || 0).toLocaleString('en-IN')} (Verified)`}
-                          </p>
-                          {isCod && (
-                            <p className="text-amber-300 font-extrabold">
-                              Balance Due at Delivery: ₹{(ord.balanceDue || 0).toLocaleString('en-IN')}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Order Items Table */}
-                      <div className="space-y-2">
-                        <span className="text-[10px] uppercase font-extrabold text-[#E5A93C] font-mono tracking-wider block">
-                          Purchased Remedies & Items
-                        </span>
-                        <div className="space-y-2">
-                          {ord.items && ord.items.map((item: any, idx: number) => (
-                            <div
-                              key={idx}
-                              className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 text-xs"
-                            >
-                              <div>
-                                <span className="font-bold text-white text-sm">{item.name}</span>
-                                <span className="text-neutral-400 text-[11px] block">
-                                  Qty: {item.quantity} × ₹{Number(item.price).toLocaleString('en-IN')}
-                                </span>
-                              </div>
-                              <span className="font-mono font-bold text-[#E5A93C] text-sm">
-                                ₹{(Number(item.price) * Number(item.quantity)).toLocaleString('en-IN')}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Tax Breakdown */}
-                      <div className="border-t border-white/10 pt-3 flex flex-wrap justify-between items-center text-[11px] text-neutral-300 gap-2">
-                        <div>
-                          <span>Taxable Value: ₹{(ord.taxableValue || 0).toLocaleString('en-IN')} | </span>
-                          <span>GST (5%): ₹{(ord.totalGst || 0).toLocaleString('en-IN')}</span>
-                        </div>
-                        <div className="text-sm font-extrabold text-white font-mono">
-                          Grand Total: <span className="text-[#E5A93C] text-base">₹{(ord.grandTotal || 0).toLocaleString('en-IN')}</span>
-                        </div>
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const cartSummary = ord.items.map((item: any) => 
-                              `${item.name} x ${item.quantity} - Rs. ${(item.price * item.quantity).toLocaleString('en-IN')}`
-                            ).join('\n');
-
-                            const paymentLine = isCod 
-                              ? `• Mandatory COD Advance Paid: Rs. 150 (Verified Txn Ref: ${ord.paymentId})\n• Balance Due at Delivery: Rs. ${ord.balanceDue.toLocaleString('en-IN', {minimumFractionDigits: 2})}`
-                              : `• Prepaid Full Amount Paid: Rs. ${ord.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})} (Verified Txn Ref: ${ord.paymentId})`;
-
-                            const textPayload = `*VERIFIED ORDER - meONmode*
-*Order ID:* ${ord.orderId}
-*Payment Status:* VERIFIED SUCCESS ✓ (Ref: ${ord.paymentId})
-───────────────────────
-*Customer Delivery Details:*
-• Name: ${ord.checkoutDetails.fullName}
-• Phone Number: ${ord.checkoutDetails.phone}
-• Full Address: ${ord.checkoutDetails.address}
-• Pincode: ${ord.checkoutDetails.pincode}
-
-*Order Summary:*
-${cartSummary}
-
-Taxable Value: Rs. ${ord.taxableValue.toLocaleString('en-IN', {minimumFractionDigits: 2})}
-CGST (2.5%): Rs. ${ord.cgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
-SGST (2.5%): Rs. ${ord.sgst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
-Total GST (5%): Rs. ${ord.totalGst.toLocaleString('en-IN', {minimumFractionDigits: 2})}
-*Grand Total: Rs. ${ord.grandTotal.toLocaleString('en-IN', {minimumFractionDigits: 2})}*
-
-*Payment Breakdown:*
-${paymentLine}
-
-*Payment Method:* ${isCod ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}
-───────────────────────
-Payment has been cryptographically verified on the backend server. Please dispatch this parcel.`;
-
-                            const whatsappUrl = `https://api.whatsapp.com/send?phone=917290810336&text=${encodeURIComponent(textPayload)}`;
-                            window.open(whatsappUrl, '_blank');
-                          }}
-                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow transition-colors cursor-pointer"
-                        >
-                          <Send className="w-4 h-4" />
-                          <span>📱 Pass Receipt to WhatsApp Dispatch</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => setSelectedInvoiceModalOrder(ord)}
-                          className="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
-                        >
-                          <Clipboard className="w-4 h-4 text-[#E5A93C]" />
-                          <span>📄 View GST Tax Invoice</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="text-center pt-4">
-              <button
-                onClick={() => navigateToView('home')}
-                className="bg-gradient-to-r from-[#C86428] to-[#E5A93C] text-white font-extrabold text-sm py-3.5 px-8 rounded-xl shadow-lg active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                Return to Shop
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Tax Invoice Modal for Order History */}
-        {selectedInvoiceModalOrder && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
-            <div className="bg-white text-neutral-900 rounded-3xl max-w-2xl w-full p-6 md:p-8 space-y-4 text-xs shadow-2xl relative border border-neutral-200 text-left my-8">
-              <div className="flex justify-between items-center border-b border-neutral-200 pb-3">
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-6 h-6 text-[#C86428]" />
-                  <div>
-                    <h3 className="font-serif text-base font-black tracking-tight text-[#4A1D05]">GST Tax Invoice - meONmode®</h3>
-                    <p className="text-[10px] text-neutral-500 font-mono">Order ID: {selectedInvoiceModalOrder.orderId}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedInvoiceModalOrder(null)}
-                  className="text-neutral-400 hover:text-neutral-600 font-bold text-xl p-1 cursor-pointer"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="flex justify-between items-start border-b border-neutral-200 pb-4">
-                <div>
-                  <h4 className="font-serif text-sm font-black text-[#4A1D05]">meONmode Wellness LLP</h4>
-                  <p className="text-[10px] text-neutral-500 leading-normal mt-1">
-                    Ayurvedic Pharmacy Licence No: DL-3234-A<br />
-                    GSTIN: 07AAGCM1314R1ZN
-                  </p>
-                </div>
-                <div className="text-right">
-                  <h5 className="font-sans font-black text-xs text-neutral-800 uppercase tracking-widest">OFFICIAL TAX INVOICE</h5>
-                  <p className="text-[10px] text-neutral-500 font-medium mt-1">
-                    Invoice No: <strong>INV/2026-27/{selectedInvoiceModalOrder.orderId}</strong><br />
-                    Verified Payment Txn ID: <strong className="text-emerald-700">{selectedInvoiceModalOrder.paymentId}</strong>
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 border-b border-neutral-200 pb-4">
-                <div>
-                  <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Billed To (Customer):</p>
-                  <p className="font-black text-neutral-800 mt-1">{selectedInvoiceModalOrder.checkoutDetails?.fullName}</p>
-                  <p className="text-neutral-600 leading-normal mt-0.5 text-[11px]">
-                    {selectedInvoiceModalOrder.checkoutDetails?.address}<br />
-                    Pincode: <strong>{selectedInvoiceModalOrder.checkoutDetails?.pincode}</strong><br />
-                    Phone: {selectedInvoiceModalOrder.checkoutDetails?.phone}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-[10px] text-neutral-400 uppercase tracking-wider">Payment Method:</p>
-                  <p className="font-bold text-neutral-800 mt-1 uppercase">{selectedInvoiceModalOrder.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Prepaid UPI'}</p>
-                  <p className="text-emerald-700 font-extrabold text-[11px] mt-0.5">
-                    Verified Status: ✓ VERIFIED SUCCESS
-                  </p>
-                </div>
-              </div>
-
-              {/* Items Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-[11px] text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-neutral-300 text-neutral-500 font-bold">
-                      <th className="py-2">Description</th>
-                      <th className="py-2 text-center">Qty</th>
-                      <th className="py-2 text-right">Price</th>
-                      <th className="py-2 text-right">Taxable</th>
-                      <th className="py-2 text-right">CGST</th>
-                      <th className="py-2 text-right">SGST</th>
-                      <th className="py-2 text-right">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedInvoiceModalOrder.items?.map((item: any, idx: number) => {
-                      const itemTotal = Number(item.price) * Number(item.quantity);
-                      const itemTaxable = Math.round((itemTotal / 1.05) * 100) / 100;
-                      const itemGst = Math.round((itemTotal - itemTaxable) * 100) / 100;
-                      const itemCgst = Math.round((itemGst / 2) * 100) / 100;
-                      const itemSgst = Math.round((itemGst / 2) * 100) / 100;
-
-                      return (
-                        <tr key={idx} className="border-b border-neutral-100 text-neutral-700 font-medium">
-                          <td className="py-2 font-bold text-neutral-800">{item.name}</td>
-                          <td className="py-2 text-center">{item.quantity}</td>
-                          <td className="py-2 text-right">₹{Number(item.price).toLocaleString('en-IN')}</td>
-                          <td className="py-2 text-right">₹{itemTaxable.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                          <td className="py-2 text-right">₹{itemCgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                          <td className="py-2 text-right">₹{itemSgst.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
-                          <td className="py-2 text-right font-bold text-neutral-900">₹{itemTotal.toLocaleString('en-IN')}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Totals */}
-              <div className="space-y-1.5 text-[11px] text-neutral-600 font-medium pt-2 border-t border-neutral-200">
-                <div className="flex justify-between">
-                  <span>Taxable Value:</span>
-                  <span>₹{(selectedInvoiceModalOrder.taxableValue || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>CGST (2.5%):</span>
-                  <span>₹{(selectedInvoiceModalOrder.cgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>SGST (2.5%):</span>
-                  <span>₹{(selectedInvoiceModalOrder.sgst || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-                <div className="flex justify-between font-black text-sm text-[#4A1D05] pt-1 border-t border-neutral-200">
-                  <span>Grand Total (Inclusive of 5% GST):</span>
-                  <span>₹{(selectedInvoiceModalOrder.grandTotal || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-3">
-                <button
-                  onClick={() => window.print()}
-                  className="flex-1 bg-[#C86428] hover:bg-[#A8521F] text-white font-extrabold text-xs py-3 rounded-xl flex items-center justify-center gap-2 shadow cursor-pointer"
-                >
-                  <span>🖨️ Print Invoice</span>
-                </button>
-                <button
-                  onClick={() => setSelectedInvoiceModalOrder(null)}
-                  className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-extrabold text-xs py-3 px-6 rounded-xl cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
+          <React.Suspense fallback={<div className="min-h-[50vh] flex items-center justify-center text-[#E5A93C]"><div className="w-8 h-8 border-2 border-[#E5A93C] border-t-transparent rounded-full animate-spin"></div></div>}>
+            <OrderHistoryView
+              orderHistoryPhoneInput={orderHistoryPhoneInput}
+              setOrderHistoryPhoneInput={setOrderHistoryPhoneInput}
+              orderHistoryOrders={orderHistoryOrders}
+              setOrderHistoryOrders={setOrderHistoryOrders}
+              isLoadingOrderHistory={isLoadingOrderHistory}
+              orderHistorySearchError={orderHistorySearchError}
+              selectedInvoiceModalOrder={selectedInvoiceModalOrder}
+              setSelectedInvoiceModalOrder={setSelectedInvoiceModalOrder}
+              handleLookupOrdersByPhone={handleLookupOrdersByPhone}
+              lastVerifiedOrder={lastVerifiedOrder}
+              orderHistory={orderHistory}
+              onBackToHome={() => navigateToView('home')}
+            />
+          </React.Suspense>
         )}
 
         {/* ----------------- VIEW 7: BLOG LISTING VIEW ----------------- */}
@@ -4492,60 +3845,96 @@ Payment has been cryptographically verified on the backend server. Please dispat
             Popular Health Tips & Guides (Hindi)
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs text-white/80">
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'pcos-kya-hai-pcod-se-alag')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            <a 
+              href="/blog/pcos-kya-hai-pcod-se-alag"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'pcos-kya-hai-pcod-se-alag');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • PCOS Kya Hai? PCOD Se Kaise Alag Hai
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'white-discharge-shwet-pradar-ayurvedic')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/white-discharge-shwet-pradar-ayurvedic"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'white-discharge-shwet-pradar-ayurvedic');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • White Discharge (Safed Pani) Ayurvedic Ilaj
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'pcod-diet-plan-hindi')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/pcod-diet-plan-hindi"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'pcod-diet-plan-hindi');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • PCOD & PCOS Diet Plan Hindi
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'wantmore-ingredient-guide')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/wantmore-ingredient-guide"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'wantmore-ingredient-guide');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • WANTMORE Prash Ingredient Guide
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'alphamax-ingredient-guide')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/alphamax-ingredient-guide"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'alphamax-ingredient-guide');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • ALPHAMAX 6 Bioactive Herbs Guide
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'ashwagandha-vs-shilajit')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/ashwagandha-vs-shilajit"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'ashwagandha-vs-shilajit');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • Ashwagandha vs Shilajit for Men
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'vayucore-ingredient-guide')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/vayucore-ingredient-guide"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'vayucore-ingredient-guide');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • VAYUCORE Gut Health & Digestion
-            </button>
-            <button 
-              onClick={() => navigateToView('blog-article', undefined, 'shatavari-in-ayurveda')}
-              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate"
+            </a>
+            <a 
+              href="/blog/shatavari-in-ayurveda"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog-article', undefined, 'shatavari-in-ayurveda');
+              }}
+              className="hover:text-[#E5A93C] hover:underline text-left cursor-pointer truncate block"
             >
               • Shatavari in Ayurveda: Female Rasayana
-            </button>
-            <button 
-              onClick={() => navigateToView('blog')}
-              className="text-[#E8621A] font-bold hover:underline text-left cursor-pointer"
+            </a>
+            <a 
+              href="/blog"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('blog');
+              }}
+              className="text-[#E8621A] font-bold hover:underline text-left cursor-pointer block"
             >
               • Saare 32 Articles Dekhein (meonmode.com/blog) →
-            </button>
+            </a>
           </div>
         </div>
 
@@ -4588,55 +3977,83 @@ Payment has been cryptographically verified on the backend server. Please dispat
           </div>
 
           <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-xs text-[#E5A93C] font-semibold mb-2">
-            <button 
-              onClick={() => navigateToView('refund-policy')} 
+            <a 
+              href="/refund-policy"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('refund-policy');
+              }} 
               className="hover:underline cursor-pointer"
             >
               Refund & Return Policy
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('shipping-policy')} 
+            <a 
+              href="/shipping-policy"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('shipping-policy');
+              }} 
               className="hover:underline cursor-pointer"
             >
               Shipping Policy
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('privacy-policy')} 
+            <a 
+              href="/privacy-policy"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('privacy-policy');
+              }} 
               className="hover:underline cursor-pointer"
             >
               Privacy Policy
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('terms-and-conditions')} 
+            <a 
+              href="/terms-and-conditions"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('terms-and-conditions');
+              }} 
               className="hover:underline cursor-pointer"
             >
               Terms & Conditions
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('about')} 
+            <a 
+              href="/about"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('about');
+              }} 
               className="hover:underline cursor-pointer"
             >
               About Us
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('contact')} 
+            <a 
+              href="/contact"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('contact');
+              }} 
               className="hover:underline cursor-pointer"
             >
               Contact Support
-            </button>
+            </a>
             <span className="text-white/20">•</span>
-            <button 
-              onClick={() => navigateToView('order-history')} 
+            <a 
+              href="/orders"
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToView('order-history');
+              }} 
               className="hover:underline cursor-pointer flex items-center gap-1.5"
             >
               <Package className="w-3.5 h-3.5" />
               <span>Order History & Verification</span>
-            </button>
+            </a>
           </div>
           <p>© 2026 meONmode® Ayurvedic Wellness. All rights reserved.</p>
           <p className="leading-relaxed">

@@ -1,1 +1,7 @@
+# Single-hop Canonical 301 Redirects: Direct to https://meonmode.com without intermediate hops
+http://www.meonmode.com/*   https://meonmode.com/:splat   301!
+https://www.meonmode.com/*  https://meonmode.com/:splat   301!
+http://meonmode.com/*       https://meonmode.com/:splat   301!
+
+# SPA Routing Fallback
 /*    /index.html   200
