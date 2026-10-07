@@ -1345,6 +1345,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
     if (!validateForm()) return;
 
     if (checkoutStep === 1) {
+      if (!hasTrackedBeginCheckoutRef.current && cart.length > 0) {
+        hasTrackedBeginCheckoutRef.current = true;
+        trackBeginCheckout(cart, getCartTotal());
+      }
       // GA4 Recommended add_shipping_info: Customer completes shipping/delivery details
       trackAddShippingInfo(cart, getCartTotal());
       setCheckoutStep(2);
@@ -1906,6 +1910,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
               setCheckoutStep(1);
               setPaymentMethod('cod');
               setCurrentView('cart');
+              if (!hasTrackedBeginCheckoutRef.current && cart.length > 0) {
+                hasTrackedBeginCheckoutRef.current = true;
+                trackBeginCheckout(cart, getCartTotal());
+              }
             }}
             className="text-xs bg-[#C86428] text-white py-1.5 px-3 rounded-lg font-bold hover:bg-[#8B3B15] transition-colors"
           >
@@ -3009,6 +3017,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
                               onClick={(e) => {
                                 e.preventDefault();
                                 if (validateForm()) {
+                                  if (!hasTrackedBeginCheckoutRef.current && cart.length > 0) {
+                                    hasTrackedBeginCheckoutRef.current = true;
+                                    trackBeginCheckout(cart, getCartTotal());
+                                  }
                                   trackAddShippingInfo(cart, getCartTotal());
                                   setCheckoutStep(2);
                                 }
