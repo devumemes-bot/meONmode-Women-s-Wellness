@@ -93,3 +93,5 @@ export interface CheckoutDetails {
   address: string;
   pincode: string;
 }
+
+export type { CustomerReview } from './data';

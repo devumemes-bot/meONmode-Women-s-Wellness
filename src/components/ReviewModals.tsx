@@ -30,7 +30,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
     if (!files) return;
     
     // Read up to 4 images
-    const fileList = Array.from(files).slice(0, 4);
+    const fileList = Array.from(files).slice(0, 4) as File[];
     fileList.forEach(file => {
       const reader = new FileReader();
       reader.onload = (uploadEvent) => {
