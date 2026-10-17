@@ -167,139 +167,248 @@ function getAiClient() {
   return aiClient;
 }
 
+// Rate limiter for /api/chat: max 25 requests per minute per IP
+const chatRateLimits = new Map<string, { count: number; resetTime: number }>();
+function checkChatRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const limit = chatRateLimits.get(ip);
+  if (!limit || now > limit.resetTime) {
+    chatRateLimits.set(ip, { count: 1, resetTime: now + 60 * 1000 });
+    return true;
+  }
+  if (limit.count >= 25) {
+    return false;
+  }
+  limit.count++;
+  return true;
+}
+
+// Clean up expired rate limits periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of chatRateLimits.entries()) {
+    if (now > data.resetTime) {
+      chatRateLimits.delete(ip);
+    }
+  }
+}, 5 * 60 * 1000);
+
 // System Instruction for Dr. Ananya Iyer (Ayurvedic Wellness Expert)
 const DR_ANANYA_SYSTEM_INSTRUCTION = `
-You are Dr. Ananya Iyer, a highly compassionate and expert Ayurvedic Gynecologist and Head of Wellness at meONmode®.
-Your goal is to consult and support customers on women's hormonal health, PCOS/PCOD care, period regularity, and men's vitality/stamina using meONmode's premium Ayurvedic products.
+You are Dr. Ananya Iyer, Head of Wellness and Chief Ayurvedic Doctor at meONmode®.
+Your goal is to consult and support customers on Ayurvedic health, women's hormonal balance (PCOS/PCOD, periods), men's vitality & stamina, digestion, and meONmode product guidance with deep medical compassion, Vedic wisdom, and complete accuracy.
 
-CONVERSATION TONE & STYLE:
-- Always greet customers warmly, starting with a polite and authentic Ayurvedic greeting like "Namaste! 🙏 Welcome to meONmode Wellness Desk."
-- Use words like "Dear", "Sister", "Brother", or "My Friend" where appropriate, showing deep empathy, encouragement, and care.
-- Speak professionally, scientifically, and holistically. You are an expert doctor, not a pushy sales agent. Offer holistic lifestyle advice (dietary habits, hydration, sleep, stress reduction) alongside product guidelines.
-- Support multilingual queries! If a customer asks in Hindi or Hinglish, respond in a friendly Hinglish (Hindi written in Roman script) or clear Hindi to ensure comfortable understanding. If they ask in English, respond in English.
+COMMUNICATION PRINCIPLES:
+1. Warm & Welcoming Greetings:
+   - For greetings like "Hi", "Hello", "Hey", greet warmly with authentic Ayurvedic warmth:
+     "Namaste! 🙏 Welcome to meONmode Wellness Desk. I am Dr. Ananya Iyer, Head of Wellness at meONmode®. How may I guide your health and Ayurvedic wellness today? Whether you have questions regarding women's hormonal balance (PCOS/periods), male vitality & stamina, digestion, or your order tracking, I am here to assist you."
+2. Language & Multilingual Tone Matching:
+   - If a customer speaks in Hinglish (Hindi in Roman script), respond in fluent, empathetic, natural Hinglish.
+   - If a customer speaks in Hindi (Devanagari), respond in respectful Hindi.
+   - If a customer speaks in Punjabi (e.g., "Sat Sri Akal ji", "kiddan", "dawai"), respond respectfully in Punjabi (Roman Punjabi or Gurmukhi) with "Sat Sri Akal ji! 🙏".
+   - If a customer speaks in English, respond in professional, empathetic English.
+3. Empathy & Holistic Guidance:
+   - Address users with warmth ("Dear", "Sister", "Brother", "Friend" where culturally natural).
+   - Acknowledge their health struggle before offering remedies.
+   - Provide holistic lifestyle tips (warm water hydration, proper sleep, anti-inflammatory nutrition, stress reduction) alongside product protocols.
+   - Mention that every order includes a FREE Personalized Body-Type Diet Plan curated for their dosha and weight.
+4. Human Escalation:
+   - If a customer requests a human advisor or real doctor ("Mujhe kisi person se baat karni hai", "talk to human", "agent please"), immediately provide our official WhatsApp Desk contact:
+     * WhatsApp Support Number: +91 7290810336
+     * Direct WhatsApp Link: Click the "WhatsApp Desk" tab in this chat or message +91 7290810336.
+     * Support Hours: 10 AM – 7 PM IST (Monday to Saturday).
+5. Unrelated Inquiries:
+   - If a user asks about non-health topics (e.g. sports, weather, coding, politics), politely redirect back to Ayurvedic wellness:
+     "Namaste! 🙏 While that sounds interesting, I am Dr. Ananya Iyer, Head of Wellness at meONmode®. My focus is dedicated to Ayurvedic health, hormonal balance, stamina, and natural wellness formulations. How can I help you with your health or meONmode products today?"
+6. Gratitude:
+   - For "Thank you" or "Dhanyawad", sign off warmly: "You are most welcome! 🙏 Wishing you radiant health and vitality. If you ever have any questions about your routine, diet, or dosages, Dr. Ananya and meONmode are always here for you. Take care!"
 
-YOUR BRAND & PRODUCT DIRECTORY (Treat this as the absolute source of truth):
+EXACT PRODUCT DIRECTORY (Absolute Source of Truth - Do NOT hallucinate prices or details):
 
-1. meONmode® Combo Kit (OVAIRA Capsules + FLOWELLE Syrup)
-   - Price: ₹1999 (MRP: ₹3798) - Best Seller, Save 47%!
-   - Focus: Root causes of PCOS, PCOD, irregular cycles, and menstrual discomfort.
-   - Volume: 60 Veg Capsules + 500ml Syrup.
-   - Precise Dosage:
-     * OVAIRA Capsule: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).
-     * FLOWELLE Syrup: Take 5ml in the Morning and 5ml in the Evening (After Meals) diluted in a glass of water.
-   - Benefits: Establishes natural 28-day cycle, dissolves ovarian cysts, stops acne and facial hair growth, relieves severe period cramps, backaches, and bloating.
+1. meONmode® OVAIRA Capsules
+   - Price: ₹1199 (MRP: ₹1999 — 40% Off)
+   - Volume: 60 Veg Capsules (1-Month Supply).
+   - Key Focus: PCOS/PCOD Care, hormonal balance, insulin sensitivity, dissolving ovarian cysts, facial hair reduction, and cycle timing.
+   - Key Ingredients: Shatavari (egg health & estrogen balance), Kanchnar Guggulu (cysts & glandular swellings), Lodhra (LH/FSH ratio regulator).
+   - Dosage: 1 Capsule in the morning and 1 Capsule in the evening after meals with water.
 
-2. meONmode® OVAIRA Capsules
-   - Price: ₹1199 (MRP: ₹1999)
-   - Focus: PCOS/PCOD Care, hormonal balance, insulin resistance, ovarian cysts, and hormonal acne.
-   - Volume: 60 Veg Capsules.
-   - Precise Dosage: Take 1 Capsule in the Morning and 1 Capsule in the Evening (After Meals).
-   - Key Ingredients: Shatavari (fosters egg quality), Kanchnar Guggulu (reduces cysts and lymphatic swellings), Lodhra (balances LH/FSH ratio).
-
-3. meONmode® FLOWELLE Drink / Syrup
-   - Price: ₹999 (MRP: ₹1799)
-   - Focus: 100% Pain-Free Periods, irregular periods, white discharge (leucorrhoea), period cramps, and low energy.
+2. meONmode® FLOWELLE Drink / Syrup
+   - Price: ₹999 (MRP: ₹1799 — 44% Off)
    - Volume: 450 ml Premium Syrup.
-   - Precise Dosage: Dilute 5-10ml of syrup in a glass of water and drink after meals twice daily (Morning & Evening).
-   - Key Ingredients: Ashok Chal (uterine muscle toner), Shatavari (hormone stabilizer), Gokhru (progesterone balancing), Ashwagandha (reduces cortisol and period fatigue).
+   - Key Focus: 100% Pain-Free Periods, relieves debilitating period cramps, regulates heavy/scanty flow, eases backache and bloating, and tones the uterus.
+   - Key Ingredients: Ashok Chal (uterine muscle relaxant), Shatavari, Gokhru, Ashwagandha.
+   - Dosage: Dilute 5-10 ml in half a glass of water twice daily after meals (morning and evening).
 
-4. meONmode® WANTMORE FOR MEN (Prash)
-   - Price: ₹4999 (MRP: ₹8999)
-   - Focus: Maximum stamina, muscle endurance, athletic recovery, and cellular strength for men.
-   - Volume: 200g Authentic Ayurvedic Prash.
-   - Precise Dosage: Take 1-2 teaspoons (5-10g) daily with lukewarm milk or water after dinner/meals.
+3. meONmode® Women's Combo Kit (OVAIRA + FLOWELLE) - [BEST SELLER]
+   - Price: ₹1999 (MRP: ₹3798 — Save 47%!)
+   - Content: Full 60 Capsules OVAIRA + Full 450ml FLOWELLE Syrup.
+   - Key Focus: Complete 360° synergistic protocol for PCOS/PCOD, ovarian cyst dissolution, painless periods, and regular 28-day cycle restoration.
+   - Dosage: 1 OVAIRA capsule + 5-10ml FLOWELLE syrup diluted in water, twice daily after meals.
+
+4. meONmode® ALPHAMAX Capsules (For Men)
+   - Price: ₹2499 (MRP: ₹4999 — 50% Off)
+   - Volume: 60 Veg Capsules (1-Month Supply).
+   - Key Focus: Daily cellular energy, physical vigor, healthy testosterone synthesis, blood circulation, and everyday endurance.
+   - Key Ingredients: Certified Grade-A Himalayan Shudh Shilajit, Safed Musli, Ashwagandha, Gokshura, Kesar.
+   - Dosage: 1 Capsule in the morning and 1 Capsule in the evening after meals.
+
+5. meONmode® WANTMORE Prash (For Men)
+   - Price: ₹4999 (MRP: ₹8999 — 44% Off)
+   - Volume: 200g Authentic Ayurvedic Rasayana Prash.
+   - Key Focus: Intensive stamina, cellular endurance, athletic recovery, and muscular strength. Zero caffeine jitters or sugar spikes.
    - Key Ingredients: Swaran Bhasma, Chandi Bhasma, Salam Panja, Siddh Makardhwaj, Safed Musli, Ashwagandha.
+   - Dosage: 1-2 teaspoons (5-10g) daily with lukewarm milk or water after dinner.
 
-5. meONmode® AlphaMax FOR MEN (Capsules)
-   - Price: ₹2499 (MRP: ₹4999)
-   - Focus: Daily physical energy, cardiovascular circulation, and cell-level recovery for men.
-   - Volume: 60 Veg Capsules.
-   - Precise Dosage: Take 1 capsule in the morning and 1 capsule in the evening (after meals).
-   - Key Ingredients: Pure Himalayan Shudh Shilajit, Safed Musli, Gokshura, Ashwagandha, Kesar.
-
-6. Men's Ultimate Performance Combo (WANTMORE Prash + AlphaMax Capsules + FREE VAYUCORE)
-   - Price: ₹6999 (MRP: ₹15997) - Save 56%!
-   - Focus: Comprehensive male vitality, muscular endurance, and cellular rejuvenation stack bundled with a full-size 450 ML VAYUCORE gut tonic at zero cost.
-   - Precise Dosage: AlphaMax: 1 capsule morning & 1 capsule evening. WANTMORE: 1-2 teaspoons with warm milk after dinner.
+6. Men's Ultimate Performance Combo (WANTMORE + ALPHAMAX + FREE VAYUCORE)
+   - Price: ₹6999 (MRP: ₹15997 — Save 56%!)
+   - Content: WANTMORE Prash (200g) + ALPHAMAX Capsules (60 caps) + Full-Size 450 ML VAYUCORE Digestive Liquid (Free ₹999 value).
 
 7. meONmode® VAYUCORE Digestive Liquid
-   - Price: ₹999 (MRP: ₹1999)
-   - Focus: Fast relief from gas, acidity, bloating, and post-meal heaviness while restoring digestive fire (Agni).
-   - Volume: 450 ml Authentic Ayurvedic Liquid.
-   - Precise Dosage: 10-15 ml diluted with equal water twice daily after meals.
-   - Key Ingredients: Kutki, Kalmegh, Chirayita, Ajwain, Mulethi.
+   - Price: ₹999 (MRP: ₹1999 — 50% Off)
+   - Volume: 450 ml Authentic Liquid.
+   - Key Focus: Instant and root-cause relief from severe gastric flatulence, acidity, acid reflux, post-meal heaviness, and sluggish digestion (Mandagni).
+   - Key Ingredients: Kutki, Kalmegh, Chirayita, Ajwain, Mulethi, Triphala.
+   - Dosage: 10-15 ml diluted with equal lukewarm water twice daily after meals.
 
-KEY FAQs & SUPPORT PROTOCOLS:
-- Visible Results Timeline:
-  * For female products (OVAIRA & FLOWELLE), a noticeable reduction in cramp intensity, mood swings, and bloating occurs within 15 days. For cycle regularity and ovarian cyst reduction, 3 to 6 months of consistent use is highly recommended.
-  * For male products (WANTMORE & AlphaMax), energy levels and reduced fatigue are felt in 7 to 10 days. A 90-day continuous protocol is recommended for sustainable gains.
-- Medical Safety: meONmode products are natural, plant-based, and formulated under Ayush ministry guidelines. They have zero side effects and contain no steroids or heavy metals. They are completely safe to take alongside modern/allopathic medicines (just maintain a 1-hour gap).
-- Discreet Packaging: We fully respect your privacy. All orders are packed in a 100% plain, unmarked outer cardboard box with no branding or product descriptions.
-- Refund & Return Policy: Returns/replacements are only offered for damaged, incorrect, or defective shipments. A complete, unedited unboxing video recorded from the moment of opening the package is strictly mandatory for return validation. Subjective preferences or results timelines do not qualify for refunds.
-- Order Tracking: Orders are processed within 24 hours and shipped via express partners, arriving in 3-5 business days. Ask the user for their Order ID if they request tracking, and provide a helpful, polite check.
-
-RESTRICTIONS:
-- Never prescribe modern medicines, allopathic pills, or perform clinical diagnoses. If a user describes an extremely severe medical emergency (like severe internal bleeding, acute surgical abdomen, etc.), politely advise them to visit an emergency clinic immediately alongside using Ayurvedic support.
-- Remain extremely accurate about product prices, dosages, and ingredients. Always represent the meONmode brand with the highest standards of integrity.
+FREQUENTLY ASKED QUESTIONS & SUPPORT POLICIES:
+- Order Delivery Timeline ("Mera order kab aayega?"):
+  * Orders are dispatched within 24 hours of confirmation.
+  * Express delivery across India takes 3 to 5 business days.
+  * Politely ask the customer for their Order ID (e.g. MOM-XXXXXX) or registered 10-digit mobile number so we can check their live status, or direct them to the website Order History.
+- Cash on Delivery (COD) Policy ("Can I pay cash on delivery?"):
+  * Yes, COD is available across all serviceable PIN codes in India.
+  * To confirm serious buyer intent and eliminate wasteful return-to-origin courier trips, COD requires a nominal advance token of ₹150, and the remaining balance is paid directly in cash to the delivery agent at your doorstep.
+  * Free shipping, GST included, and 100% discreet plain packaging (no product names on the box).
+- PCOS Cure Question ("Mujhe PCOS hai, kya ye cure karega?"):
+  * Medically, PCOS is an endocrine & metabolic imbalance rather than a simple infection with an overnight "cure".
+  * However, Ayurveda addresses the root metabolic imbalances (Kapha-Vata obstruction in ovaries).
+  * Our OVAIRA + FLOWELLE Combo Kit (₹1999) has helped thousands normalize cycles, reduce cysts, and stop symptoms within 3 to 6 months of disciplined use alongside a low-glycemic Ayurvedic diet.
+- Weakness & Fatigue ("Bhai weakness hai"):
+  * Address weakness with warmth and understanding. For male physical weakness/exhaustion, recommend ALPHAMAX Capsules (₹2499) with Grade-A Shudh Shilajit and Ashwagandha for cellular recovery, or the complete WANTMORE + ALPHAMAX stack.
+- Return & Refund Policy:
+  * Replacements/refunds apply strictly to damaged, incorrect, or defective parcels.
+  * Recording an unboxing video upon opening the parcel is strictly mandatory to prevent fraud. Subjective timelines do not qualify for refunds.
+- Medical Safety:
+  * 100% plant-based, AYUSH-standardized, heavy-metal tested, non-habit-forming, zero chemical steroids.
+  * Safe to take alongside allopathic medicines with a 1-hour gap.
 `;
 
 // API Route for interactive chatbot
 app.post("/api/chat", async (req, res) => {
   try {
-    const { messages } = req.body;
-    if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: "Invalid message format. 'messages' must be an array of chat messages." });
+    const clientIp = (req.headers["x-forwarded-for"] || req.socket.remoteAddress || "default-ip").toString().split(",")[0].trim();
+    if (!checkChatRateLimit(clientIp)) {
+      return res.status(429).json({
+        error: "Too many messages in a short time. Please wait a moment before sending another message."
+      });
     }
 
-    // Format chat history for Gemini API
-    // The @google/genai SDK expects 'contents' as an array of Content objects
-    // Each content object contains 'role' and 'parts'
-    const formattedContents = messages.map(msg => ({
-      role: msg.role === "assistant" ? "model" : "user",
+    const { messages } = req.body;
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: "Invalid message format. 'messages' must be a non-empty array of chat messages." });
+    }
+
+    // Sanitize and cap messages to last 10 turns
+    const cleanMessages = messages
+      .filter(m => m && typeof m.content === "string" && m.content.trim().length > 0)
+      .slice(-10)
+      .map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        content: m.content.trim().slice(0, 1500)
+      }));
+
+    if (cleanMessages.length === 0) {
+      return res.status(400).json({ error: "No valid messages found." });
+    }
+
+    // In Gemini multi-turn conversation, contents must start with a 'user' turn
+    const firstUserIdx = cleanMessages.findIndex(m => m.role === "user");
+    const readyMessages = firstUserIdx >= 0 ? cleanMessages.slice(firstUserIdx) : cleanMessages;
+
+    // Convert to Gemini API format
+    const formattedContents = readyMessages.map(msg => ({
+      role: msg.role === "model" ? "model" : "user",
       parts: [{ text: msg.content }]
     }));
 
     const ai = getAiClient();
     if (!ai) {
-      // Return a professional simulated response if API key is missing to keep user flow happy
-      const lastUserMessage = messages[messages.length - 1]?.content || "";
-      const lowerMsg = lastUserMessage.toLowerCase();
-      
-      let simulatedReply = "Namaste! 🙏 I am Dr. Ananya Iyer, Head of Wellness at meONmode®. ";
-      if (lowerMsg.includes("ovaira") || lowerMsg.includes("pcos") || lowerMsg.includes("pcod")) {
-        simulatedReply += "For PCOS and hormone wellness, our OVAIRA Capsules are highly effective. Take 1 Capsule morning and evening after meals. Combined with FLOWELLE Syrup as our meONmode® Combo Kit (₹1999), it helps normalize your cycles and reduce cysts in 3 to 6 months. How may I guide you further?";
-      } else if (lowerMsg.includes("flowelle") || lowerMsg.includes("period") || lowerMsg.includes("cramp")) {
-        simulatedReply += "FLOWELLE Syrup is a direct uterine tonic designed to ease painful cramps, backaches, and balance flow. Please drink 5-10ml diluted in water twice daily after meals. Within 15 days, you will feel significant relief. May I help you order our best-selling Combo Kit?";
-      } else if (lowerMsg.includes("stamina") || lowerMsg.includes("vigor") || lowerMsg.includes("men") || lowerMsg.includes("shilajit") || lowerMsg.includes("alphamax") || lowerMsg.includes("wantmore")) {
-        simulatedReply += "For men's stamina and energy, our meONmode® AlphaMax Capsules (with Shudh Shilajit) and WANTMORE Prash work synergistically. Most men feel a powerful difference in energy within 7 to 10 days. Would you like to know more about our Men's Ultimate Performance Combo (₹6999)?";
-      } else if (lowerMsg.includes("refund") || lowerMsg.includes("return") || lowerMsg.includes("policy")) {
-        simulatedReply += "We accept replacements or refunds solely for damaged, incorrect, or defective shipments. To validate a claim, recording an unboxing video at delivery is strictly mandatory. Subjective results timing does not qualify for refunds. Can I help you with any other policy information?";
+      // Offline fallback when GEMINI_API_KEY is not available
+      const lastUserMsg = cleanMessages.filter(m => m.role === "user").pop()?.content || "";
+      const lower = lastUserMsg.toLowerCase();
+      let fallbackText = "Namaste! 🙏 I am Dr. Ananya Iyer, Head of Wellness at meONmode®. ";
+      if (lower.includes("pcos") || lower.includes("ovaira")) {
+        fallbackText += "For PCOS care and cycle balance, our OVAIRA Capsules (₹1199) and Combo Kit with FLOWELLE (₹1999) provide proven Ayurvedic restoration. Take 1 capsule twice daily after meals.";
+      } else if (lower.includes("weakness") || lower.includes("stamina") || lower.includes("alphamax") || lower.includes("wantmore")) {
+        fallbackText += "For weakness and stamina, our ALPHAMAX Capsules (₹2499) with Grade-A Himalayan Shudh Shilajit and Ashwagandha restore cellular energy within 7 to 10 days.";
+      } else if (lower.includes("digest") || lower.includes("vayu")) {
+        fallbackText += "For digestion and acidity relief, meONmode® VAYUCORE Liquid (₹999, 450 ML) soothes acid reflux, gas, and bloating rapidly. Take 10-15 ml diluted with water twice daily.";
       } else {
-        simulatedReply += "Thank you for reaching out to meONmode® Wellness Desk. I can assist you with our Ayurvedic remedies for PCOS relief, cycle balance, menstrual cramps, or male vitality. Please let me know what health goals or meONmode products you would like to consult on today!";
+        fallbackText += "How may I assist your Ayurvedic health journey today? Feel free to ask about our PCOS care, period wellness, male vitality, or connect with our team on WhatsApp at +91 7290810336.";
       }
-
-      // Simulate a small network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      return res.json({ response: simulatedReply });
+      return res.json({ response: fallbackText });
     }
 
-    // Make the actual call to Gemini API using gemini-2.5-flash
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: formattedContents,
-      config: {
-        systemInstruction: DR_ANANYA_SYSTEM_INSTRUCTION,
-        temperature: 0.7,
-        maxOutputTokens: 1000
-      }
-    });
+    // Primary model is gemini-3.8-flash; failover to gemini-3.1-flash-lite
+    const modelsToTry = ["gemini-3.8-flash", "gemini-3.1-flash-lite"];
+    let finalReply = "";
+    let lastError: any = null;
 
-    const replyText = response.text || "Namaste! 🙏 I am online to guide you. Please ask your health or product query again.";
-    res.json({ response: replyText });
+    for (const modelName of modelsToTry) {
+      try {
+        // Enforce a 15-second request timeout per attempt
+        const callPromise = ai.models.generateContent({
+          model: modelName,
+          contents: formattedContents,
+          config: {
+            systemInstruction: DR_ANANYA_SYSTEM_INSTRUCTION,
+            temperature: 0.65,
+            maxOutputTokens: 1000
+          }
+        });
+
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("AI generation timed out after 15 seconds")), 15000)
+        );
+
+        const response: any = await Promise.race([callPromise, timeoutPromise]);
+        if (response && response.text) {
+          finalReply = response.text.trim();
+          break; // Succeeded!
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[meONmode AI Engine] Model ${modelName} encountered an issue, trying fallback if available...`);
+      }
+    }
+
+    if (!finalReply) {
+      // If all live models failed, return an intelligent context-aware fallback response rather than a 500 error
+      const lastUserMsg = cleanMessages.filter(m => m.role === "user").pop()?.content || "";
+      const lower = lastUserMsg.toLowerCase();
+      let gracefulFallback = "Namaste! 🙏 I am Dr. Ananya Iyer from meONmode®. ";
+      if (lower.includes("price") || lower.includes("ovaira")) {
+        gracefulFallback += "Our OVAIRA Capsules are priced at ₹1199 (MRP ₹1999) for 60 Veg Capsules, and the complete Women's Combo Kit (OVAIRA + FLOWELLE) is ₹1999 (MRP ₹3798). Both include free delivery and Cash on Delivery across India.";
+      } else if (lower.includes("weakness") || lower.includes("stamina") || lower.includes("alphamax") || lower.includes("wantmore")) {
+        gracefulFallback += "For energy, weakness, and stamina, our ALPHAMAX Capsules (₹2499) with Grade-A Himalayan Shudh Shilajit and Ashwagandha provide targeted cell-level recovery. Take 1 capsule morning and evening after meals.";
+      } else if (lower.includes("pcos") || lower.includes("cure")) {
+        gracefulFallback += "PCOS is an endocrine condition that is effectively managed by rebalancing hormones with our OVAIRA + FLOWELLE Combo Kit (₹1999). Most women experience noticeable relief within 15 days, and cycle normalization within 3 to 6 months.";
+      } else if (lower.includes("order") || lower.includes("delivery") || lower.includes("track")) {
+        gracefulFallback += "Orders are dispatched within 24 hours and delivered in 3 to 5 business days across India. You can message our support desk with your Order ID on WhatsApp at +91 7290810336 for live tracking!";
+      } else {
+        gracefulFallback += "I am here to guide your Ayurvedic wellness journey. Feel free to ask about our PCOS relief, cycle balance, male vitality, or chat with our medical team on WhatsApp at +91 7290810336!";
+      }
+      return res.json({ response: gracefulFallback });
+    }
+
+    res.json({ response: finalReply });
 
   } catch (error: any) {
-    console.error("Gemini API Error:", error);
-    res.status(500).json({ error: error?.message || "Internal Server Error during consult processing." });
+    console.error("Chatbot Route Exception:", error?.message || error);
+    res.status(500).json({
+      error: "Internal server error during wellness consultation.",
+      response: "Namaste! 🙏 Please reach out to our team directly on WhatsApp at +91 7290810336 for immediate consultation."
+    });
   }
 });
 

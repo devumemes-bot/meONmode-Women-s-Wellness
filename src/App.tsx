@@ -908,29 +908,13 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
   const scrollToBuyingDetails = scrollToPricingDetails;
 
-  const [showWhatsAppChat, setShowWhatsAppChat] = useState<boolean>(false);
-  const [whatsAppMessage, setWhatsAppMessage] = useState<string>('');
-  const [whatsAppTopic, setWhatsAppTopic] = useState<string>('general');
-
-  // AI Chatbot States (Dr. Ananya AI Consultant)
-  const [chatTab, setChatTab] = useState<'ai' | 'whatsapp'>('ai');
-  const [aiInput, setAiInput] = useState<string>('');
-  const [isAiTyping, setIsAiTyping] = useState<boolean>(false);
-  const [aiMessages, setAiMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([
-    {
-      role: 'assistant',
-      content: "Namaste! 🙏 I am Dr. Ananya Iyer, Head of Wellness at meONmode®. How may I guide your Ayurvedic hormone balance, PCOS relief, cycle regularity, or male vitality journey today?"
+  const [showWhatsAppChat, setShowWhatsAppChat] = useState<boolean>(() => {
+    try {
+      return typeof window !== 'undefined' && sessionStorage.getItem('meonmode_chat_open_v1') === 'true';
+    } catch {
+      return false;
     }
-  ]);
-
-  // Auto scroll chat to bottom only when open
-  useEffect(() => {
-    if (showWhatsAppChat && chatEndRef.current) {
-      requestAnimationFrame(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      });
-    }
-  }, [aiMessages, isAiTyping, showWhatsAppChat, chatTab]);
+  });
 
   // Ensure checkout details are completely empty on mount so actual customers can type cleanly
   useEffect(() => {
@@ -1161,43 +1145,6 @@ Payment has been cryptographically verified on the backend server. Please dispat
     setMeta('name', 'twitter:description', seo.description);
     setMeta('name', 'twitter:image', seo.ogImage);
   }, [currentView, selectedProduct, selectedBlogSlug]);
-
-  const handleSendAiMessage = async (customText?: string) => {
-    const textToSend = customText || aiInput;
-    if (!textToSend.trim()) return;
-
-    const updatedMessages = [...aiMessages, { role: 'user' as const, content: textToSend }];
-    setAiMessages(updatedMessages);
-    if (!customText) setAiInput('');
-    setIsAiTyping(true);
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: updatedMessages })
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to fetch from wellness engine');
-      }
-
-      const data = await res.json();
-      setAiMessages(prev => [...prev, { role: 'assistant' as const, content: data.response }]);
-    } catch (err) {
-      console.error("AI Consult Error:", err);
-      // Fallback friendly message
-      setAiMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant' as const,
-          content: "Thank you for consulting. I'm experiencing a brief connection delay with our AI engine. Feel free to ask about our PCOS Combo Kit (₹1999), OVAIRA (₹1199) or FLOWELLE (₹999) prices, dosages, or unboxing policy, or select the WhatsApp tab to chat directly with our medical support desk!"
-        }
-      ]);
-    } finally {
-      setIsAiTyping(false);
-    }
-  };
 
   // Auto-switch to home view when user starts searching
   useEffect(() => {

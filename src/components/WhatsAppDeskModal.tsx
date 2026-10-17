@@ -7,25 +7,64 @@ interface WhatsAppDeskModalProps {
   lastOrderId: string | null;
 }
 
+const DEFAULT_WELCOME_MESSAGE = {
+  role: 'assistant' as const,
+  content: "Namaste! 🙏 Welcome to meONmode Wellness Desk. I am Dr. Ananya Iyer, Head of Wellness at meONmode®. How may I guide your Ayurvedic hormone balance, PCOS relief, male vitality & stamina, or order dispatch tracking today?"
+};
+
 export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
   showWhatsAppChat,
   setShowWhatsAppChat,
   lastOrderId
 }) => {
-  const [chatTab, setChatTab] = useState<'ai' | 'whatsapp'>('whatsapp');
+  // Session-persisted tab selection
+  const [chatTab, setChatTab] = useState<'ai' | 'whatsapp'>(() => {
+    try {
+      const saved = sessionStorage.getItem('meonmode_chat_tab_v1');
+      if (saved === 'ai' || saved === 'whatsapp') return saved;
+    } catch {}
+    return 'ai';
+  });
+
   const [whatsAppTopic, setWhatsAppTopic] = useState<string>('general');
   const [whatsAppMessage, setWhatsAppMessage] = useState<string>('');
   
-  // AI Doctor State
-  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
-    {
-      role: 'assistant',
-      content: "Namaste! 🙏 I am Dr. Ananya. How may we guide your Ayurvedic hormone balance, PCOS relief, stamina, or order dispatch tracking today?"
-    }
-  ]);
+  // Session-persisted AI conversation state so users don't lose chat when browsing pages
+  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>(() => {
+    try {
+      const saved = sessionStorage.getItem('meonmode_chat_history_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [DEFAULT_WELCOME_MESSAGE];
+  });
+
   const [aiInput, setAiInput] = useState<string>('');
   const [isAiTyping, setIsAiTyping] = useState<boolean>(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Sync open state with sessionStorage so navigating between pages keeps the chat active
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('meonmode_chat_open_v1', showWhatsAppChat ? 'true' : 'false');
+    } catch {}
+  }, [showWhatsAppChat]);
+
+  // Sync tab selection with sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('meonmode_chat_tab_v1', chatTab);
+    } catch {}
+  }, [chatTab]);
+
+  // Sync conversation history with sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('meonmode_chat_history_v1', JSON.stringify(aiMessages));
+    } catch {}
+  }, [aiMessages]);
 
   useEffect(() => {
     if (showWhatsAppChat && chatEndRef.current) {
@@ -34,8 +73,9 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
   }, [aiMessages, isAiTyping, showWhatsAppChat, chatTab]);
 
   const handleSendAiMessage = async (customText?: string) => {
-    const textToSend = customText || aiInput;
-    if (!textToSend.trim()) return;
+    if (isAiTyping) return; // Prevent duplicate submissions
+    const textToSend = (customText || aiInput).trim();
+    if (!textToSend) return;
 
     const updatedMessages = [...aiMessages, { role: 'user' as const, content: textToSend }];
     setAiMessages(updatedMessages);
@@ -50,19 +90,24 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
       });
 
       if (!res.ok) {
-        throw new Error('Failed to fetch from wellness engine');
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || 'Failed to fetch from wellness engine');
       }
 
       const data = await res.json();
-      setAiMessages(prev => [...prev, { role: 'assistant' as const, content: data.response }]);
-    } catch (err) {
-      console.error("AI Consult Error:", err);
-      // Fallback friendly message
+      if (data && data.response) {
+        setAiMessages(prev => [...prev, { role: 'assistant' as const, content: data.response }]);
+      } else {
+        throw new Error('Empty response from AI engine');
+      }
+    } catch (err: any) {
+      console.warn("AI Consult notice:", err?.message || err);
+      // Graceful, non-intrusive fallback with real product details & WhatsApp direct link
       setAiMessages(prev => [
         ...prev,
         {
           role: 'assistant' as const,
-          content: "Thank you for consulting. I'm experiencing a brief connection delay with our AI engine. Feel free to ask about our PCOS Combo Kit (₹1999), OVAIRA (₹1199) or FLOWELLE (₹999) prices, dosages, or unboxing policy, or select the WhatsApp tab to chat directly with our medical support desk!"
+          content: "Namaste! 🙏 I'm experiencing a brief connection delay with our server. Feel free to ask about our OVAIRA PCOS Capsules (₹1199), FLOWELLE Syrup (₹999), or ALPHAMAX Shilajit (₹2499), or click the WhatsApp tab to chat directly with our medical desk at +91 7290810336!"
         }
       ]);
     } finally {
@@ -71,39 +116,39 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       {/* Expanded Chat Desk Card */}
       {showWhatsAppChat && (
-        <div className="mb-4 w-[320px] sm:w-[380px] bg-neutral-950/95 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left backdrop-blur-md animate-fade-in z-50">
+        <div className="mb-3 w-[calc(100vw-2rem)] max-w-[360px] sm:max-w-[380px] max-h-[82vh] bg-neutral-950/95 border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col text-left backdrop-blur-md animate-fade-in z-50">
           {/* Widget Header */}
-          <div className="bg-gradient-to-r from-emerald-950 via-[#1C110D] to-[#4A1D05] p-4 border-b border-white/10 relative">
+          <div className="bg-gradient-to-r from-emerald-950 via-[#1C110D] to-[#4A1D05] p-3.5 sm:p-4 border-b border-white/10 relative shrink-0">
             <button
               type="button"
               onClick={() => setShowWhatsAppChat(false)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white cursor-pointer hover:scale-110 transition-all p-1 rounded-full bg-black/40 border border-white/5"
+              className="absolute top-3.5 right-3.5 text-white/50 hover:text-white cursor-pointer hover:scale-110 transition-all p-1.5 rounded-full bg-black/40 border border-white/10"
               aria-label="Close Chat Widget"
             >
               <X className="w-3.5 h-3.5" />
             </button>
             
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] flex items-center justify-center border border-white/20 text-white font-serif text-lg font-extrabold shadow-inner overflow-hidden">
+            <div className="flex items-center gap-3 pr-8">
+              <div className="relative shrink-0">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-[#8B3B15] to-[#4A1D05] flex items-center justify-center border border-white/20 text-white font-serif text-base sm:text-lg font-extrabold shadow-inner overflow-hidden">
                   🌱
                 </div>
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-neutral-950 animate-pulse"></span>
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-neutral-950 animate-pulse"></span>
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-white tracking-wide">meONmode Wellness Desk</h4>
+              <div className="min-w-0">
+                <h4 className="text-xs font-bold text-white tracking-wide truncate">meONmode Wellness Desk</h4>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                  <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider font-mono">Advisors Online</span>
+                  <span className="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider font-mono">Dr. Ananya Online</span>
                 </div>
               </div>
             </div>
 
             {/* Tab Selector Buttons */}
-            <div className="flex gap-2 mt-4 bg-black/40 p-1 rounded-xl border border-white/5">
+            <div className="flex gap-2 mt-3 bg-black/40 p-1 rounded-xl border border-white/5">
               <button
                 type="button"
                 onClick={() => setChatTab('ai')}
@@ -131,21 +176,21 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
 
           {/* AI Consultant Chat Mode */}
           {chatTab === 'ai' && (
-            <>
+            <div className="flex flex-col flex-grow min-h-0">
               {/* Chat Log Window */}
-              <div className="p-4 space-y-4 h-[300px] overflow-y-auto custom-scrollbar flex flex-col">
+              <div className="p-3.5 sm:p-4 space-y-3.5 h-[270px] sm:h-[300px] overflow-y-auto custom-scrollbar flex flex-col">
                 {aiMessages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`flex flex-col max-w-[85%] ${
+                    className={`flex flex-col max-w-[88%] ${
                       msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'
                     }`}
                   >
                     <div
-                      className={`p-3 rounded-2xl leading-relaxed text-xs leading-normal font-sans shadow-sm border ${
+                      className={`p-3 rounded-2xl text-xs leading-relaxed font-sans shadow-sm border ${
                         msg.role === 'user'
-                          ? 'bg-[#5C1D13] border-[#8B3B15]/20 text-[#FAF6F0] rounded-tr-none'
-                          : 'bg-white/5 border-white/5 text-neutral-200 rounded-tl-none'
+                          ? 'bg-[#5C1D13] border-[#8B3B15]/30 text-[#FAF6F0] rounded-tr-none'
+                          : 'bg-white/5 border-white/10 text-neutral-200 rounded-tl-none'
                       }`}
                     >
                       {msg.content}
@@ -158,13 +203,13 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
 
                 {/* Pulsing Loading dots for AI Typing */}
                 {isAiTyping && (
-                  <div className="flex flex-col items-start max-w-[85%] self-start">
-                    <div className="bg-white/5 border border-white/5 text-neutral-200 text-xs px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5 shadow-sm">
-                      <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce"></span>
-                      <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                      <span className="w-1.5 h-1.5 bg-neutral-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                  <div className="flex flex-col items-start max-w-[88%] self-start">
+                    <div className="bg-white/5 border border-white/10 text-neutral-200 text-xs px-3.5 py-2.5 rounded-2xl rounded-tl-none flex items-center gap-1.5 shadow-sm">
+                      <span className="w-1.5 h-1.5 bg-[#E5A93C] rounded-full animate-bounce"></span>
+                      <span className="w-1.5 h-1.5 bg-[#E5A93C] rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                      <span className="w-1.5 h-1.5 bg-[#E5A93C] rounded-full animate-bounce [animation-delay:0.4s]"></span>
                     </div>
-                    <span className="text-[8px] text-neutral-500 font-mono mt-1 px-1">Dr. Ananya is analyzing...</span>
+                    <span className="text-[8px] text-neutral-500 font-mono mt-1 px-1">Dr. Ananya is consulting...</span>
                   </div>
                 )}
                 
@@ -173,18 +218,20 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
               </div>
 
               {/* Quick Helper Suggestion Chips */}
-              <div className="px-4 pb-2 pt-1 flex flex-wrap gap-1.5 border-t border-white/5 max-h-[80px] overflow-y-auto custom-scrollbar">
+              <div className="px-3 pb-2 pt-1 flex flex-wrap gap-1.5 border-t border-white/5 max-h-[85px] overflow-y-auto custom-scrollbar shrink-0 bg-black/20">
                 {[
-                  "🌸 PCOS Treatment Guidance?",
-                  "🩸 How to use OVAIRA/FLOWELLE?",
-                  "⚡ Men's Vitality/Stamina?",
-                  "📦 Mandates for Returns?"
+                  "🌸 PCOS Guidance",
+                  "🩸 OVAIRA Price",
+                  "⚡ Men's Stamina & Shilajit",
+                  "🌿 Gas & Digestion",
+                  "📦 Track My Order"
                 ].map((chipText, cidx) => (
                   <button
                     key={cidx}
                     type="button"
+                    disabled={isAiTyping}
                     onClick={() => handleSendAiMessage(chipText)}
-                    className="bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white/80 hover:text-white px-2.5 py-1 rounded-full text-[9px] font-bold transition-all cursor-pointer"
+                    className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white/80 hover:text-white px-2.5 py-1 rounded-full text-[9px] font-bold transition-all cursor-pointer disabled:opacity-50"
                   >
                     {chipText}
                   </button>
@@ -197,25 +244,26 @@ export const WhatsAppDeskModal: React.FC<WhatsAppDeskModalProps> = ({
                   e.preventDefault();
                   handleSendAiMessage();
                 }}
-                className="p-3 bg-black/40 border-t border-white/5 flex gap-2 items-center"
+                className="p-2.5 sm:p-3 bg-black/40 border-t border-white/5 flex gap-2 items-center shrink-0"
               >
                 <input
                   type="text"
                   value={aiInput}
                   onChange={(e) => setAiInput(e.target.value)}
                   placeholder="Ask Dr. Ananya about Ayurvedic wellness..."
-                  className="flex-grow bg-white/5 border border-white/10 focus:border-[#E5A93C] focus:ring-1 focus:ring-[#E5A93C] rounded-xl px-3 py-2 text-xs text-white placeholder-white/30 focus:outline-none transition-all"
+                  className="flex-grow bg-white/5 border border-white/10 focus:border-[#E5A93C] focus:ring-1 focus:ring-[#E5A93C] rounded-xl px-3 py-2 text-xs text-white placeholder-white/30 focus:outline-none transition-all disabled:opacity-50"
                   disabled={isAiTyping}
                 />
                 <button
                   type="submit"
                   disabled={isAiTyping || !aiInput.trim()}
-                  className="bg-[#E5A93C] hover:bg-[#F2B94C] text-[#2D120B] p-2 rounded-xl transition-all active:scale-90 disabled:opacity-40 disabled:scale-100 flex items-center justify-center shrink-0 cursor-pointer"
+                  className="bg-[#E5A93C] hover:bg-[#F2B94C] text-[#2D120B] p-2 rounded-xl transition-all active:scale-90 disabled:opacity-40 disabled:scale-100 flex items-center justify-center shrink-0 cursor-pointer shadow-md"
+                  aria-label="Send Message"
                 >
                   <Send className="w-4 h-4" />
                 </button>
               </form>
-            </>
+            </div>
           )}
 
           {/* Original WhatsApp Consult Mode */}
