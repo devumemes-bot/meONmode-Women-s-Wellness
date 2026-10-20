@@ -42,7 +42,8 @@ import {
   trackBeginCheckout, 
   trackAddShippingInfo, 
   trackAddPaymentInfo, 
-  trackPurchase 
+  trackPurchase,
+  trackPageView
 } from './analytics';
 
 // Code-split dynamic views and below-the-fold sections for optimal mobile FCP/LCP
@@ -556,6 +557,11 @@ export default function App() {
       if (currentView !== 'not-found') setCurrentView('not-found');
     }
   }, [location.pathname, location.search]);
+
+  // SPA Route Change & PageView Tracking for Meta Pixel & Google Analytics (Single PageView per route navigation)
+  useEffect(() => {
+    trackPageView(location.pathname);
+  }, [location.pathname]);
 
   // Always reset activeImageIndex and detailQuantity when selected product changes
   useEffect(() => {

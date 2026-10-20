@@ -11,6 +11,7 @@
  */
 
 export const GA4_MEASUREMENT_ID = 'G-WPSR26Z55Q';
+export const META_PIXEL_ID = '1110041358399519';
 
 export interface EcommerceItem {
   item_id: string;
@@ -51,6 +52,89 @@ declare global {
   interface Window {
     dataLayer?: any[];
     gtag?: (...args: any[]) => void;
+    fbq?: (...args: any[]) => void;
+    _fbq?: any;
+  }
+}
+
+/**
+ * Sanitized product category mapping for Meta Pixel.
+ * Adheres strictly to Meta's Health and Wellness policy:
+ * NEVER transmits medical conditions, diagnoses, or symptoms (e.g., PCOS, hormonal disorder, uterine issue).
+ */
+export function getSanitizedMetaCategory(productIdOrName: string): string {
+  const str = (productIdOrName || '').toLowerCase();
+  if (str.includes('mens-combo') || (str.includes('men') && str.includes('combo'))) {
+    return "Men's Wellness Combos";
+  }
+  if (str.includes('combo')) {
+    return "Women's Wellness Combos";
+  }
+  if (str.includes('ovaira') || str.includes('flowelle')) {
+    return "Women's Wellness";
+  }
+  if (str.includes('alphamax') || str.includes('wantmore') || str.includes('shilajit')) {
+    return "Men's Wellness";
+  }
+  if (str.includes('vayu')) {
+    return "Digestive Wellness";
+  }
+  return "Ayurvedic Wellness";
+}
+
+/**
+ * Safe dispatcher for Meta Pixel (fbq) tracking calls.
+ * Protects against missing window.fbq, ensures non-blocking error handling,
+ * and safeguards against transmitting personal identifying customer information (zero PII).
+ */
+export function trackMetaEvent(eventName: string, params?: Record<string, any>): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    if (typeof window.fbq === 'function') {
+      if (params) {
+        window.fbq('track', eventName, params);
+      } else {
+        window.fbq('track', eventName);
+      }
+    }
+  } catch (err) {
+    console.debug('[Meta Pixel Tracking]', eventName, err);
+  }
+}
+
+let lastTrackedPagePath: string | null = null;
+let lastTrackedPageTime = 0;
+
+/**
+ * PageView tracking for Meta Pixel and GA4/GTM in React SPA.
+ * Deduplicates rapid re-renders and pathname changes within 400ms to guarantee exactly one event.
+ */
+export function trackPageView(path?: string): void {
+  if (typeof window === 'undefined') return;
+
+  const currentPath = path || window.location.pathname || '/';
+  const now = Date.now();
+
+  if (lastTrackedPagePath === currentPath && now - lastTrackedPageTime < 400) {
+    return;
+  }
+  lastTrackedPagePath = currentPath;
+  lastTrackedPageTime = now;
+
+  // 1. Meta Pixel PageView
+  trackMetaEvent('PageView');
+
+  // 2. Google Tag Manager / GA4 dataLayer page_view
+  try {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: 'page_view',
+      page_path: currentPath,
+      page_location: window.location.href
+    });
+  } catch {
+    // Non-blocking fallback
   }
 }
 
@@ -131,7 +215,7 @@ let lastTrackedPaymentMethodTime = 0;
 const trackedPurchases = new Set<string>();
 
 /**
- * 1. view_item: Fires ONCE when a customer opens an individual product or combo page
+ * 1. view_item & ViewContent: Fires ONCE when a customer opens an individual product or combo page
  * Dynamic across all products and combos using real prices and IDs
  */
 export function trackViewItem(product: TrackableProduct): void {
@@ -144,26 +228,49 @@ export function trackViewItem(product: TrackableProduct): void {
   lastTrackedViewItemId = product.id;
   lastTrackedViewItemTime = now;
 
+  // GA4 Ecommerce view_item
   const item = mapProductToGa4Item(product, 1);
   pushEcommerceEvent('view_item', {
     currency: 'INR',
     value: Number(product.price),
     items: [item]
   });
+
+  // Meta Pixel ViewContent
+  trackMetaEvent('ViewContent', {
+    content_name: product.name,
+    content_category: getSanitizedMetaCategory(product.id || product.name),
+    content_ids: [product.id],
+    content_type: 'product',
+    value: Number(product.price),
+    currency: 'INR'
+  });
 }
 
 /**
- * 2. add_to_cart: Fires ONCE only after an item is genuinely added to the cart
+ * 2. add_to_cart & AddToCart: Fires ONCE only after an item is genuinely added to the cart
  */
 export function trackAddToCart(product: TrackableProduct, quantity = 1): void {
   if (!product || !product.id) return;
   const qty = Number(quantity) || 1;
   const price = Number(product.price) || 0;
   const item = mapProductToGa4Item(product, qty);
+
+  // GA4 Ecommerce add_to_cart
   pushEcommerceEvent('add_to_cart', {
     currency: 'INR',
     value: price * qty,
     items: [item]
+  });
+
+  // Meta Pixel AddToCart
+  trackMetaEvent('AddToCart', {
+    content_name: product.name,
+    content_category: getSanitizedMetaCategory(product.id || product.name),
+    content_ids: [product.id],
+    content_type: 'product',
+    value: price * qty,
+    currency: 'INR'
   });
 }
 
@@ -181,15 +288,35 @@ export function trackViewCart(cartItems: TrackableCartItem[], totalValue: number
 }
 
 /**
- * 4. begin_checkout: Fires ONCE when customer initiates the checkout process
+ * 4. begin_checkout & InitiateCheckout: Fires ONCE when customer initiates the checkout process
  */
 export function trackBeginCheckout(cartItems: TrackableCartItem[], totalValue: number): void {
   if (!cartItems || cartItems.length === 0) return;
   const items = cartItems.map(item => mapProductToGa4Item(item.product, item.quantity));
+
+  // GA4 Ecommerce begin_checkout
   pushEcommerceEvent('begin_checkout', {
     currency: 'INR',
     value: Number(totalValue),
     items
+  });
+
+  // Meta Pixel InitiateCheckout
+  const metaContentIds = cartItems.map(ci => ci.product.id);
+  const metaContents = cartItems.map(ci => ({
+    id: ci.product.id,
+    quantity: ci.quantity,
+    item_price: Number(ci.product.price)
+  }));
+  const totalNumItems = cartItems.reduce((acc, ci) => acc + (ci.quantity || 1), 0);
+
+  trackMetaEvent('InitiateCheckout', {
+    content_ids: metaContentIds,
+    contents: metaContents,
+    content_type: 'product',
+    num_items: totalNumItems,
+    value: Number(totalValue),
+    currency: 'INR'
   });
 }
 
@@ -266,6 +393,7 @@ export function trackPurchase(order: TrackableOrder): void {
     item_category: item.category || getProductCategory(item.id || item.name)
   }));
 
+  // GA4 Ecommerce purchase
   pushEcommerceEvent('purchase', {
     transaction_id: order.orderId,
     value: Number(order.grandTotal),
@@ -274,5 +402,24 @@ export function trackPurchase(order: TrackableOrder): void {
     shipping: 0,
     payment_type: order.paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 'Prepaid UPI',
     items
+  });
+
+  // Meta Pixel Purchase (Sanitized, confirmed orders only, zero PII, zero medical claims)
+  const metaOrderContentIds = (order.items || []).map(item => item.id || item.name.toLowerCase().replace(/\s+/g, '-'));
+  const metaOrderContents = (order.items || []).map(item => ({
+    id: item.id || item.name.toLowerCase().replace(/\s+/g, '-'),
+    quantity: Number(item.quantity || 1),
+    item_price: Number(item.price)
+  }));
+  const metaOrderNumItems = (order.items || []).reduce((acc, item) => acc + (Number(item.quantity) || 1), 0);
+
+  trackMetaEvent('Purchase', {
+    content_ids: metaOrderContentIds,
+    contents: metaOrderContents,
+    content_type: 'product',
+    num_items: metaOrderNumItems,
+    value: Number(order.grandTotal),
+    currency: 'INR',
+    order_id: order.orderId
   });
 }

@@ -5,14 +5,18 @@ import dotenv from "dotenv";
 import crypto from "crypto";
 import Razorpay from "razorpay";
 import { GoogleGenAI } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 import compression from "compression";
 
 // Load environment variables
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+// Health check endpoints for Cloud Run and container probes
+app.get(["/health", "/api/health"], (_req, res) => {
+  res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
 
 // Enable HTTP Compression for all responses (Gzip/Deflate)
 app.use(compression({
@@ -819,14 +823,17 @@ app.use(express.static(path.join(process.cwd(), "public"), {
 
 // Serve frontend assets using Vite middleware or static files
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
+  const distPath = path.join(process.cwd(), "dist");
+  const isProd = process.env.NODE_ENV === "production" || (!process.env.NODE_ENV && fs.existsSync(path.join(distPath, "index.html")));
+
+  if (!isProd) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: process.env.DISABLE_HMR !== 'true' },
       appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), "dist");
     // Long-term immutable caching for hashed production assets
     app.use(express.static(distPath, {
       maxAge: '1y',
@@ -845,7 +852,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[meONmode Server] Running on http://localhost:${PORT} in ${process.env.NODE_ENV || "development"} mode`);
+    console.log(`[meONmode Server] Running on http://localhost:${PORT} in ${isProd ? "production" : "development"} mode`);
   });
 }
 
