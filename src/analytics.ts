@@ -91,11 +91,12 @@ export function trackMetaEvent(eventName: string, params?: Record<string, any>):
   if (typeof window === 'undefined') return;
 
   try {
-    if (typeof window.fbq === 'function') {
+    const fbq = (window as any).fbq || (window as any)._fbq;
+    if (typeof fbq === 'function') {
       if (params) {
-        window.fbq('track', eventName, params);
+        fbq('track', eventName, params);
       } else {
-        window.fbq('track', eventName);
+        fbq('track', eventName);
       }
     }
   } catch (err) {
@@ -210,6 +211,8 @@ export function mapProductToGa4Item(product: TrackableProduct, quantity = 1): Ec
 // In-memory deduplication guards
 let lastTrackedViewItemId: string | null = null;
 let lastTrackedViewItemTime = 0;
+let lastTrackedAddToCartKey: string | null = null;
+let lastTrackedAddToCartTime = 0;
 let lastTrackedPaymentMethod: string | null = null;
 let lastTrackedPaymentMethodTime = 0;
 const trackedPurchases = new Set<string>();
@@ -228,48 +231,79 @@ export function trackViewItem(product: TrackableProduct): void {
   lastTrackedViewItemId = product.id;
   lastTrackedViewItemTime = now;
 
+  const itemPrice = Number(product.price) || 0;
+
   // GA4 Ecommerce view_item
   const item = mapProductToGa4Item(product, 1);
   pushEcommerceEvent('view_item', {
     currency: 'INR',
-    value: Number(product.price),
+    value: itemPrice,
     items: [item]
   });
 
-  // Meta Pixel ViewContent
+  // Meta Pixel ViewContent (Complete standard schema with contents & sanitized category)
   trackMetaEvent('ViewContent', {
     content_name: product.name,
     content_category: getSanitizedMetaCategory(product.id || product.name),
-    content_ids: [product.id],
+    content_ids: [String(product.id)],
     content_type: 'product',
-    value: Number(product.price),
+    contents: [
+      {
+        id: String(product.id),
+        quantity: 1,
+        item_price: itemPrice
+      }
+    ],
+    value: itemPrice,
     currency: 'INR'
   });
 }
 
 /**
  * 2. add_to_cart & AddToCart: Fires ONCE only after an item is genuinely added to the cart
+ * Sends standard Meta Pixel parameters: content_ids, content_type, contents, value, currency ("INR")
  */
 export function trackAddToCart(product: TrackableProduct, quantity = 1): void {
   if (!product || !product.id) return;
-  const qty = Number(quantity) || 1;
+  const qty = Number(quantity) > 0 ? Number(quantity) : 1;
   const price = Number(product.price) || 0;
-  const item = mapProductToGa4Item(product, qty);
+  const totalValue = Math.round(price * qty * 100) / 100;
 
-  // GA4 Ecommerce add_to_cart
+  // Deduplicate rapid accidental double-clicks within 500ms for identical product & quantity
+  const now = Date.now();
+  const dedupeKey = `${product.id}_${qty}`;
+  if (lastTrackedAddToCartKey === dedupeKey && now - lastTrackedAddToCartTime < 500) {
+    return;
+  }
+  lastTrackedAddToCartKey = dedupeKey;
+  lastTrackedAddToCartTime = now;
+
+  // 1. GA4 Ecommerce add_to_cart
+  const item = mapProductToGa4Item(product, qty);
   pushEcommerceEvent('add_to_cart', {
     currency: 'INR',
-    value: price * qty,
+    value: totalValue,
     items: [item]
   });
 
-  // Meta Pixel AddToCart
+  // 2. Standard Meta Pixel AddToCart Event
+  // Strictly complies with Meta e-commerce event specification:
+  // content_ids, content_type, contents, value, currency ("INR")
+  const metaContents = [
+    {
+      id: String(product.id),
+      quantity: qty,
+      item_price: price
+    }
+  ];
+
   trackMetaEvent('AddToCart', {
     content_name: product.name,
     content_category: getSanitizedMetaCategory(product.id || product.name),
-    content_ids: [product.id],
+    content_ids: [String(product.id)],
     content_type: 'product',
-    value: price * qty,
+    contents: metaContents,
+    value: totalValue,
     currency: 'INR'
   });
 }

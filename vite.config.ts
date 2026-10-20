@@ -35,6 +35,15 @@ export default defineConfig(({ mode }) => {
                 return 'vendor-icons';
               }
             }
+            if (id.includes('src/translations')) {
+              return 'data-translations';
+            }
+            if (id.includes('src/analytics')) {
+              return 'analytics';
+            }
+            if (id.includes('src/data')) {
+              return 'data-products';
+            }
           },
         },
       },
