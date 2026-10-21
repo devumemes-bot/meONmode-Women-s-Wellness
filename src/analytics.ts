@@ -91,12 +91,18 @@ export function trackMetaEvent(eventName: string, params?: Record<string, any>):
   if (typeof window === 'undefined') return;
 
   try {
-    const fbq = (window as any).fbq || (window as any)._fbq;
-    if (typeof fbq === 'function') {
+    const w = window as any;
+    if (typeof w.fbq === 'function') {
       if (params) {
-        fbq('track', eventName, params);
+        w.fbq('track', eventName, params);
       } else {
-        fbq('track', eventName);
+        w.fbq('track', eventName);
+      }
+    } else if (typeof w._fbq === 'function') {
+      if (params) {
+        w._fbq('track', eventName, params);
+      } else {
+        w._fbq('track', eventName);
       }
     }
   } catch (err) {

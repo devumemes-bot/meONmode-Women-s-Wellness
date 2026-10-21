@@ -1216,20 +1216,23 @@ Payment has been cryptographically verified on the backend server. Please dispat
 
   // Cart Functions
   const addToCart = (product: Product, quantity: number = 1) => {
-    // GA4 Recommended add_to_cart Ecommerce Event
-    trackAddToCart(product, quantity);
+    if (!product || !product.id) return;
+    const qty = Number(quantity) > 0 ? Number(quantity) : 1;
 
     setCart(prevCart => {
       const existing = prevCart.find(item => item.product.id === product.id);
       if (existing) {
         return prevCart.map(item => 
           item.product.id === product.id 
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, quantity: item.quantity + qty }
             : item
         );
       }
-      return [...prevCart, { product, quantity }];
+      return [...prevCart, { product, quantity: qty }];
     });
+
+    // Fire standard Meta Pixel AddToCart & GA4 add_to_cart event upon successful cart addition
+    trackAddToCart(product, qty);
 
     // Trigger feedback toast
     setShowToast(`${product.name} added to cart!`);
