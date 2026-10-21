@@ -6,7 +6,7 @@ import {
 import { Product } from '../types';
 import { CustomerReview, PRODUCTS, MENS_PRODUCTS } from '../data';
 import { ProductGallery } from './ProductGallery';
-import { trackViewItem } from '../analytics';
+import { trackViewItem, trackViewItemList } from '../analytics';
 
 interface ProductDetailProps {
   product: Product;
@@ -55,10 +55,23 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const [detailQuantity, setDetailQuantity] = useState<number>(1);
   const [showShareDropdown, setShowShareDropdown] = useState<boolean>(false);
 
-  // GA4 Recommended view_item Ecommerce Event
+  const isMenProduct = MENS_PRODUCTS.some(m => m.id === product.id);
+
+  // Related products strictly segregated by gender relevance
+  const relatedProducts = (isMenProduct ? menProducts : womenProducts)
+    .filter(p => p.id !== product.id);
+
+  // GA4 Recommended view_item and view_item_list Ecommerce Events
   useEffect(() => {
     if (product && product.id) {
       trackViewItem(product);
+      if (relatedProducts.length > 0) {
+        trackViewItemList(
+          relatedProducts,
+          'related_products',
+          isMenProduct ? "Complementary Men's Vitality Formulations" : "Complementary Women's Wellness Formulations"
+        );
+      }
     }
   }, [product.id]);
 
@@ -67,12 +80,6 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
   const isWishlisted = wishlist.includes(product.id);
   const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
   const stockInfo = getProductStockStatus(product.id);
-
-  const isMenProduct = MENS_PRODUCTS.some(m => m.id === product.id);
-
-  // Related products strictly segregated by gender relevance
-  const relatedProducts = (isMenProduct ? menProducts : womenProducts)
-    .filter(p => p.id !== product.id);
 
   // Helper for parsing review images safely
   const getReviewImages = (img?: string | string[]): string[] => {

@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Product } from '../types';
 import { Star, ShieldCheck, ShoppingCart, Zap, ArrowRight, SlidersHorizontal, Search, X } from 'lucide-react';
 import { optimizeCloudinaryUrl, getProductCleanSlug } from '../data';
+import { trackViewItemList, trackSelectItem } from '../analytics';
 
 interface AllProductsPageProps {
   products: Product[];
@@ -21,6 +22,18 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
   const [filterCategory, setFilterCategory] = useState<'all' | 'women' | 'men' | 'combos'>('all');
   const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high' | 'rating'>('featured');
   const [search, setSearch] = useState<string>('');
+
+  // GA4 Recommended view_item_list tracking on All Products page
+  useEffect(() => {
+    if (products && products.length > 0) {
+      trackViewItemList(products, 'all_products', 'All Products');
+    }
+  }, [products]);
+
+  const handleProductSelect = (product: Product) => {
+    trackSelectItem(product, 'all_products', 'All Products');
+    onSelectProduct(product);
+  };
 
   // Helper to categorize products
   const isMen = (p: Product) => p.id === 'wantmore-men' || p.id === 'alphamax-men' || p.id === 'mens-combo';
@@ -220,7 +233,7 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                   className="relative bg-black/40 p-6 flex items-center justify-center cursor-pointer overflow-hidden border-b border-white/5 aspect-[4/3] sm:aspect-square block"
                   onClick={(e) => {
                     e.preventDefault();
-                    onSelectProduct(product);
+                    handleProductSelect(product);
                   }}
                   aria-label={`View details for ${product.name}`}
                 >
@@ -271,7 +284,7 @@ export const AllProductsPage: React.FC<AllProductsPageProps> = ({
                           href={`/products/${getProductCleanSlug(product.id)}`}
                           onClick={(e) => {
                             e.preventDefault();
-                            onSelectProduct(product);
+                            handleProductSelect(product);
                           }}
                           className="hover:text-[#E5A93C] cursor-pointer"
                         >

@@ -38,12 +38,15 @@ import { Hero } from './components/Hero';
 import { ConcernSelector } from './components/ConcernSelector';
 import { 
   trackAddToCart, 
+  trackRemoveFromCart,
   trackViewCart, 
   trackBeginCheckout, 
   trackAddShippingInfo, 
   trackAddPaymentInfo, 
   trackPurchase,
-  trackPageView
+  trackPageView,
+  trackViewItemList,
+  trackSelectItem
 } from './analytics';
 
 // Code-split dynamic views and below-the-fold sections for optimal mobile FCP/LCP
@@ -955,6 +958,20 @@ Payment has been cryptographically verified on the backend server. Please dispat
     }
   }, [currentView, cart]);
 
+  // GA4 Recommended view_item_list tracking when customer views category collections
+  useEffect(() => {
+    if (currentView === 'home') {
+      if (activeCategory === 'women') {
+        trackViewItemList(womenProducts, 'womens_collection', "Women's Wellness Collection");
+      } else if (activeCategory === 'men') {
+        trackViewItemList(menProducts, 'mens_collection', "Men's Wellness Collection");
+      } else {
+        const allProds = Array.from(new Map([...womenProducts, ...menProducts, VAYUCORE_PRODUCT].map(p => [p.id, p])).values());
+        trackViewItemList(allProds, 'all_products', 'All Ayurvedic Products');
+      }
+    }
+  }, [currentView, activeCategory, womenProducts, menProducts]);
+
   const handleCheckoutFieldFocus = () => {
     if (!hasTrackedBeginCheckoutRef.current && cart.length > 0) {
       hasTrackedBeginCheckoutRef.current = true;
@@ -1240,6 +1257,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
   };
 
   const updateQuantity = (productId: string, delta: number) => {
+    const targetItem = cart.find(item => item.product.id === productId);
+    if (targetItem && delta < 0 && targetItem.quantity === 1) {
+      trackRemoveFromCart(targetItem.product, 1);
+    }
     setCart(prevCart => 
       prevCart.map(item => {
         if (item.product.id === productId) {
@@ -1252,6 +1273,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
   };
 
   const removeFromCart = (productId: string) => {
+    const itemToRemove = cart.find(item => item.product.id === productId);
+    if (itemToRemove) {
+      trackRemoveFromCart(itemToRemove.product, itemToRemove.quantity);
+    }
     setCart(prevCart => prevCart.filter(item => item.product.id !== productId));
   };
 
@@ -1413,6 +1438,10 @@ Payment has been cryptographically verified on the backend server. Please dispat
   };
 
   const handleProductClick = (product: Product) => {
+    const listId = activeCategory === 'men' ? 'mens_collection' : activeCategory === 'women' ? 'womens_collection' : 'all_products';
+    const listName = activeCategory === 'men' ? "Men's Wellness Collection" : activeCategory === 'women' ? "Women's Wellness Collection" : "All Ayurvedic Products";
+    trackSelectItem(product, listId, listName);
+
     setSelectedProduct(product);
     setActiveImageIndex(0);
     setDetailQuantity(1);

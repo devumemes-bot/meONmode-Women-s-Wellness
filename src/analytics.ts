@@ -20,6 +20,9 @@ export interface EcommerceItem {
   quantity: number;
   item_brand?: string;
   item_category?: string;
+  index?: number;
+  item_list_id?: string;
+  item_list_name?: string;
 }
 
 export interface TrackableProduct {
@@ -151,22 +154,16 @@ export function trackPageView(path?: string): void {
 export function getProductCategory(productIdOrName: string): string {
   const str = (productIdOrName || '').toLowerCase();
   if (str.includes('mens-combo') || (str.includes('men') && str.includes('combo'))) {
-    return "Men's Combos & Kits";
+    return "Men's Wellness Combos";
   }
   if (str.includes('combo')) {
-    return "Women's Combos & Kits";
+    return "Women's Wellness Combos";
   }
-  if (str.includes('ovaira')) {
-    return "Women's Hormonal & PCOS Care";
+  if (str.includes('ovaira') || str.includes('flowelle')) {
+    return "Women's Wellness";
   }
-  if (str.includes('flowelle')) {
-    return "Women's Period & Uterine Wellness";
-  }
-  if (str.includes('alphamax') || str.includes('shilajit')) {
-    return "Men's Vitality & Stamina";
-  }
-  if (str.includes('wantmore')) {
-    return "Men's Performance & Energy";
+  if (str.includes('alphamax') || str.includes('wantmore') || str.includes('shilajit')) {
+    return "Men's Wellness";
   }
   if (str.includes('vayu')) {
     return "Digestive Wellness";
@@ -176,7 +173,8 @@ export function getProductCategory(productIdOrName: string): string {
 
 /**
  * Universal dispatcher for Google Tag Manager & GA4 dataLayer
- * Clears previous ecommerce state to prevent parameter pollution per Google's official specification
+ * Clears previous ecommerce state ({ ecommerce: null }) before each push
+ * per Google Tag Manager GA4 official guidelines to prevent parameter leakage.
  */
 export function pushEcommerceEvent(eventName: string, ecommerceData: Record<string, any>): void {
   if (typeof window === 'undefined') return;
@@ -192,11 +190,6 @@ export function pushEcommerceEvent(eventName: string, ecommerceData: Record<stri
       event: eventName,
       ecommerce: ecommerceData
     });
-
-    // 3. Direct gtag fallback if active in the browser environment
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', eventName, ecommerceData);
-    }
   } catch (err) {
     // Fail-safe: analytics failure must never block consumer checkout or UI
     console.debug('[GA4 Tracking]', eventName, err);
@@ -215,16 +208,92 @@ export function mapProductToGa4Item(product: TrackableProduct, quantity = 1): Ec
 }
 
 // In-memory deduplication guards
+let lastTrackedViewItemListId: string | null = null;
+let lastTrackedViewItemListTime = 0;
+let lastTrackedSelectItemId: string | null = null;
+let lastTrackedSelectItemTime = 0;
 let lastTrackedViewItemId: string | null = null;
 let lastTrackedViewItemTime = 0;
 let lastTrackedAddToCartKey: string | null = null;
 let lastTrackedAddToCartTime = 0;
+let lastTrackedRemoveFromCartKey: string | null = null;
+let lastTrackedRemoveFromCartTime = 0;
 let lastTrackedPaymentMethod: string | null = null;
 let lastTrackedPaymentMethodTime = 0;
 const trackedPurchases = new Set<string>();
 
 /**
- * 1. view_item & ViewContent: Fires ONCE when a customer opens an individual product or combo page
+ * 1. view_item_list: Fires when a product collection or listing is viewed
+ * Sends item_list_id, item_list_name, and items array per GA4 recommended specification
+ */
+export function trackViewItemList(
+  items: TrackableProduct[],
+  listId = 'product_list',
+  listName = 'Product List'
+): void {
+  if (!items || items.length === 0) return;
+  const now = Date.now();
+  if (lastTrackedViewItemListId === listId && now - lastTrackedViewItemListTime < 1500) {
+    return;
+  }
+  lastTrackedViewItemListId = listId;
+  lastTrackedViewItemListTime = now;
+
+  const ecommerceItems: EcommerceItem[] = items.map((product, idx) => ({
+    item_id: product.id,
+    item_name: product.name,
+    price: Number(product.price),
+    quantity: 1,
+    item_brand: 'meONmode',
+    item_category: product.category || getProductCategory(product.id || product.name),
+    index: idx + 1,
+    item_list_id: listId,
+    item_list_name: listName
+  }));
+
+  pushEcommerceEvent('view_item_list', {
+    item_list_id: listId,
+    item_list_name: listName,
+    items: ecommerceItems
+  });
+}
+
+/**
+ * 2. select_item: Fires when customer clicks on a product from a listing/collection to view details
+ */
+export function trackSelectItem(
+  product: TrackableProduct,
+  listId = 'product_list',
+  listName = 'Product List'
+): void {
+  if (!product || !product.id) return;
+  const now = Date.now();
+  if (lastTrackedSelectItemId === product.id && now - lastTrackedSelectItemTime < 500) {
+    return;
+  }
+  lastTrackedSelectItemId = product.id;
+  lastTrackedSelectItemTime = now;
+
+  const item: EcommerceItem = {
+    item_id: product.id,
+    item_name: product.name,
+    price: Number(product.price),
+    quantity: 1,
+    item_brand: 'meONmode',
+    item_category: product.category || getProductCategory(product.id || product.name),
+    item_list_id: listId,
+    item_list_name: listName
+  };
+
+  pushEcommerceEvent('select_item', {
+    item_list_id: listId,
+    item_list_name: listName,
+    items: [item]
+  });
+}
+
+/**
+ * 3. view_item & ViewContent: Fires ONCE when a customer opens an individual product or combo page
  * Dynamic across all products and combos using real prices and IDs
  */
 export function trackViewItem(product: TrackableProduct): void {
@@ -266,7 +335,7 @@ export function trackViewItem(product: TrackableProduct): void {
 }
 
 /**
- * 2. add_to_cart & AddToCart: Fires ONCE only after an item is genuinely added to the cart
+ * 4. add_to_cart & AddToCart: Fires ONCE only after an item is genuinely added to the cart
  * Sends standard Meta Pixel parameters: content_ids, content_type, contents, value, currency ("INR")
  */
 export function trackAddToCart(product: TrackableProduct, quantity = 1): void {
@@ -315,7 +384,32 @@ export function trackAddToCart(product: TrackableProduct, quantity = 1): void {
 }
 
 /**
- * 3. view_cart: Fires when the cart drawer/view is opened with contents
+ * 5. remove_from_cart: Fires when an item is removed from the cart or quantity reduced to 0
+ */
+export function trackRemoveFromCart(product: TrackableProduct, quantity = 1): void {
+  if (!product || !product.id) return;
+  const qty = Number(quantity) > 0 ? Number(quantity) : 1;
+  const price = Number(product.price) || 0;
+  const totalValue = Math.round(price * qty * 100) / 100;
+
+  const now = Date.now();
+  const dedupeKey = `${product.id}_${qty}`;
+  if (lastTrackedRemoveFromCartKey === dedupeKey && now - lastTrackedRemoveFromCartTime < 400) {
+    return;
+  }
+  lastTrackedRemoveFromCartKey = dedupeKey;
+  lastTrackedRemoveFromCartTime = now;
+
+  const item = mapProductToGa4Item(product, qty);
+  pushEcommerceEvent('remove_from_cart', {
+    currency: 'INR',
+    value: totalValue,
+    items: [item]
+  });
+}
+
+/**
+ * 6. view_cart: Fires when the cart drawer/view is opened with contents
  */
 export function trackViewCart(cartItems: TrackableCartItem[], totalValue: number): void {
   if (!cartItems || cartItems.length === 0) return;
@@ -328,7 +422,7 @@ export function trackViewCart(cartItems: TrackableCartItem[], totalValue: number
 }
 
 /**
- * 4. begin_checkout & InitiateCheckout: Fires ONCE when customer initiates the checkout process
+ * 7. begin_checkout & InitiateCheckout: Fires ONCE when customer initiates the checkout process
  */
 export function trackBeginCheckout(cartItems: TrackableCartItem[], totalValue: number): void {
   if (!cartItems || cartItems.length === 0) return;
@@ -361,7 +455,7 @@ export function trackBeginCheckout(cartItems: TrackableCartItem[], totalValue: n
 }
 
 /**
- * 5. add_shipping_info: Fires when delivery address validation passes and customer advances to payment
+ * 8. add_shipping_info: Fires when delivery address validation passes and customer advances to payment
  */
 export function trackAddShippingInfo(cartItems: TrackableCartItem[], totalValue: number): void {
   if (!cartItems || cartItems.length === 0) return;
@@ -375,7 +469,7 @@ export function trackAddShippingInfo(cartItems: TrackableCartItem[], totalValue:
 }
 
 /**
- * 6. add_payment_info: Fires when customer selects/submits payment method
+ * 9. add_payment_info: Fires when customer selects/submits payment method
  */
 export function trackAddPaymentInfo(
   cartItems: TrackableCartItem[],
@@ -401,7 +495,7 @@ export function trackAddPaymentInfo(
 }
 
 /**
- * 7. purchase: Fires ONCE only after the order is cryptographically verified and created on the backend
+ * 10. purchase: Fires ONCE only after the order is cryptographically verified and created on the backend
  * Deduplicated via sessionStorage & memory set to prevent double-counting on page refresh/re-renders
  */
 export function trackPurchase(order: TrackableOrder): void {
